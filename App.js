@@ -1,27 +1,25 @@
-import { StatusBar } from 'expo-status-bar';
-import { StyleSheet, Text, View,Button } from 'react-native';
+import React from 'react';
+import { StyleSheet, View } from 'react-native';
+import { NavigationContainer } from '@react-navigation/native';
+import { createNativeStackNavigator } from '@react-navigation/native-stack';
+import RegisterScreen from './src/RegisterScreen'; // Importa el componente RegisterScreen
+import VerifyCodeScreen from './src/VerifyCodeScreen'; // Importa el componente VerifyCodeScreen
+//import HomeScreen from './HomeScreen';  //Importa la HomeScreen
+import axios from 'axios'; // Importa axios para realizar peticiones HTTP
+
+const Stack = createNativeStackNavigator();
 
 export default function App() {
-  const handleRegister = () => {
-    console.log('Registrarse presionado');
-    // Navegación o acción futura
-  };
-
-  const handleLogin = () => {
-    console.log('Iniciar sesión presionado');
-    // Navegación o acción futura
-  };
-
   return (
-    <View style={styles.container}>
-      <View style={styles.buttonContainer}>
-        <Button title="Registrarse" onPress={handleRegister} />
-      </View>
-      <View style={styles.buttonContainer}>
-        <Button title="Iniciar sesión" onPress={handleLogin} />
-      </View>
-      <StatusBar style="auto" />
-    </View>
+    <NavigationContainer>
+      <Stack.Navigator initialRouteName="Register">
+        {/* Define las pantallas de tu aplicación */}
+        <Stack.Screen name="Register" component={RegisterScreen} options={{ title: 'Registro' }} />
+        <Stack.Screen name="VerifyCode" component={VerifyCodeScreen} options={{ title: 'Verificación de Código' }} />
+        {/*<Stack.Screen name="Home" component={HomeScreen} options={{title: 'Home'}}/>*/}
+        {/* Agrega aquí otras pantallas que tengas (Login, Home, etc.) */}
+      </Stack.Navigator>
+    </NavigationContainer>
   );
 }
 
@@ -29,12 +27,5 @@ const styles = StyleSheet.create({
   container: {
     flex: 1,
     backgroundColor: '#fff',
-    justifyContent: 'center',
-    alignItems: 'center',
-  },
-  buttonContainer: {
-    marginVertical: 10,
-    width: 200, // Ancho fijo para los botones
   },
 });
-
