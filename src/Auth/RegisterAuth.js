@@ -8,8 +8,8 @@ const RegisterAuth = () => {
 
     const handleRegisterSuccess = (registeredEmail) => {
         setEmail(registeredEmail);
+        console.log("Email registrado:", registeredEmail); 
     };
-
     return (
         <View style={styles.container}>
             <View style={styles.formContainer}>

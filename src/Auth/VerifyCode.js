@@ -1,12 +1,15 @@
 import React, { useState } from 'react';
 import { View, Text, TextInput, Button, StyleSheet, Alert } from 'react-native';
 import axios from 'axios';
+import { useNavigation } from '@react-navigation/native'; 
+
 
 const VerifyCode = ({ email }) => {
     const [code, setCode] = useState('');
     const [loading, setLoading] = useState(false);
     const [error, setError] = useState(null);
     const [verified, setVerified] = useState(false);
+    const navigation = useNavigation();
 
     const handleVerify = async () => {
         setError(null);
@@ -17,6 +20,7 @@ const VerifyCode = ({ email }) => {
             if (response.status === 200) {
                 setVerified(true);
                 console.log("Verification successful");
+                navigation.navigate('Home');
             } else {
                 setError('Código de verificación incorrecto.');
             }
@@ -31,9 +35,10 @@ const VerifyCode = ({ email }) => {
         setError(null);
         setLoading(true);
         try {
-            const response = await axios.post('http://localhost:8080/auth/resend-code', { email });
+            const response = await axios.post('http://localhost:8081/auth/resend-code', { email });
             console.log(response.data.message);
             Alert.alert("Success", response.data.message);
+            navigation.navigate('Home');
         } catch (err) {
             setError(`Error de conexión: ${err.message}`);
         } finally {
@@ -70,18 +75,21 @@ const VerifyCode = ({ email }) => {
                 </View>
             )}
 
-            <Button
-                title={loading ? 'Verifying...' : 'Verify'}
-                onPress={handleVerify}
-                disabled={loading}
-                color="#4B9CE2"
-            />
-            <Button
-                title={loading ? 'Sending...' : 'Resend Code'}
-                onPress={handleResend}
-                disabled={loading}
-                color="#B0B0B0"
-            />
+            <View style={styles.buttonContainer}>
+    <Button
+        title={loading ? 'Verifying...' : 'Verify'}
+        onPress={handleVerify}
+        disabled={loading}
+        color="#4B9CE2"
+        style={{ marginBottom: 10 }} 
+    />
+    <Button
+        title={loading ? 'Sending...' : 'Resend Code'}
+        onPress={handleResend}
+        disabled={loading}
+        color="#B0B0B0"
+    />
+</View>
         </View>
     );
 };
@@ -97,6 +105,8 @@ const styles = StyleSheet.create({
     inputContainer: {
         width: '100%',
         marginVertical: 10,
+        marginTop: 210, 
+
     },
     label: {
         fontSize: 16,
@@ -118,6 +128,16 @@ const styles = StyleSheet.create({
     },
     errorText: {
         color: '#e74c3c',
+    },
+    buttonContainer: {
+        marginTop: 150,
+        width: '100%',
+        minHeight: 100,
+        display: 'flex',
+        flexDirection: 'column',
+        justifyContent: 'space-between',
+        paddingVertical: 10,
+        alignItems: 'center', 
     },
 });
 
