@@ -1,4 +1,5 @@
 import React, { useState } from 'react';
+import Input from '../Components/Input';
 import { View, Text, TextInput, Button, Alert, ActivityIndicator } from 'react-native';
 import axios from 'axios';
 
@@ -112,116 +113,54 @@ const RegisterForm = ({ onRegisterSuccess }) => {
 
     return (
         <View style={{ padding: 20 }}>
-            <View style={{ marginBottom: 10 }}>
-                <Text>Nombre</Text>
-                <TextInput
-                    style={{
-                        height: 40,
-                        borderColor: 'gray',
-                        borderWidth: 1,
-                        borderRadius: 5,
-                        paddingLeft: 10,
-                    }}
-                    value={name}
-                    onChangeText={(text) => setName(text)}
-                    placeholder="Ingrese su nombre"
-                />
-            </View>
-            <View style={{ marginBottom: 10 }}>
-                <Text>Apellido</Text>
-                <TextInput
-                    style={{
-                        height: 40,
-                        borderColor: 'gray',
-                        borderWidth: 1,
-                        borderRadius: 5,
-                        paddingLeft: 10,
-                    }}
-                    value={surname}
-                    onChangeText={(text) => setSurname(text)}
-                    placeholder="Ingrese su apellido"
-                />
-            </View>
-            <View style={{ marginBottom: 10 }}>
-                <Text>DNI</Text>
-                <TextInput
-                    style={{
-                        height: 40,
-                        borderColor: 'gray',
-                        borderWidth: 1,
-                        borderRadius: 5,
-                        paddingLeft: 10,
-                    }}
-                    value={dni}
-                    onChangeText={(text) => setDni(text)}
-                    placeholder="Ingrese su DNI"
-                    keyboardType="numeric"
-                />
-            </View>
-            <View style={{ marginBottom: 10 }}>
-                <Text>Teléfono</Text>
-                <TextInput
-                    style={{
-                        height: 40,
-                        borderColor: 'gray',
-                        borderWidth: 1,
-                        borderRadius: 5,
-                        paddingLeft: 10,
-                    }}
-                    value={phoneNumber}
-                    onChangeText={(text) => setPhoneNumber(text)}
-                    placeholder="Ingrese su teléfono"
-                    keyboardType="numeric"
-                />
-            </View>
-            <View style={{ marginBottom: 10 }}>
-                <Text>Email</Text>
-                <TextInput
-                    style={{
-                        height: 40,
-                        borderColor: 'gray',
-                        borderWidth: 1,
-                        borderRadius: 5,
-                        paddingLeft: 10,
-                    }}
-                    value={email}
-                    onChangeText={(text) => setEmail(text)}
-                    placeholder="Ingrese su email"
-                    keyboardType="email-address"
-                />
-            </View>
-            <View style={{ marginBottom: 10 }}>
-                <Text>Contraseña</Text>
-                <TextInput
-                    style={{
-                        height: 40,
-                        borderColor: 'gray',
-                        borderWidth: 1,
-                        borderRadius: 5,
-                        paddingLeft: 10,
-                    }}
-                    value={password}
-                    onChangeText={(text) => setPassword(text)}
-                    placeholder="Ingrese su contraseña"
-                    secureTextEntry
-                />
-            </View>
-            <View style={{ marginBottom: 10 }}>
-                <Text>Confirmar Contraseña</Text>
-                <TextInput
-                    style={{
-                        height: 40,
-                        borderColor: 'gray',
-                        borderWidth: 1,
-                        borderRadius: 5,
-                        paddingLeft: 10,
-                    }}
-                    value={confirmPassword}
-                    onChangeText={(text) => setConfirmPassword(text)}
-                    placeholder="Confirme su contraseña"
-                    secureTextEntry
-                />
-            </View>
+            <Input
+                label="Nombre"
+                value={name}
+                onChangeText={setName}
+                placeholder="Ingrese su nombre"
+            />
+            <Input
+                label="Apellido"
+                value={surname}
+                onChangeText={setSurname}
+                placeholder="Ingrese su apellido"
+            />
+            <Input
+                label="DNI"
+                value={dni}
+                onChangeText={setDni}
+                placeholder="Ingrese su DNI"
+                keyboardType="numeric"
+            />
+            <Input
+                label="Teléfono"
+                value={phoneNumber}
+                onChangeText={setPhoneNumber}
+                placeholder="Ingrese su teléfono"
+                keyboardType="numeric"
+            />
+            <Input
+                label="Email"
+                value={email}
+                onChangeText={setEmail}
+                placeholder="Ingrese su email"
+                keyboardType="email-address"
+            />
+            <Input
+                label="Contraseña"
+                value={password}
+                onChangeText={setPassword}
+                placeholder="Ingrese su contraseña"
+                secureTextEntry
+            />
+            <Input
+                label="Confirmar Contraseña"
+                value={confirmPassword}
+                onChangeText={setConfirmPassword}
+                placeholder="Confirme su contraseña"
+                secureTextEntry
+            />
+            
             {error && (
                 <View style={{ backgroundColor: '#f8d7da', padding: 10, borderRadius: 5, marginBottom: 10 }}>
                     <Text style={{ color: '#721c24' }}>Error: {error}</Text>

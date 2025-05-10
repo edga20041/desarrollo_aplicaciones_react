@@ -2,6 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { View, Text, TextInput, Button, Alert, StyleSheet, ActivityIndicator } from 'react-native';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import axios from 'axios';
+import Input from '../Components/Input';
 import { useNavigation } from '@react-navigation/native';
 
 const LoginAuth = () => {
@@ -67,16 +68,15 @@ const LoginAuth = () => {
   return (
     <View style={styles.container}>
       <Text style={styles.title}>Iniciar sesión</Text>
-      <TextInput
-        style={styles.input}
+      <Input
+        label="Correo electrónico"
         placeholder="Correo electrónico"
         keyboardType="email-address"
         value={email}
         onChangeText={setEmail}
-        autoCapitalize="none"
       />
-      <TextInput
-        style={styles.input}
+      <Input
+        label="Contraseña"
         placeholder="Contraseña"
         secureTextEntry
         value={password}
