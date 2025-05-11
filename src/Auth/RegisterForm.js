@@ -2,6 +2,7 @@ import React, { useState } from 'react';
 import Input from '../Components/Input';
 import { View, Text, TextInput, Button, Alert, ActivityIndicator } from 'react-native';
 import axios from 'axios';
+import config from '../config/config';
 
 const validateFields = (nombre, apellido, dni, phoneNumber, email, password, confirmPassword) => {
     /*
@@ -87,7 +88,7 @@ const RegisterForm = ({ onRegisterSuccess }) => {
     
         setLoading(true);
         try {
-            const response = await axios.post('http://localhost:8081/auth/register', registerRequest);
+            const response = await axios.post(`${config.API_URL}${config.AUTH.REGISTER}`, registerRequest);
             console.log('Registro exitoso:', response.data);  
             onRegisterSuccess(email);
         } catch (err) {

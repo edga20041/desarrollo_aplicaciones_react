@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
 import { View, Text, TextInput, Button, ToastAndroid } from 'react-native';
 import axios from 'axios';
+import config from '../config/config';
 
 const RecoverPasswordScreen = ({ navigation }) => {
   const [email, setEmail] = useState('');
@@ -14,7 +15,8 @@ const RecoverPasswordScreen = ({ navigation }) => {
     ToastAndroid.show("Enviando código de verificación...", ToastAndroid.LONG);
 
     try {
-      await axios.post('http://localhost:8081/auth/recover', { email });
+      await axios.post( `${config.API_URL}${config.AUTH.RECOVER}`,
+         { email });
       ToastAndroid.show("Correo enviado con un código de verificación.", ToastAndroid.SHORT);
       navigation.navigate('VerifyCodePassword', { email });
     } catch (error) {

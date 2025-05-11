@@ -1,5 +1,6 @@
 import React, { useState } from 'react';
 import { View, TextInput, Button, ToastAndroid } from 'react-native';
+import config from '../config/config';
 import axios from 'axios';
 
 const VerifyCodePasswordScreen = ({ navigation, route }) => {
@@ -13,7 +14,8 @@ const VerifyCodePasswordScreen = ({ navigation, route }) => {
     }
 
     try {
-      const response = await axios.post('http://localhost:8081/auth/validate-recovery-code', { email, code });
+      const response = await axios.post(`${config.API_URL}${config.AUTH.VERIFY_CODE}`,
+        { email, code });
 
       if (response.data?.message === "Código válido") {
         ToastAndroid.show("Código verificado.", ToastAndroid.SHORT);
@@ -31,7 +33,8 @@ const VerifyCodePasswordScreen = ({ navigation, route }) => {
   const handleResendCode = async () => {
     ToastAndroid.show("Enviando código nuevo...", ToastAndroid.SHORT);
     try {
-      await axios.post('http://TU_BACKEND/resend-recovery-code', { email });
+      await axios.post( `${config.API_URL}${config.AUTH.RESEND_CODE_RECOVERY}`,
+         { email });
       ToastAndroid.show("Código reenviado.", ToastAndroid.SHORT);
     } catch (error) {
       ToastAndroid.show("Error al reenviar el código.", ToastAndroid.SHORT);

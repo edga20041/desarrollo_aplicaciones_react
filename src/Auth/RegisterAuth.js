@@ -3,6 +3,7 @@ import { View, Text, StyleSheet } from 'react-native';
 import RegisterForm from './RegisterForm'; 
 import VerifyCode from './VerifyCode'; 
 
+
 const RegisterAuth = () => {
     const [email, setEmail] = useState(null);
 

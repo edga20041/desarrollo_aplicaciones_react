@@ -2,6 +2,7 @@ import React, { useState } from 'react';
 import { View, Text, TextInput, Button, StyleSheet, Alert } from 'react-native';
 import axios from 'axios';
 import { useNavigation } from '@react-navigation/native'; 
+import config from '../config/config';
 
 
 const VerifyCode = ({ email }) => {
@@ -15,7 +16,8 @@ const VerifyCode = ({ email }) => {
         setError(null);
         setLoading(true);
         try {
-            const response = await axios.post('http://localhost:8081/auth/verify', { email, code });
+            const response = await axios.post( `${config.API_URL}${config.AUTH.VERIFY}`,
+                 { email, code });
 
             if (response.status === 200) {
                 setVerified(true);
@@ -35,7 +37,8 @@ const VerifyCode = ({ email }) => {
         setError(null);
         setLoading(true);
         try {
-            const response = await axios.post('http://localhost:8081/auth/resend-code', { email });
+            const response = await axios.post( `${config.API_URL}${config.AUTH.RESEND_CODE}`,
+                { email });
             console.log(response.data.message);
             Alert.alert("Success", response.data.message);
             navigation.navigate('Home');

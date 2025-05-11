@@ -4,6 +4,7 @@ import AsyncStorage from '@react-native-async-storage/async-storage';
 import axios from 'axios';
 import Input from '../Components/Input';
 import { useNavigation } from '@react-navigation/native';
+import config from '../config/config';
 
 const LoginAuth = () => {
   const [email, setEmail] = useState('');
@@ -41,7 +42,7 @@ const LoginAuth = () => {
 
     setLoading(true);
     try {
-      const response = await axios.post('http://localhost:8081/auth/login', {
+      const response = await axios.post(`${config.API_URL}${config.AUTH.LOGIN}`, {
         email,
         password,
       });
