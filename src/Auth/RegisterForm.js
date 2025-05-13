@@ -1,11 +1,11 @@
 import React, { useState } from 'react';
 import Input from '../Components/Input';
-import { View, Text, TextInput, Button, Alert, ActivityIndicator } from 'react-native';
+import { View, Text, Button, Alert, ActivityIndicator } from 'react-native';
 import axios from 'axios';
 import config from '../config/config';
+import { useNavigation } from "@react-navigation/native";
 
 const validateFields = (nombre, apellido, dni, phoneNumber, email, password, confirmPassword) => {
-    /*
     if (!nombre || !apellido || !dni || !phoneNumber || !email || !password || !confirmPassword) {
         return { valid: false, message: 'Todos los campos son obligatorios.' };
     }
@@ -42,11 +42,10 @@ const validateFields = (nombre, apellido, dni, phoneNumber, email, password, con
     if (nombre.length < 2 || apellido.length < 2) {
         return { valid: false, message: 'El nombre y el apellido deben tener al menos 2 caracteres.' };
     }
-    */
     return { valid: true };
 };
 
-const RegisterForm = ({ onRegisterSuccess }) => {
+const RegisterForm = () => {
     const [name, setName] = useState('');
     const [surname, setSurname] = useState('');
     const [dni, setDni] = useState('');
@@ -56,57 +55,35 @@ const RegisterForm = ({ onRegisterSuccess }) => {
     const [confirmPassword, setConfirmPassword] = useState('');
     const [loading, setLoading] = useState(false);
     const [error, setError] = useState(null);
+    const navigation = useNavigation();
 
     const handleRegister = async () => {
         setError(null);
-        console.log('Valores antes de la validación:');
-        console.log('Nombre:', name);
-        console.log('Apellido:', surname);
-        console.log('DNI:', dni);
-        console.log('Teléfono:', phoneNumber);
-        console.log('Email:', email);
-        console.log('Contraseña:', password);
-        console.log('Confirmar Contraseña:', confirmPassword);
-        const validationResult = validateFields(name, surname, dni, email, phoneNumber, password, confirmPassword);
-    
+        const validationResult = validateFields(name, surname, dni, phoneNumber, email, password, confirmPassword);
+
         if (!validationResult.valid) {
             setError(validationResult.message || 'Error de validación.');
-            console.log("Error de validación:", validationResult.message);
             return;
         }
-    
+
         const registerRequest = {
             email,
             password,
             name,
             surname,
-            dni: Number(dni), 
-            phoneNumber: Number(phoneNumber), 
+            dni: Number(dni),
+            phoneNumber: Number(phoneNumber),
         };
-    
-        console.log('Datos a enviar al backend:', registerRequest);  
-    
+
         setLoading(true);
         try {
             const response = await axios.post(`${config.API_URL}${config.AUTH.REGISTER}`, registerRequest);
-            console.log('Registro exitoso:', response.data);  
-            onRegisterSuccess(email);
+            console.log('Registro exitoso:', response.data);
+            navigation.navigate('VerifyCode', { email });
         } catch (err) {
-            console.error('Error en la solicitud:', err);  
-            if (err.response) {
-                console.error('Error del servidor:', err.response.data);
-                if (err.response.status === 400) {
-                    setError(err.response.data.message || 'El usuario ya está registrado o datos inválidos.');
-                } else {
-                    setError('Error en el registro. Por favor, intenta nuevamente.');
-                }
-            } else if (err.request) {
-                setError('No se recibió respuesta del servidor.');
-                console.error('No se recibió respuesta del servidor:', err.request);
-            } else {
-                setError(`Error al configurar la petición: ${err.message}`);
-                console.error('Error al configurar la petición:', err.message);
-            }
+            setError(`Error de registro: ${err.message}`);
+            console.error('Error de registro:', err.response ? err.response.data : err.message);
+            Alert.alert('Error', 'Ocurrió un error durante el registro. Inténtalo de nuevo.');
         } finally {
             setLoading(false);
         }
@@ -161,12 +138,13 @@ const RegisterForm = ({ onRegisterSuccess }) => {
                 placeholder="Confirme su contraseña"
                 secureTextEntry
             />
-            
+
             {error && (
                 <View style={{ backgroundColor: '#f8d7da', padding: 10, borderRadius: 5, marginBottom: 10 }}>
                     <Text style={{ color: '#721c24' }}>Error: {error}</Text>
                 </View>
             )}
+
             {loading ? (
                 <ActivityIndicator size="large" color="#0000ff" />
             ) : (
