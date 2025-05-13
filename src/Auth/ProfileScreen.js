@@ -3,9 +3,6 @@ import { View, Text, Button, StyleSheet, Alert } from 'react-native';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import { useNavigation } from '@react-navigation/native';
 import { useEffect } from 'react';
-import { useState } from 'react';
-import config from '../config/config';
-import axios from 'axios';
 
 
 const ProfileScreen = () => {

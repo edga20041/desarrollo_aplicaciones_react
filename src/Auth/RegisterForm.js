@@ -113,7 +113,7 @@ const RegisterForm = ({ onRegisterSuccess }) => {
     };
 
     return (
-        <View style={{ padding: 20 }}>
+        <View style={{ padding: 15 }}>
             <Input
                 label="Nombre"
                 value={name}

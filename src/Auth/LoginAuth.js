@@ -97,11 +97,9 @@ const LoginAuth = () => {
 };
 
 const styles = StyleSheet.create({
-  container: { padding: 20, flex: 1, justifyContent: 'center' },
-  title: { fontSize: 24, marginBottom: 20, textAlign: 'center' },
-  input: {
-    borderWidth: 1, borderColor: '#ccc', padding: 10, marginBottom: 10, borderRadius: 5,
-  },
+  container: { padding: 35, flex: 1, justifyContent: 'center', backgroundColor: 'white'},
+  title: { fontSize: 24, marginBottom: 20, textAlign: 'center', fontWeight: 'bold', color:'#333'},
+  input: { borderWidth: 1, borderColor: '#ccc', padding: 10, marginBottom: 10, borderRadius: 5 },
   links: { marginTop: 20, alignItems: 'center' },
   link: { color: 'blue', marginTop: 10 },
 });

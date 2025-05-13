@@ -16,7 +16,7 @@ function HomeScreen({ navigation }) {
     <SafeAreaView style={styles.gradientBackground}>
       <StatusBar barStyle="light-content" backgroundColor="#232526" />
       <View style={styles.container}>
-        <Text style={styles.title}>Bienvenido a la App</Text>
+        <Text style={styles.title}>Bienvenido a DeRemate</Text>
         <TouchableOpacity style={styles.button} onPress={() => navigation.navigate('Register')}>
           <Text style={styles.buttonText}>Registrarse</Text>
         </TouchableOpacity>
@@ -62,10 +62,10 @@ const styles = StyleSheet.create({
     paddingHorizontal: 24,
   },
   title: {
-    fontSize: 32,
+    fontSize: 28,
     fontWeight: 'bold',
     color: '#fff',
-    marginBottom: 32,
+    marginBottom: 24,
     letterSpacing: 1,
     textShadowColor: '#0008',
     textShadowOffset: { width: 0, height: 2 },

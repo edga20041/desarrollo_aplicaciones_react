@@ -31,7 +31,8 @@
     "react-native-web": "^0.20.0",
     "react-redux": "^9.2.0",
     "redux-thunk": "^3.1.0",
-    "yup": "^1.6.1"
+    "yup": "^1.6.1",
+    "@expo/metro-runtime": "~5.0.4"
   },
   "devDependencies": {
     "@babel/core": "^7.20.0"

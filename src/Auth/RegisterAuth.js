@@ -28,29 +28,9 @@ const RegisterAuth = () => {
 };
 
 const styles = StyleSheet.create({
-    container: {
-        flex: 1,
-        justifyContent: 'center',
-        alignItems: 'center',
-        backgroundColor: '#f0f0f0',
-    },
-    formContainer: {
-        backgroundColor: 'white',
-        padding: 20,
-        borderRadius: 10,
-        shadowColor: '#000',
-        shadowOffset: { width: 0, height: 2 },
-        shadowOpacity: 0.1,
-        shadowRadius: 4,
-        width: '100%',
-        maxWidth: 400,
-    },
-    header: {
-        fontSize: 24,
-        fontWeight: 'bold',
-        marginBottom: 20,
-        textAlign: 'center',
-    },
+    container: { flex: 1, justifyContent: 'center', alignItems: 'center', backgroundColor: 'white'},
+    formContainer: { padding: 20, borderRadius: 10, width: '90%'},
+    header: { fontSize: 24, fontWeight: 'bold', marginBottom: 20, textAlign: 'center',},
 });
 
 export default RegisterAuth;
