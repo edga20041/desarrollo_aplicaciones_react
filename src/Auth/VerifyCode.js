@@ -24,7 +24,7 @@ const VerifyCode = ({ email }) => {
             if (response.status === 200) {
                 setVerified(true);
                 console.log("Verification successful");
-                navigation.navigate('Home');
+                navigation.replace('Home');
             } else {
                 setError('Código de verificación incorrecto.');
             }
@@ -45,7 +45,7 @@ const VerifyCode = ({ email }) => {
             );
             console.log(response.data.message);
             Alert.alert("Success", response.data.message);
-            navigation.navigate('Home');
+            navigation.replace('Home');
         } catch (err) {
             setError(`Error de conexión: ${err.message}`);
         } finally {
