@@ -7,7 +7,7 @@ import LoginAuth from './src/Auth/LoginAuth';
 import RecoverPasswordScreen from './src/Auth/RecoverPasswordScreen';
 import VerifyCodePasswordScreen from './src/Auth/VerifyCodePasswordScreen';
 import ResetPasswordScreen from './src/Auth/ResetPasswordScreen';
-import ProfileScreen from './src/Auth/ProfileScreen'; 
+import MainScreen from './src/Auth/MainScreen'; 
 
 const Stack = createNativeStackNavigator();
 
@@ -23,9 +23,6 @@ function HomeScreen({ navigation }) {
         <TouchableOpacity style={styles.button} onPress={() => navigation.navigate('Login')}>
           <Text style={styles.buttonText}>Iniciar Sesión</Text>
         </TouchableOpacity>
-        <TouchableOpacity style={styles.button} onPress={() => navigation.navigate('Profile')}>
-          <Text style={styles.buttonText}>Ir al Perfil</Text>
-        </TouchableOpacity>
       </View>
     </SafeAreaView>
   );
@@ -38,7 +35,7 @@ export default function App() {
         <Stack.Screen name="Home" component={HomeScreen} />
         <Stack.Screen name="Register" component={RegisterAuth} />
         <Stack.Screen name="Login" component={LoginAuth} />
-        <Stack.Screen name="Profile" component={ProfileScreen} /> 
+        <Stack.Screen name="Main" component={MainScreen} /> 
         
         <Stack.Screen name="RecoverPassword" component={RecoverPasswordScreen} />
         <Stack.Screen name="VerifyCodePassword" component={VerifyCodePasswordScreen} />

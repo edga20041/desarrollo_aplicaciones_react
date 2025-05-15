@@ -18,7 +18,7 @@ const LoginAuth = () => {
       if (savedToken) {
         navigation.reset({
           index: 0,
-          routes: [{ name: 'Home' }],
+          routes: [{ name: 'Main' }],
         });
       }
     };
@@ -48,12 +48,16 @@ const LoginAuth = () => {
       });
 
       const token = response.data.token;
+      const name = response.data.name;
       if (token) {
         await AsyncStorage.setItem('token', token);
+        if (name) {
+        await AsyncStorage.setItem('userName', name); 
+        }
         Alert.alert('Login exitoso', 'Bienvenido!');
         navigation.reset({
           index: 0,
-          routes: [{ name: 'Profile' }],
+          routes: [{ name: 'Main' }],
         });
       } else {
         Alert.alert('Error', 'Token no recibido.');

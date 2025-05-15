@@ -23,8 +23,15 @@ const VerifyCode = ({ email }) => {
 
             if (response.status === 200) {
                 setVerified(true);
+                const { token, name } = response.data;
+                 if (token) {
+                    await AsyncStorage.setItem('token', token);
+                }
+                if (name) {
+                 await AsyncStorage.setItem('userName', name); // <-- guardá el nombre
+                }
                 console.log("Verification successful");
-                navigation.replace('Home');
+                navigation.replace('Main');
             } else {
                 setError('Código de verificación incorrecto.');
             }
