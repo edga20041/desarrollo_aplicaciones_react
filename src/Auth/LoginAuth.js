@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { View, Text, TextInput, Button, Alert, StyleSheet, ActivityIndicator } from 'react-native';
 import AsyncStorage from '@react-native-async-storage/async-storage';
-import axios from 'axios';
+import axios from '../axiosInstance';
 import Input from '../Components/Input';
 import { useNavigation } from '@react-navigation/native';
 import config from '../config/config';
