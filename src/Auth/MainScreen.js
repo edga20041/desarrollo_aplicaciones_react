@@ -2,12 +2,14 @@ import { View, Text, Button, StyleSheet, Alert,SafeAreaView,TouchableOpacity, Im
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import { useNavigation } from '@react-navigation/native';
 import React, { useEffect, useState  } from 'react';
+import EntregasPendientes from '../Components/EntregasPendientes';
 
 
 const MainScreen = () => {
   const navigation = useNavigation();
   const [greeting, setGreeting] = useState('');
   const [userName, setUserName] = useState('');
+  const [showEntregas, setShowEntregas] = useState(false);
 
    useEffect(() => {
     const checkAuthentication = async () => {
@@ -55,18 +57,21 @@ const MainScreen = () => {
       <View style={styles.container}>
         <View style={styles.headerRow}>
           <Image
-            source={require('../../assets/avatar.png')} // Cambia la ruta si tu imagen está en otro lado
+            source={require('../../assets/avatar.png')} 
             style={styles.avatar}
           />
           <Text style={styles.greeting}>{greeting} {userName}!</Text>
         </View>
         <View style={styles.buttonRow}>
-          <TouchableOpacity style={styles.customButton} onPress={() => {/* acción para entregas */}}>
+          <TouchableOpacity style={styles.customButton} onPress={() => {setShowEntregas(true);}}>
             <Text style={styles.buttonText}>Ver Entregas</Text>
           </TouchableOpacity>
-          <TouchableOpacity style={styles.customButton} onPress={() => {/* acción para historial */}}>
+          <TouchableOpacity style={styles.customButton} onPress={() => {}}>
             <Text style={styles.buttonText}>Ver Historial</Text>
           </TouchableOpacity>
+        </View>
+        <View style={{ flex: 1, width: '100%' }}>
+          {showEntregas && <EntregasPendientes />}
         </View>
         <View style={styles.logoutContainer}>
           <TouchableOpacity style={styles.logoutButton} onPress={handleLogout}>
@@ -138,11 +143,11 @@ const styles = StyleSheet.create({
     marginBottom: 20,  
   },
   logoutButton: {
-     backgroundColor: '#fff',         // Fondo blanco
+     backgroundColor: '#fff',         
   borderRadius: 20,
   paddingVertical: 14,
   alignItems: 'center',
-  borderWidth: 2,                  // Borde visible
+  borderWidth: 2,                  
   borderColor: '#black',  
   },
   logoutText: {
