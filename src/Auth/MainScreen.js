@@ -3,6 +3,7 @@ import AsyncStorage from '@react-native-async-storage/async-storage';
 import { useNavigation } from '@react-navigation/native';
 import React, { useEffect, useState  } from 'react';
 import EntregasPendientes from '../Components/EntregasPendientes';
+import HistorialEntregas from '../Components/HistorialEntregas';
 
 
 const MainScreen = () => {
@@ -10,6 +11,7 @@ const MainScreen = () => {
   const [greeting, setGreeting] = useState('');
   const [userName, setUserName] = useState('');
   const [showEntregas, setShowEntregas] = useState(false);
+  const [showHistorial, setShowHistorial] = useState(false);
 
    useEffect(() => {
     const checkAuthentication = async () => {
@@ -63,15 +65,16 @@ const MainScreen = () => {
           <Text style={styles.greeting}>{greeting} {userName}!</Text>
         </View>
         <View style={styles.buttonRow}>
-          <TouchableOpacity style={styles.customButton} onPress={() => {setShowEntregas(true);}}>
+          <TouchableOpacity style={styles.customButton} onPress={() => {setShowEntregas(true); setShowHistorial(false);}}>
             <Text style={styles.buttonText}>Ver Entregas</Text>
           </TouchableOpacity>
-          <TouchableOpacity style={styles.customButton} onPress={() => {}}>
+          <TouchableOpacity style={styles.customButton} onPress={() => {setShowEntregas(false); setShowHistorial(true);}}>
             <Text style={styles.buttonText}>Ver Historial</Text>
           </TouchableOpacity>
         </View>
         <View style={{ flex: 1, width: '100%' }}>
           {showEntregas && <EntregasPendientes />}
+          {showHistorial && <HistorialEntregas />}
         </View>
         <View style={styles.logoutContainer}>
           <TouchableOpacity style={styles.logoutButton} onPress={handleLogout}>
