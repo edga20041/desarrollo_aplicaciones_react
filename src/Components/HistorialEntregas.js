@@ -29,7 +29,7 @@ const HistorialEntregas = () => {
     }, []);
 
     const handleEntregaPress = (entregaId) => {
-        navigation.navigate('DetalleEntregaHistorial', { entrega_id: entregaId });
+        navigation.navigate('Detalle Entrega Historial', { entrega_id: entregaId });
     };
 
     if (loading) {

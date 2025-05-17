@@ -54,7 +54,7 @@ export default function App() {
                 <Stack.Screen name="ResetPassword" component={ResetPasswordScreen} />
 
                 <Stack.Screen name="Historial" component={HistorialEntregas} />
-                <Stack.Screen name="DetalleEntregaHistorial" component={DetalleEntregaHistorial} />
+                <Stack.Screen name="Detalle Entrega Historial" component={DetalleEntregaHistorial} />
             </Stack.Navigator>
         </NavigationContainer>
     );
