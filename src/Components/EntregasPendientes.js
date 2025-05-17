@@ -1,6 +1,8 @@
 import React, { useEffect, useState } from 'react';
 import { View, Text, FlatList, ActivityIndicator, StyleSheet } from 'react-native';
 import axios from '../axiosInstance';
+import { useNavigation } from '@react-navigation/native';
+import config from '../config/config';
 
 const EntregasPendientes = () => {
   const [entregas, setEntregas] = useState([]);
@@ -9,7 +11,7 @@ const EntregasPendientes = () => {
   useEffect(() => {
     const fetchEntregas = async () => {
       try {
-        const response = await axios.get('/entregas/pendientes');
+        const response = await axios.get(config.ENTREGAS.PENDIENTES);
         setEntregas(response.data);
       } catch (error) {
         setEntregas([]);
