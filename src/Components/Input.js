@@ -12,6 +12,7 @@ const Input = ({ label, value, onChangeText, placeholder, keyboardType = 'defaul
                     borderWidth: 1,
                     borderRadius: 5,
                     paddingLeft: 10,
+                    marginBottom: 5,
                 }}
                 value={value}
                 onChangeText={onChangeText}

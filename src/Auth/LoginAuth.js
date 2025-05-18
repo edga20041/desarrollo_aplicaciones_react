@@ -1,16 +1,23 @@
 import React, { useState, useEffect } from 'react';
-import { View, Text, TextInput, Button, Alert, StyleSheet, ActivityIndicator } from 'react-native';
+import { View, Text, TextInput, TouchableOpacity, Alert, StyleSheet, ActivityIndicator, Platform, StatusBar } from 'react-native';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import axios from '../axiosInstance';
 import Input from '../Components/Input';
 import { useNavigation } from '@react-navigation/native';
 import config from '../config/config';
+import { LinearGradient } from 'expo-linear-gradient';
+import { useFonts, Montserrat_400Regular, Montserrat_600SemiBold, Montserrat_700Bold } from '@expo-google-fonts/montserrat';
 
 const LoginAuth = () => {
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [loading, setLoading] = useState(false);
   const navigation = useNavigation();
+  const [fontsLoaded] = useFonts({
+    Montserrat_400Regular,
+    Montserrat_600SemiBold,
+    Montserrat_700Bold,
+  });
 
   useEffect(() => {
     const checkToken = async () => {
@@ -23,7 +30,7 @@ const LoginAuth = () => {
       }
     };
     checkToken();
-  }, []);
+  }, [navigation]);
 
   const isValidEmail = (email) => {
     return /\S+@\S+\.\S+/.test(email);
@@ -52,9 +59,9 @@ const LoginAuth = () => {
       if (token) {
         await AsyncStorage.setItem('token', token);
         if (name) {
-        await AsyncStorage.setItem('userName', name); 
+          await AsyncStorage.setItem('userName', name);
         }
-        Alert.alert('Login exitoso', 'Bienvenido!');
+        Alert.alert('Login exitoso', '¡Bienvenido!');
         navigation.reset({
           index: 0,
           routes: [{ name: 'Main' }],
@@ -70,15 +77,27 @@ const LoginAuth = () => {
     }
   };
 
+  if (!fontsLoaded) {
+    return (
+      <View style={styles.loadingContainer}>
+        <ActivityIndicator size="large" color="#E94057" />
+        <Text style={styles.loadingText}>Cargando...</Text>
+      </View>
+    );
+  }
+
   return (
     <View style={styles.container}>
-      <Text style={styles.title}>Iniciar sesión</Text>
+      <Text style={styles.title}>Iniciar Sesión</Text>
       <Input
         label="Correo electrónico"
         placeholder="Correo electrónico"
         keyboardType="email-address"
         value={email}
         onChangeText={setEmail}
+        style={styles.input}
+        labelStyle={styles.label}
+        inputStyle={styles.inputField}
       />
       <Input
         label="Contraseña"
@@ -86,26 +105,119 @@ const LoginAuth = () => {
         secureTextEntry
         value={password}
         onChangeText={setPassword}
+        style={styles.input}
+        labelStyle={styles.label}
+        inputStyle={styles.inputField}
       />
       {loading ? (
-        <ActivityIndicator size="large" color="#0000ff" />
+        <ActivityIndicator size="large" color="#E94057" />
       ) : (
-        <Button title="Iniciar sesión" onPress={handleLogin} />
+        <TouchableOpacity style={styles.loginButton} onPress={handleLogin}>
+          <LinearGradient colors={['#F27121', '#E94057']} style={styles.buttonGradient}>
+            <Text style={styles.loginButtonText}>Iniciar Sesión</Text>
+          </LinearGradient>
+        </TouchableOpacity>
       )}
       <View style={styles.links}>
-        <Text style={styles.link} onPress={() => navigation.navigate('RecoverPassword')}>¿Olvidaste tu contraseña?</Text>
-        <Text style={styles.link} onPress={() => navigation.navigate('Register')}>¿No tienes cuenta? Regístrate</Text>
+        <TouchableOpacity onPress={() => navigation.navigate('RecoverPassword')}>
+          <Text style={styles.link}>¿Olvidaste tu contraseña?</Text>
+        </TouchableOpacity>
+        <TouchableOpacity onPress={() => navigation.navigate('Register')}>
+          <Text style={styles.link}>¿No tienes cuenta? Regístrate</Text>
+        </TouchableOpacity>
       </View>
     </View>
   );
 };
 
 const styles = StyleSheet.create({
-  container: { padding: 35, flex: 1, justifyContent: 'center', backgroundColor: 'white'},
-  title: { fontSize: 24, marginBottom: 20, textAlign: 'center', fontWeight: 'bold', color:'#333'},
-  input: { borderWidth: 1, borderColor: '#ccc', padding: 10, marginBottom: 10, borderRadius: 5 },
-  links: { marginTop: 20, alignItems: 'center' },
-  link: { color: 'blue', marginTop: 10 },
+  container: {
+    flex: 1,
+    padding: 35,
+    justifyContent: 'center',
+    backgroundColor: 'white',
+  },
+  loadingContainer: {
+    flex: 1,
+    justifyContent: 'center',
+    alignItems: 'center',
+  },
+  loadingText: {
+    fontSize: 16,
+  },
+  logoContainer: {
+    alignItems: 'center',
+    marginBottom: 30,
+  },
+  logoGradient: {
+    borderRadius: 50,
+    paddingVertical: 15,
+    paddingHorizontal: 30,
+    shadowColor: '#000',
+    shadowOffset: { width: 0, height: 2 },
+    shadowOpacity: 0.25,
+    shadowRadius: 3.84,
+    elevation: 5,
+  },
+  logoText: {
+    color: 'white',
+    fontSize: 24,
+    fontFamily: 'Montserrat_700Bold',
+  },
+  title: {
+    fontSize: 28,
+    marginBottom: 30,
+    textAlign: 'center',
+    fontFamily: 'Montserrat_600SemiBold',
+    color: 'black',
+  },
+  input: {
+    marginBottom: 20,
+  },
+  label: {
+    fontSize: 16,
+    color: '#555',
+    marginBottom: 8,
+    fontFamily: 'Montserrat_400Regular',
+  },
+  inputField: {
+    borderWidth: 1,
+    borderColor: '#ccc',
+    borderRadius: 8,
+    paddingVertical: 12,
+    paddingHorizontal: 15,
+    fontSize: 16,
+    color: '#333',
+    fontFamily: 'Montserrat_400Regular',
+  },
+  loginButton: {
+    borderRadius: 10,
+    overflow: 'hidden',
+    shadowColor: '#000',
+    shadowOffset: { width: 0, height: 2 },
+    shadowOpacity: 0.25,
+    shadowRadius: 3.84,
+    elevation: 5,
+  },
+  buttonGradient: {
+    paddingVertical: 14,
+    alignItems: 'center',
+  },
+  loginButtonText: {
+    color: 'white',
+    fontSize: 18,
+    fontFamily: 'Montserrat_600SemiBold',
+  },
+  links: {
+    marginTop: 30,
+    alignItems: 'center',
+  },
+  link: {
+    color: '#007AFF',
+    marginTop: 15,
+    fontSize: 16,
+    fontFamily: 'Montserrat_400Regular',
+  },
 });
 
 export default LoginAuth;

@@ -37,7 +37,7 @@ const HistorialEntregas = () => {
     }
 
     if (historial.length === 0) {
-        return <Text style={{ textAlign: 'center', marginTop: 20 }}>No hay historial de entregas.</Text>;
+        return <Text style={{ textAlign: 'center', marginTop: 20, color: 'white'}}>No hay historial de entregas.</Text>;
     }
 
     return (

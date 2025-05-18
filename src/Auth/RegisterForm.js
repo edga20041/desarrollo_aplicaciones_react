@@ -1,11 +1,18 @@
 import React, { useState } from 'react';
 import Input from '../Components/Input';
-import { View, Text, TextInput, Button, Alert, ActivityIndicator } from 'react-native';
+import { LinearGradient } from 'expo-linear-gradient';
+import {
+    View,
+    Text,
+    ActivityIndicator,
+    TouchableOpacity,
+    StyleSheet
+} from 'react-native';
 import axios from 'axios';
 import config from '../config/config';
 
-
 const validateFields = (nombre, apellido, dni, phoneNumber, email, password, confirmPassword) => {
+    // Validaciones (descomentá si querés activarlas)
     /*
     if (!nombre || !apellido || !dni || !phoneNumber || !email || !password || !confirmPassword) {
         return { valid: false, message: 'Todos los campos son obligatorios.' };
@@ -58,45 +65,30 @@ const RegisterForm = ({ onRegisterSuccess }) => {
     const [loading, setLoading] = useState(false);
     const [error, setError] = useState(null);
 
-
     const handleRegister = async () => {
         setError(null);
-        console.log('Valores antes de la validación:');
-        console.log('Nombre:', name);
-        console.log('Apellido:', surname);
-        console.log('DNI:', dni);
-        console.log('Teléfono:', phoneNumber);
-        console.log('Email:', email);
-        console.log('Contraseña:', password);
-        console.log('Confirmar Contraseña:', confirmPassword);
-        const validationResult = validateFields(name, surname, dni, email, phoneNumber, password, confirmPassword);
-    
+        const validationResult = validateFields(name, surname, dni, phoneNumber, email, password, confirmPassword);
+
         if (!validationResult.valid) {
             setError(validationResult.message || 'Error de validación.');
-            console.log("Error de validación:", validationResult.message);
             return;
         }
-    
+
         const registerRequest = {
             email,
             password,
             name,
             surname,
-            dni: Number(dni), 
-            phoneNumber: Number(phoneNumber), 
+            dni: Number(dni),
+            phoneNumber: Number(phoneNumber),
         };
-    
-        console.log('Datos a enviar al backend:', registerRequest);  
-    
+
         setLoading(true);
         try {
             const response = await axios.post(`${config.API_URL}${config.AUTH.REGISTER}`, registerRequest);
-            console.log('Registro exitoso:', response.data);  
             onRegisterSuccess(email);
         } catch (err) {
-            console.error('Error en la solicitud:', err);  
             if (err.response) {
-                console.error('Error del servidor:', err.response.data);
                 if (err.response.status === 400) {
                     setError(err.response.data.message || 'El usuario ya está registrado o datos inválidos.');
                 } else {
@@ -104,10 +96,8 @@ const RegisterForm = ({ onRegisterSuccess }) => {
                 }
             } else if (err.request) {
                 setError('No se recibió respuesta del servidor.');
-                console.error('No se recibió respuesta del servidor:', err.request);
             } else {
                 setError(`Error al configurar la petición: ${err.message}`);
-                console.error('Error al configurar la petición:', err.message);
             }
         } finally {
             setLoading(false);
@@ -116,54 +106,14 @@ const RegisterForm = ({ onRegisterSuccess }) => {
 
     return (
         <View style={{ padding: 15 }}>
-            <Input
-                label="Nombre"
-                value={name}
-                onChangeText={setName}
-                placeholder="Ingrese su nombre"
-            />
-            <Input
-                label="Apellido"
-                value={surname}
-                onChangeText={setSurname}
-                placeholder="Ingrese su apellido"
-            />
-            <Input
-                label="DNI"
-                value={dni}
-                onChangeText={setDni}
-                placeholder="Ingrese su DNI"
-                keyboardType="numeric"
-            />
-            <Input
-                label="Teléfono"
-                value={phoneNumber}
-                onChangeText={setPhoneNumber}
-                placeholder="Ingrese su teléfono"
-                keyboardType="numeric"
-            />
-            <Input
-                label="Email"
-                value={email}
-                onChangeText={setEmail}
-                placeholder="Ingrese su email"
-                keyboardType="email-address"
-            />
-            <Input
-                label="Contraseña"
-                value={password}
-                onChangeText={setPassword}
-                placeholder="Ingrese su contraseña"
-                secureTextEntry
-            />
-            <Input
-                label="Confirmar Contraseña"
-                value={confirmPassword}
-                onChangeText={setConfirmPassword}
-                placeholder="Confirme su contraseña"
-                secureTextEntry
-            />
-            
+            <Input label="Nombre" value={name} onChangeText={setName} placeholder="Ingrese su nombre" />
+            <Input label="Apellido" value={surname} onChangeText={setSurname} placeholder="Ingrese su apellido" />
+            <Input label="DNI" value={dni} onChangeText={setDni} placeholder="Ingrese su DNI" keyboardType="numeric" />
+            <Input label="Teléfono" value={phoneNumber} onChangeText={setPhoneNumber} placeholder="Ingrese su teléfono" keyboardType="numeric" />
+            <Input label="Email" value={email} onChangeText={setEmail} placeholder="Ingrese su email" keyboardType="email-address" />
+            <Input label="Contraseña" value={password} onChangeText={setPassword} placeholder="Ingrese su contraseña" secureTextEntry />
+            <Input label="Confirmar Contraseña" value={confirmPassword} onChangeText={setConfirmPassword} placeholder="Confirme su contraseña" secureTextEntry />
+
             {error && (
                 <View style={{ backgroundColor: '#f8d7da', padding: 10, borderRadius: 5, marginBottom: 10 }}>
                     <Text style={{ color: '#721c24' }}>Error: {error}</Text>
@@ -173,10 +123,35 @@ const RegisterForm = ({ onRegisterSuccess }) => {
             {loading ? (
                 <ActivityIndicator size="large" color="#0000ff" />
             ) : (
-                <Button title="Registrarse" onPress={handleRegister} />
+                <TouchableOpacity onPress={handleRegister}>
+                    <LinearGradient colors={['#F27121', '#E94057']} style={styles.registerButton}>
+                        <Text style={styles.registerButtonText}>Registrarse</Text>
+                    </LinearGradient>
+                </TouchableOpacity>
             )}
         </View>
     );
 };
+
+const styles = StyleSheet.create({
+    registerButton: {
+        borderRadius: 10,
+        overflow: 'hidden',
+        shadowColor: '#000',
+        shadowOffset: { width: 0, height: 2 },
+        shadowOpacity: 0.25,
+        shadowRadius: 3.84,
+        elevation: 5,
+        paddingVertical: 12,
+        paddingHorizontal: 25,
+        alignItems: 'center',
+        marginTop: 10,
+    },
+    registerButtonText: {
+        color: 'white',
+        fontSize: 18,
+        fontFamily: 'Montserrat_600SemiBold'
+    },
+});
 
 export default RegisterForm;
