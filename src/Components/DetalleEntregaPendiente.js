@@ -1,9 +1,10 @@
 import React, { useEffect, useState } from 'react';
-import { View, Text, StyleSheet, Button, ActivityIndicator, Alert, TouchableOpacity } from 'react-native';
+import { View, Text, StyleSheet, ActivityIndicator, Alert, TouchableOpacity, SafeAreaView, StatusBar, Button } from 'react-native';
 import { useNavigation, useRoute } from '@react-navigation/native';
 import axios from '../axiosInstance';
 import config from '../config/config';
 import AsyncStorage from '@react-native-async-storage/async-storage';
+import { LinearGradient } from 'expo-linear-gradient';
 
 const DetalleEntregaPendiente = () => {
   const navigation = useNavigation();
@@ -52,49 +53,111 @@ const DetalleEntregaPendiente = () => {
   };
 
   if (loading) {
-    return <ActivityIndicator size="large" color="#2d3a4b" />;
+    return (
+      <LinearGradient colors={['#1A1A2E', '#16213E', '#0F3460']} style={{ flex: 1, justifyContent: 'center', alignItems: 'center' }}>
+        <ActivityIndicator size="large" color="#F27121" />
+      </LinearGradient>
+    );
   }
 
   if (!detalle) {
-    return <Text style={{ textAlign: 'center', marginTop: 20 }}>No se encontró la entrega.</Text>;
+    return (
+      <LinearGradient colors={['#1A1A2E', '#16213E', '#0F3460']} style={{ flex: 1, justifyContent: 'center', alignItems: 'center' }}>
+        <Text style={{ color: '#fff', fontSize: 18 }}>No se encontró la entrega.</Text>
+      </LinearGradient>
+    );
   }
 
   return (
-    <View style={styles.container}>
-      <Text style={styles.title}>Detalle de Entrega Pendiente</Text>
-      <Text>Cliente: {detalle.cliente}</Text>
-      <Text>DNI: {detalle.clienteDni}</Text>
-      <Text>Producto: {detalle.producto}</Text>
-      <Text>Ruta ID: {detalle.rutaId}</Text>
-      <Text>Estado: Pendiente</Text>
-      <Text>Fecha Creación: {detalle.fechaCreacion}</Text>
-      <TouchableOpacity
-        style={styles.qrButton}
-        onPress={finalizarEntrega}
-        disabled={finalizando}
-        activeOpacity={0.8}
-      >
-        <Text style={styles.qrButtonText}>{finalizando ? 'Finalizando...' : 'QR'}</Text>
-      </TouchableOpacity>
-      <Button title="Volver" onPress={() => navigation.goBack()} />
-    </View>
+    <LinearGradient
+      colors={['#1A1A2E', '#16213E', '#0F3460']}
+      style={styles.gradient}
+      start={{ x: 0, y: 0 }}
+      end={{ x: 1, y: 1 }}
+    >
+      <SafeAreaView style={{ flex: 1 }}>
+        <StatusBar barStyle="light-content" backgroundColor="#1A1A2E" translucent />
+        <View style={styles.container}>
+          <Text style={styles.title}>Detalle de Entrega Pendiente</Text>
+          <View style={styles.card}>
+            <Text style={styles.label}>Cliente: <Text style={styles.value}>{detalle.cliente}</Text></Text>
+            <Text style={styles.label}>DNI: <Text style={styles.value}>{detalle.clienteDni}</Text></Text>
+            <Text style={styles.label}>Producto: <Text style={styles.value}>{detalle.producto}</Text></Text>
+            <Text style={styles.label}>Ruta ID: <Text style={styles.value}>{detalle.rutaId}</Text></Text>
+            <Text style={styles.label}>Estado: <Text style={styles.value}>Pendiente</Text></Text>
+            <Text style={styles.label}>Fecha Creación: <Text style={styles.value}>{detalle.fechaCreacion}</Text></Text>
+          </View>
+          <TouchableOpacity
+            style={styles.qrButton}
+            onPress={finalizarEntrega}
+            disabled={finalizando}
+            activeOpacity={0.8}
+          >
+            <Text style={styles.qrButtonText}>{finalizando ? 'Finalizando...' : 'QR'}</Text>
+          </TouchableOpacity>
+          <Button title="Volver" color="#F27121" onPress={() => navigation.goBack()} />
+        </View>
+      </SafeAreaView>
+    </LinearGradient>
   );
 };
 
 const styles = StyleSheet.create({
-  container: { flex: 1, padding: 24, backgroundColor: '#fff' },
-  title: { fontSize: 22, fontWeight: 'bold', marginBottom: 15, color: '#2d3a4b' },
+  gradient: {
+    flex: 1,
+  },
+  container: {
+    flex: 1,
+    padding: 24,
+    justifyContent: 'center',
+  },
+  title: {
+    fontSize: 24,
+    fontWeight: 'bold',
+    color: '#F27121',
+    marginBottom: 20,
+    textAlign: 'center',
+  },
+  card: {
+    backgroundColor: '#fff',
+    borderRadius: 16,
+    padding: 20,
+    marginBottom: 30,
+    borderWidth: 2,
+    borderColor: '#16213E',
+    shadowColor: '#0F3460',
+    shadowOffset: { width: 0, height: 2 },
+    shadowOpacity: 0.12,
+    shadowRadius: 6,
+    elevation: 3,
+  },
+  label: {
+    fontWeight: 'bold',
+    color: '#16213E',
+    marginBottom: 4,
+    fontSize: 16,
+  },
+  value: {
+    fontWeight: 'normal',
+    color: '#222',
+  },
   qrButton: {
     backgroundColor: '#fff',
-    borderColor: '#2d3a4b',
+    borderColor: '#black',
     borderWidth: 2,
     borderRadius: 20,
     paddingVertical: 14,
     alignItems: 'center',
-    marginVertical: 24,
+    marginBottom: 24,
+    marginTop: 8,
+    elevation: 2,
+    shadowColor: '#F27121',
+    shadowOffset: { width: 0, height: 2 },
+    shadowOpacity: 0.12,
+    shadowRadius: 4,
   },
   qrButtonText: {
-    color: '#2d3a4b',
+    color: '#black',
     fontWeight: 'bold',
     fontSize: 18,
   },

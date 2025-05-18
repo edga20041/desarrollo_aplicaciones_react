@@ -91,11 +91,14 @@ function HomeScreen({ navigation }) {
       >
         <Animatable.View
           animation="fadeIn"
-          duration={2000}
+          duration={7000}
           style={styles.logoContainer}
         >
           <View style={styles.logoCircle}>
-            <Text style={styles.logoText}>DR</Text>
+            <Image
+              source={require('./assets/logo.png')}
+              style={{ width: 250, height: 200, resizeMode: 'cover' }}
+    />
           </View>
         </Animatable.View>
 
@@ -285,11 +288,12 @@ const styles = StyleSheet.create({
   },
   logoContainer: {
     alignItems: 'center',
-    marginBottom: 40,
+    marginBottom: 2,
+    
   },
   logoCircle: {
-    width: 80,
-    height: 80,
+    width: 10,
+    height: 100,
     borderRadius: 40,
     backgroundColor: '#E94057',
     justifyContent: 'center',
@@ -299,6 +303,7 @@ const styles = StyleSheet.create({
     shadowOpacity: 0.3,
     shadowRadius: 6,
     elevation: 8,
+    marginTop: 100,
   },
   logoText: {
     color: 'white',

@@ -1,11 +1,12 @@
 import React, { useState, useEffect } from 'react';
-import { View, Text, StyleSheet, ScrollView, Button, ActivityIndicator, Alert } from 'react-native';
+import { View, Text, StyleSheet, ScrollView, Button, ActivityIndicator, Alert, SafeAreaView, StatusBar } from 'react-native';
 import { useNavigation, useRoute } from '@react-navigation/native';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import MapView, { Marker, Polyline } from 'react-native-maps';
 import Geocoder from 'react-native-geocoding';
 import config from '../config/config';
 import axiosInstance from '../axiosInstance';
+import { LinearGradient } from 'expo-linear-gradient';
 
 const DetalleEntregaHistorial = () => {
     const navigation = useNavigation();
@@ -134,100 +135,150 @@ const DetalleEntregaHistorial = () => {
     };
 
     if (loading) {
-        return <View style={styles.loadingContainer}><ActivityIndicator size="large" color="#0000ff" /></View>;
+        return (
+            <LinearGradient colors={['#1A1A2E', '#16213E', '#0F3460']} style={{ flex: 1, justifyContent: 'center', alignItems: 'center' }}>
+                <ActivityIndicator size="large" color="#F27121" />
+            </LinearGradient>
+        );
     }
 
     if (error) {
-        return <View style={styles.errorContainer}><Text style={styles.errorText}>{error}</Text></View>;
+        return (
+            <LinearGradient colors={['#1A1A2E', '#16213E', '#0F3460']} style={{ flex: 1, justifyContent: 'center', alignItems: 'center' }}>
+                <Text style={{ color: '#fff', fontSize: 18 }}>{error}</Text>
+            </LinearGradient>
+        );
     }
 
     if (!detalleEntrega) {
-        return <View style={styles.container}><Text>No se encontraron detalles de la entrega.</Text></View>;
+        return (
+            <LinearGradient colors={['#1A1A2E', '#16213E', '#0F3460']} style={{ flex: 1, justifyContent: 'center', alignItems: 'center' }}>
+                <Text style={{ color: '#fff', fontSize: 18 }}>No se encontraron detalles de la entrega.</Text>
+            </LinearGradient>
+        );
     }
 
     return (
-        <ScrollView style={styles.scrollView}>
-            <View style={styles.container}>
-                <Text style={styles.title}>Detalle de Entrega</Text>
-                <Text>Cliente: {detalleEntrega.cliente}</Text>
-                <Text>DNI: {detalleEntrega.clienteDni}</Text>
-                <Text>Producto: {detalleEntrega.producto}</Text>
-                <Text>Ruta ID: {detalleEntrega.rutaId}</Text>
-                <Text>Estado: {estadoNombre}</Text>
-                <Text>Fecha Creación: {detalleEntrega.fechaCreacion}</Text>
-                <Text>Fecha Finalización: {detalleEntrega.fechaFinalizacion}</Text>
-
-                <Text style={styles.mapTitle}>Ubicación de la Ruta</Text>
-                {detalleRuta ? (
-                    <View style={styles.mapContainer}>
-                        <MapView
-                            style={styles.map}
-                            initialRegion={{
-                                latitude: (detalleRuta.latitudOrigen + detalleRuta.latitudDestino) / 2,
-                                longitude: (detalleRuta.longitudOrigen + detalleRuta.longitudDestino) / 2,
-                                latitudeDelta: 0.0922,
-                                longitudeDelta: 0.0421,
-                            }}
-                            onMapReady={onMapReadyHandler}
-                        >
-                            <Marker
-                                coordinate={{ latitude: detalleRuta.latitudOrigen, longitude: detalleRuta.longitudOrigen }}
-                                title="Origen"
-                            />
-                            <Marker
-                                coordinate={{ latitude: detalleRuta.latitudDestino, longitude: detalleRuta.longitudDestino }}
-                                title="Destino"
-                            />
-                            <Polyline
-                                coordinates={[
-                                    { latitude: detalleRuta.latitudOrigen, longitude: detalleRuta.longitudOrigen },
-                                    { latitude: detalleRuta.latitudDestino, longitude: detalleRuta.longitudDestino },
-                                ]}
-                                strokeColor="#0000FF"
-                                strokeWidth={3}
-                            />
-                        </MapView>
-                        <Text style={styles.addressText}>{origenAddress}</Text>
-                        <Text style={styles.addressText}>{destinoAddress}</Text>
+        <LinearGradient
+            colors={['#1A1A2E', '#16213E', '#0F3460']}
+            style={styles.gradient}
+            start={{ x: 0, y: 0 }}
+            end={{ x: 1, y: 1 }}
+        >
+            <SafeAreaView style={{ flex: 1 }}>
+                <StatusBar barStyle="light-content" backgroundColor="#1A1A2E" translucent />
+                <ScrollView style={styles.scrollView}>
+                    <View style={styles.container}>
+                        <Text style={styles.title}>Detalle de Entrega</Text>
+                        <View style={styles.card}>
+                            <Text style={styles.label}>Cliente: <Text style={styles.value}>{detalleEntrega.cliente}</Text></Text>
+                            <Text style={styles.label}>DNI: <Text style={styles.value}>{detalleEntrega.clienteDni}</Text></Text>
+                            <Text style={styles.label}>Producto: <Text style={styles.value}>{detalleEntrega.producto}</Text></Text>
+                            <Text style={styles.label}>Ruta ID: <Text style={styles.value}>{detalleEntrega.rutaId}</Text></Text>
+                            <Text style={styles.label}>Estado: <Text style={styles.value}>{estadoNombre}</Text></Text>
+                            <Text style={styles.label}>Fecha Creación: <Text style={styles.value}>{detalleEntrega.fechaCreacion}</Text></Text>
+                            <Text style={styles.label}>Fecha Finalización: <Text style={styles.value}>{detalleEntrega.fechaFinalizacion}</Text></Text>
+                        </View>
+                        <Text style={styles.mapTitle}>Ubicación de la Ruta</Text>
+                        {detalleRuta ? (
+                            <View style={styles.mapContainer}>
+                                <MapView
+                                    style={styles.map}
+                                    initialRegion={{
+                                        latitude: (detalleRuta.latitudOrigen + detalleRuta.latitudDestino) / 2,
+                                        longitude: (detalleRuta.longitudOrigen + detalleRuta.longitudDestino) / 2,
+                                        latitudeDelta: 0.0922,
+                                        longitudeDelta: 0.0421,
+                                    }}
+                                    onMapReady={onMapReadyHandler}
+                                >
+                                    <Marker
+                                        coordinate={{ latitude: detalleRuta.latitudOrigen, longitude: detalleRuta.longitudOrigen }}
+                                        title="Origen"
+                                    />
+                                    <Marker
+                                        coordinate={{ latitude: detalleRuta.latitudDestino, longitude: detalleRuta.longitudDestino }}
+                                        title="Destino"
+                                    />
+                                    <Polyline
+                                        coordinates={[
+                                            { latitude: detalleRuta.latitudOrigen, longitude: detalleRuta.longitudOrigen },
+                                            { latitude: detalleRuta.latitudDestino, longitude: detalleRuta.longitudDestino },
+                                        ]}
+                                        strokeColor="#F27121"
+                                        strokeWidth={3}
+                                    />
+                                </MapView>
+                                <Text style={styles.addressText}>{origenAddress}</Text>
+                                <Text style={styles.addressText}>{destinoAddress}</Text>
+                            </View>
+                        ) : (
+                            <Text style={{ color: '#fff' }}>Cargando mapa...</Text>
+                        )}
+                        <Button title="Volver" color="#F27121" onPress={handleVolver} />
                     </View>
-                ) : (
-                    <Text>Cargando mapa...</Text>
-                )}
-
-                <Button title="Volver" onPress={handleVolver} />
-            </View>
-        </ScrollView>
+                </ScrollView>
+            </SafeAreaView>
+        </LinearGradient>
     );
 };
 
 const styles = StyleSheet.create({
+    gradient: {
+        flex: 1,
+    },
     scrollView: {
         flex: 1,
-        backgroundColor: '#f8f8f8',
+        backgroundColor: 'transparent',
     },
     container: {
         padding: 20,
     },
     title: {
-        fontSize: 22,
+        fontSize: 24,
         fontWeight: 'bold',
         marginBottom: 15,
-        color: '#333',
+        color: '#F27121',
+        textAlign: 'center',
+    },
+    card: {
+        backgroundColor: '#fff',
+        borderRadius: 16,
+        padding: 20,
+        marginBottom: 30,
+        borderWidth: 2,
+        borderColor: '#16213E',
+        shadowColor: '#0F3460',
+        shadowOffset: { width: 0, height: 2 },
+        shadowOpacity: 0.12,
+        shadowRadius: 6,
+        elevation: 3,
+    },
+    label: {
+        fontWeight: 'bold',
+        color: '#16213E',
+        marginBottom: 4,
+        fontSize: 16,
+    },
+    value: {
+        fontWeight: 'normal',
+        color: '#222',
     },
     mapTitle: {
         fontSize: 18,
         fontWeight: 'bold',
         marginTop: 20,
         marginBottom: 10,
-        color: '#333',
+        color: '#fff',
+        textAlign: 'center',
     },
     mapContainer: {
         height: 250,
-        borderRadius: 5,
+        borderRadius: 10,
         overflow: 'hidden',
         marginBottom: 15,
-        borderColor: '#ccc',
-        borderWidth: 1,
+        borderColor: '#F27121',
+        borderWidth: 2,
     },
     map: {
         ...StyleSheet.absoluteFillObject,
@@ -235,22 +286,7 @@ const styles = StyleSheet.create({
     addressText: {
         marginTop: 5,
         fontSize: 14,
-        color: '#555',
-    },
-    loadingContainer: {
-        flex: 1,
-        justifyContent: 'center',
-        alignItems: 'center',
-    },
-    errorContainer: {
-        flex: 1,
-        justifyContent: 'center',
-        alignItems: 'center',
-        padding: 20,
-    },
-    errorText: {
-        fontSize: 16,
-        color: 'red',
+        color: '#fff',
         textAlign: 'center',
     },
 });
