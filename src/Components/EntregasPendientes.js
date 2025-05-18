@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from 'react';
-import { View, Text, FlatList, ActivityIndicator, StyleSheet } from 'react-native';
+import { View, Text, FlatList, ActivityIndicator, StyleSheet, TouchableOpacity} from 'react-native';
 import axios from '../axiosInstance';
 import { useNavigation } from '@react-navigation/native';
 import config from '../config/config';
@@ -7,6 +7,7 @@ import config from '../config/config';
 const EntregasPendientes = () => {
   const [entregas, setEntregas] = useState([]);
   const [loading, setLoading] = useState(true);
+   const navigation = useNavigation();
 
   useEffect(() => {
     const fetchEntregas = async () => {
@@ -30,16 +31,22 @@ const EntregasPendientes = () => {
     return <Text style={{ textAlign: 'center', marginTop: 20 }}>No hay entregas pendientes.</Text>;
   }
 
+  const handleEntregaPress = (entregaId) => {
+    navigation.navigate('Detalle Entrega Pendiente', { entrega_id: entregaId });
+  };
+
   return (
     <FlatList
       data={entregas}
       keyExtractor={item => item.id.toString()}
       renderItem={({ item }) => (
-        <View style={styles.card}>
-          <Text style={styles.title}>Entrega #{item.id}</Text>
-          <Text>Cliente: {item.cliente}</Text>
-          <Text>Producto: {item.producto}</Text>
-        </View>
+        <TouchableOpacity onPress={() => handleEntregaPress(item.id)}>
+          <View style={styles.card}>
+            <Text style={styles.title}>Entrega #{item.id}</Text>
+            <Text>Cliente: {item.cliente}</Text>
+            <Text>Producto: {item.producto}</Text>
+          </View>
+        </TouchableOpacity>
       )}
     />
   );

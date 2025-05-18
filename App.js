@@ -26,6 +26,7 @@ import HistorialEntregas from './src/Components/HistorialEntregas';
 import DetalleEntregaHistorial from './src/Components/DetalleEntregaHistorial';
 import Geocoder from 'react-native-geocoding';
 import config from './src/config/config';
+import DetalleEntregaPendiente from './src/Components/DetalleEntregaPendiente';
 
 const Stack = createNativeStackNavigator();
 const { width, height } = Dimensions.get('window');
@@ -249,6 +250,14 @@ export default function App() {
             headerBackTitle: 'Volver',
           }}
         />
+        <Stack.Screen
+          name="Detalle Entrega Pendiente"
+          component={DetalleEntregaPendiente}
+          options={{
+          title: 'Detalle de Entrega',
+          headerBackTitle: 'Volver',
+  }}
+/>
       </Stack.Navigator>
     </NavigationContainer>
   );
