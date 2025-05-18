@@ -4,7 +4,7 @@ import axios from '../axiosInstance';
 import { useNavigation } from '@react-navigation/native';
 import config from '../config/config';
 
-const EntregasPendientes = () => {
+const EntregasPendientes = ({refresh}) => {
   const [entregas, setEntregas] = useState([]);
   const [loading, setLoading] = useState(true);
    const navigation = useNavigation();
@@ -21,7 +21,7 @@ const EntregasPendientes = () => {
       }
     };
     fetchEntregas();
-  }, []);
+  }, [refresh]);
 
   if (loading) {
     return <ActivityIndicator size="large" color="#2d3a4b" />;

@@ -1,6 +1,6 @@
 import { View, Text, Button, StyleSheet, Alert,SafeAreaView,TouchableOpacity, Image} from 'react-native';
 import AsyncStorage from '@react-native-async-storage/async-storage';
-import { useNavigation } from '@react-navigation/native';
+import { useNavigation,useFocusEffect } from '@react-navigation/native';
 import React, { useEffect, useState  } from 'react';
 import EntregasPendientes from '../Components/EntregasPendientes';
 import HistorialEntregas from '../Components/HistorialEntregas';
@@ -12,6 +12,14 @@ const MainScreen = () => {
   const [userName, setUserName] = useState('');
   const [showEntregas, setShowEntregas] = useState(false);
   const [showHistorial, setShowHistorial] = useState(false);
+  const [refreshEntregas, setRefreshEntregas] = useState(false);
+
+
+  useFocusEffect(
+    React.useCallback(() => {
+      setRefreshEntregas(prev => !prev); //Refresca la lista de entregas
+    }, [])
+  );
 
    useEffect(() => {
     const checkAuthentication = async () => {
@@ -73,7 +81,7 @@ const MainScreen = () => {
           </TouchableOpacity>
         </View>
         <View style={{ flex: 1, width: '100%' }}>
-          {showEntregas && <EntregasPendientes />}
+          {showEntregas && <EntregasPendientes refresh={refreshEntregas} />}
           {showHistorial && <HistorialEntregas />}
         </View>
         <View style={styles.logoutContainer}>
