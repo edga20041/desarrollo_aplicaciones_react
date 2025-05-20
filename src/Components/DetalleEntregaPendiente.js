@@ -86,9 +86,9 @@ return (
 
         {showImage ? (
           <Image
-            source={require('../assets/qr_imagen.jpeg')} 
+            source={require('../../assets/qr_imagen.jpeg')} 
             style={styles.fullscreenImage}
-            resizeMode="contain" // Ajusta la imagen para que cubra toda la pantalla
+            resizeMode="contain" 
           />
         ) : (
           <View style={styles.container}>

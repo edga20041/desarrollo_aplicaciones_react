@@ -54,7 +54,6 @@ const MainScreen = () => {
         routes: [{ name: 'Home' }],
       });
     } catch (error) {
-      // Manejo de error opcional
     }
   };
 
@@ -69,10 +68,12 @@ const MainScreen = () => {
         <StatusBar barStyle="light-content" backgroundColor="#1A1A2E" translucent />
         <View style={styles.container}>
           <View style={styles.headerRow}>
-            <Image
-              source={require('../../assets/avatar.png')}
-              style={styles.avatar}
-            />
+          <TouchableOpacity onPress={() => navigation.navigate('Profilescreen')}>
+          <Image
+          source={require('../../assets/avatar.png')}
+          style={styles.avatar}
+           />
+          </TouchableOpacity>
             <Text style={styles.greeting}>
               <Text style={{ fontWeight: 'bold', color: '#fff' }}>{greeting}</Text>
               <Text style={{ color: '#F27121' }}> {userName}!</Text>

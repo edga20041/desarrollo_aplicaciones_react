@@ -117,7 +117,6 @@ const DetalleEntregaHistorial = () => {
                     setDestinoAddress(`Destino: ${destinoResult.results[0].formatted_address}`);
                 }
             } catch (error) {
-                console.error("Error al geocodificar:", error);
             }
         }
     };

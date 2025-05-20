@@ -22,6 +22,7 @@ const config = {
     RESEND_CODE: "/auth/resend-code",
     VERIFY_CODE: "/auth/validate-recovery-code",
     RESEND_CODE_RECOVERY: "/auth/resend-recovery-code",
+    PROFILE: "/auth/user/me",
   },
   ENTREGAS: {
     PENDIENTES: "/entregas/pendientes",

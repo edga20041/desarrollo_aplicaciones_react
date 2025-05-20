@@ -28,7 +28,7 @@ const VerifyCode = ({ email }) => {
                     await AsyncStorage.setItem('token', token);
                 }
                 if (name) {
-                 await AsyncStorage.setItem('userName', name); // <-- guardá el nombre
+                 await AsyncStorage.setItem('userName', name); 
                 }
                 console.log("Verification successful");
                 navigation.replace('Main');
