@@ -1,11 +1,14 @@
 import React, { useEffect, useState } from 'react';
-import { View, Text, StyleSheet, ActivityIndicator } from 'react-native';
+import { View, Text, StyleSheet, ActivityIndicator, SafeAreaView, StatusBar, Button } from 'react-native';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import config from '../config/config';
+import { LinearGradient } from 'expo-linear-gradient';
+import { useNavigation } from '@react-navigation/native';
 
 const PerfilUsuario = () => {
   const [perfil, setPerfil] = useState(null);
   const [loading, setLoading] = useState(true);
+  const navigation = useNavigation();
 
   useEffect(() => {
     const fetchPerfil = async () => {
@@ -29,56 +32,87 @@ const PerfilUsuario = () => {
   }, []);
 
   if (loading) {
-    return <ActivityIndicator size="large" color="#F27121" />;
+    return (
+      <LinearGradient colors={['#1A1A2E', '#16213E', '#0F3460']} style={styles.gradient}>
+        <ActivityIndicator size="large" color="#F27121" style={{ flex: 1, justifyContent: 'center' }} />
+      </LinearGradient>
+    );
   }
 
   if (!perfil) {
-    return <Text style={styles.errorText}>No se pudo cargar el perfil.</Text>;
+    return (
+      <LinearGradient colors={['#1A1A2E', '#16213E', '#0F3460']} style={styles.gradient}>
+        <Text style={styles.errorText}>No se pudo cargar el perfil.</Text>
+      </LinearGradient>
+    );
   }
 
   return (
-    <View style={styles.container}>
-      <Text style={styles.title}>Perfil del Usuario</Text>
-      <Text style={styles.value}>ID:{perfil.id}</Text>
-
-      <Text style={styles.value}>Nombre: {perfil.name}</Text>
-
-      <Text style={styles.value}>Apellido: {perfil.surname}</Text>
-
-      <Text style={styles.value}>Email: {perfil.email}</Text>
-
-      <Text style={styles.value}>Telefono: {perfil.phoneNumber}</Text>
-
-      <Text style={styles.value}>DNI: {perfil.dni}</Text>
-    </View>
+    <LinearGradient colors={['#1A1A2E', '#16213E', '#0F3460']} style={styles.gradient}>
+      <SafeAreaView style={{ flex: 1 }}>
+        <StatusBar barStyle="light-content" backgroundColor="#1A1A2E" translucent />
+        <View style={styles.container}>
+          <Text style={styles.title}>Mi Perfil</Text>
+          <View style={styles.card}>
+            <Text style={styles.label}>ID: <Text style={styles.value}>{perfil.id}</Text></Text>
+            <Text style={styles.label}>Nombre: <Text style={styles.value}>{perfil.name}</Text></Text>
+            <Text style={styles.label}>Apellido: <Text style={styles.value}>{perfil.surname}</Text></Text>
+            <Text style={styles.label}>Email: <Text style={styles.value}>{perfil.email}</Text></Text>
+            <Text style={styles.label}>Teléfono: <Text style={styles.value}>{perfil.phoneNumber}</Text></Text>
+            <Text style={styles.label}>DNI: <Text style={styles.value}>{perfil.dni}</Text></Text>
+          </View>
+          <Button title="Volver" color="#F27121" onPress={() => navigation.goBack()} />
+        </View>
+      </SafeAreaView>
+    </LinearGradient>
   );
 };
 
 const styles = StyleSheet.create({
+  gradient: {
+    flex: 1,
+  },
   container: {
     flex: 1,
-    padding: 20,
-    backgroundColor: '#fff',
+    padding: 24,
+    justifyContent: 'center',
   },
   title: {
-    fontSize: 22,
+    fontSize: 24,
     fontWeight: 'bold',
+    color: '#F27121',
     marginBottom: 20,
+    textAlign: 'center',
+  },
+  card: {
+    backgroundColor: '#fff',
+    borderRadius: 16,
+    padding: 20,
+    marginBottom: 30,
+    borderWidth: 2,
+    borderColor: '#16213E',
+    shadowColor: '#0F3460',
+    shadowOffset: { width: 0, height: 2 },
+    shadowOpacity: 0.12,
+    shadowRadius: 6,
+    elevation: 3,
   },
   label: {
     fontWeight: 'bold',
-    marginTop: 10,
+    color: '#16213E',
+    marginBottom: 4,
+    fontSize: 16,
   },
   value: {
-    fontSize: 16,
-    marginBottom: 10,
+    fontWeight: 'normal',
+    color: '#222',
   },
   errorText: {
+    color: '#fff',
+    fontSize: 18,
     textAlign: 'center',
     marginTop: 20,
-    color: 'red',
   },
 });
 
 export default PerfilUsuario;
-
