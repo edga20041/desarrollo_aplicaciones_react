@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from 'react';
-import { View, Text, StyleSheet, ActivityIndicator, SafeAreaView, StatusBar, Button } from 'react-native';
+import { View, Text, StyleSheet, ActivityIndicator,TouchableOpacity, SafeAreaView, StatusBar, Button } from 'react-native';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import config from '../config/config';
 import { LinearGradient } from 'expo-linear-gradient';
@@ -61,7 +61,24 @@ const PerfilUsuario = () => {
             <Text style={styles.label}>Teléfono: <Text style={styles.value}>{perfil.phoneNumber}</Text></Text>
             <Text style={styles.label}>DNI: <Text style={styles.value}>{perfil.dni}</Text></Text>
           </View>
-          <Button title="Volver" color="#F27121" onPress={() => navigation.goBack()} />
+          <TouchableOpacity
+            style={styles.logoutButton}
+            onPress={async () => {
+                try {
+                    await AsyncStorage.removeItem('token');
+                    await AsyncStorage.removeItem('userName');
+                navigation.reset({
+                        index: 0,
+                        routes: [{ name: 'Home' }],
+                    });
+                } catch (error) {
+                        console.error('Error al cerrar sesión:', error);
+                }
+            }}
+            activeOpacity={0.85}
+            >
+        <Text style={styles.logoutText}>Cerrar sesión</Text>
+        </TouchableOpacity>
         </View>
       </SafeAreaView>
     </LinearGradient>
@@ -112,6 +129,25 @@ const styles = StyleSheet.create({
     fontSize: 18,
     textAlign: 'center',
     marginTop: 20,
+  },
+  logoutButton: {
+    backgroundColor: '#fff',
+    borderRadius: 20,
+    paddingVertical: 14,
+    alignItems: 'center',
+    borderWidth: 2,
+    borderColor: '#E94057',
+    elevation: 2,
+    shadowColor: '#E94057',
+    shadowOffset: { width: 0, height: 2 },
+    shadowOpacity: 0.08,
+    shadowRadius: 4,
+},
+  logoutText: {
+    color: '#E94057',
+    fontWeight: 'bold',
+    fontSize: 16,
+    textAlign: 'center',
   },
 });
 

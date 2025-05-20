@@ -119,11 +119,6 @@ const MainScreen = () => {
             {showEntregas && <EntregasPendientes refresh={refreshEntregas} />}
             {showHistorial && <HistorialEntregas />}
           </View>
-          <View style={styles.logoutContainer}>
-            <TouchableOpacity style={styles.logoutButton} onPress={handleLogout} activeOpacity={0.85}>
-              <Text style={styles.logoutText}>Cerrar sesión</Text>
-            </TouchableOpacity>
-          </View>
         </View>
       </SafeAreaView>
     </LinearGradient>
