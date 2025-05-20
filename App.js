@@ -16,12 +16,12 @@ import {
 import { LinearGradient } from 'expo-linear-gradient';
 import { useFonts, Montserrat_400Regular, Montserrat_600SemiBold, Montserrat_700Bold } from '@expo-google-fonts/montserrat';
 import * as Animatable from 'react-native-animatable';
-import RegisterAuth from './src/Auth/RegisterAuth';
-import LoginAuth from './src/Auth/LoginAuth';
-import RecoverPasswordScreen from './src/Auth/RecoverPasswordScreen';
-import VerifyCodePasswordScreen from './src/Auth/VerifyCodePasswordScreen';
-import ResetPasswordScreen from './src/Auth/ResetPasswordScreen';
-import MainScreen from './src/Auth/MainScreen';
+import RegisterAuth from './src/screens/RegisterAuth';
+import LoginAuth from './src/screens/LoginAuth';
+import RecoverPasswordScreen from './src/screens/RecoverPasswordScreen';
+import VerifyCodePasswordScreen from './src/screens/VerifyCodePasswordScreen';
+import ResetPasswordScreen from './src/screens/ResetPasswordScreen';
+import MainScreen from './src/screens/MainScreen';
 import HistorialEntregas from './src/Components/HistorialEntregas';
 import DetalleEntregaHistorial from './src/Components/DetalleEntregaHistorial';
 import Geocoder from 'react-native-geocoding';

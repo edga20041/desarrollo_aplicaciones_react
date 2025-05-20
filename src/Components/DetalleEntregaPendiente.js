@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from 'react';
-import { View, Text, StyleSheet, ActivityIndicator, Alert, TouchableOpacity, SafeAreaView, StatusBar, Button } from 'react-native';
+import { View, Text, StyleSheet, ActivityIndicator, Alert, TouchableOpacity, SafeAreaView, StatusBar, Button, Image } from 'react-native';
 import { useNavigation, useRoute } from '@react-navigation/native';
 import axios from '../axiosInstance';
 import config from '../config/config';
@@ -14,6 +14,7 @@ const DetalleEntregaPendiente = () => {
   const [detalle, setDetalle] = useState(null);
   const [loading, setLoading] = useState(true);
   const [finalizando, setFinalizando] = useState(false);
+  const [showImage, setShowImage] = useState(false);
 
   useEffect(() => {
     const fetchDetalle = async () => {
@@ -32,24 +33,29 @@ const DetalleEntregaPendiente = () => {
 
   const finalizarEntrega = async () => {
     setFinalizando(true);
-    try {
-      const token = await AsyncStorage.getItem('token');
-      const url = config.API_URL + config.ENTREGAS.CAMBIAR_ESTADO; 
-      const body = {
-        entregaId: detalle.id,
-        estadoId: 3,
-        repartidorId: detalle.repartidorId 
-      };
-      await axios.patch(url, body, {
-        headers: { Authorization: `Bearer ${token}` }
-      });
-      Alert.alert('Éxito', 'La entrega fue finalizada.');
-      navigation.goBack();
-    } catch (error) {
-      Alert.alert('Error', 'No se pudo finalizar la entrega.');
-    } finally {
-      setFinalizando(false);
-    }
+    setShowImage(true);
+
+    setTimeout(async () => {
+      setShowImage(false);
+      try {
+        const token = await AsyncStorage.getItem('token');
+        const url = config.API_URL + config.ENTREGAS.CAMBIAR_ESTADO; 
+        const body = {
+          entregaId: detalle.id,
+          estadoId: 3,
+          repartidorId: detalle.repartidorId 
+        };
+        await axios.patch(url, body, {
+          headers: { Authorization: `Bearer ${token}` }
+        });
+        Alert.alert('Éxito', 'La entrega fue finalizada.');
+        navigation.goBack();
+      } catch (error) {
+        Alert.alert('Error', 'No se pudo finalizar la entrega.');
+      } finally {
+        setFinalizando(false);
+      }
+    }, 7000);
   };
 
   if (loading) {
@@ -68,7 +74,7 @@ const DetalleEntregaPendiente = () => {
     );
   }
 
-  return (
+return (
     <LinearGradient
       colors={['#1A1A2E', '#16213E', '#0F3460']}
       style={styles.gradient}
@@ -77,26 +83,35 @@ const DetalleEntregaPendiente = () => {
     >
       <SafeAreaView style={{ flex: 1 }}>
         <StatusBar barStyle="light-content" backgroundColor="#1A1A2E" translucent />
-        <View style={styles.container}>
-          <Text style={styles.title}>Detalle de Entrega Pendiente</Text>
-          <View style={styles.card}>
-            <Text style={styles.label}>Cliente: <Text style={styles.value}>{detalle.cliente}</Text></Text>
-            <Text style={styles.label}>DNI: <Text style={styles.value}>{detalle.clienteDni}</Text></Text>
-            <Text style={styles.label}>Producto: <Text style={styles.value}>{detalle.producto}</Text></Text>
-            <Text style={styles.label}>Ruta ID: <Text style={styles.value}>{detalle.rutaId}</Text></Text>
-            <Text style={styles.label}>Estado: <Text style={styles.value}>Pendiente</Text></Text>
-            <Text style={styles.label}>Fecha Creación: <Text style={styles.value}>{detalle.fechaCreacion}</Text></Text>
+
+        {showImage ? (
+          <Image
+            source={require('../assets/qr_imagen.jpeg')} 
+            style={styles.fullscreenImage}
+            resizeMode="contain" // Ajusta la imagen para que cubra toda la pantalla
+          />
+        ) : (
+          <View style={styles.container}>
+            <Text style={styles.title}>Detalle de Entrega Pendiente</Text>
+            <View style={styles.card}>
+              <Text style={styles.label}>Cliente: <Text style={styles.value}>{detalle.cliente}</Text></Text>
+              <Text style={styles.label}>DNI: <Text style={styles.value}>{detalle.clienteDni}</Text></Text>
+              <Text style={styles.label}>Producto: <Text style={styles.value}>{detalle.producto}</Text></Text>
+              <Text style={styles.label}>Ruta ID: <Text style={styles.value}>{detalle.rutaId}</Text></Text>
+              <Text style={styles.label}>Estado: <Text style={styles.value}>Pendiente</Text></Text>
+              <Text style={styles.label}>Fecha Creación: <Text style={styles.value}>{detalle.fechaCreacion}</Text></Text>
+            </View>
+            <TouchableOpacity
+              style={styles.qrButton}
+              onPress={finalizarEntrega}
+              disabled={finalizando}
+              activeOpacity={0.8}
+            >
+              <Text style={styles.qrButtonText}>{finalizando ? 'Finalizando...' : 'QR'}</Text>
+            </TouchableOpacity>
+            <Button title="Volver" color="#F27121" onPress={() => navigation.goBack()} />
           </View>
-          <TouchableOpacity
-            style={styles.qrButton}
-            onPress={finalizarEntrega}
-            disabled={finalizando}
-            activeOpacity={0.8}
-          >
-            <Text style={styles.qrButtonText}>{finalizando ? 'Finalizando...' : 'QR'}</Text>
-          </TouchableOpacity>
-          <Button title="Volver" color="#F27121" onPress={() => navigation.goBack()} />
-        </View>
+        )}
       </SafeAreaView>
     </LinearGradient>
   );
@@ -160,6 +175,16 @@ const styles = StyleSheet.create({
     color: '#black',
     fontWeight: 'bold',
     fontSize: 18,
+  },
+  fullscreenImage: {
+    position: 'absolute',
+    top: 0,
+    left: 0,
+    right: 0,
+    bottom: 0,
+    width: '100%',
+    height: '100%',
+    zIndex: 1000,
   },
 });
 
