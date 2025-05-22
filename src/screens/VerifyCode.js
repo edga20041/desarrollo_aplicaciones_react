@@ -3,6 +3,7 @@ import { View, Text, TextInput, Button, StyleSheet, Alert } from 'react-native';
 import axios from 'axios';
 import { useNavigation } from '@react-navigation/native';
 import config from '../config/config';
+import AsyncStorage from '@react-native-async-storage/async-storage';
 
 const VerifyCode = ({ email }) => {
     const [code, setCode] = useState('');
@@ -52,7 +53,7 @@ const VerifyCode = ({ email }) => {
             );
             console.log(response.data.message);
             Alert.alert("Success", response.data.message);
-            navigation.replace('Home');
+            navigation.replace('Main');
         } catch (err) {
             setError(`Error de conexión: ${err.message}`);
         } finally {
