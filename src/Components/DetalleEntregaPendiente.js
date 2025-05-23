@@ -45,9 +45,7 @@ const DetalleEntregaPendiente = () => {
           estadoId: 3,
           repartidorId: detalle.repartidorId 
         };
-        await axios.patch(url, body, {
-          headers: { Authorization: `Bearer ${token}` }
-        });
+        await axios.patch(url, body, {});
         Alert.alert('Éxito', 'La entrega fue finalizada.');
         navigation.goBack();
       } catch (error) {
