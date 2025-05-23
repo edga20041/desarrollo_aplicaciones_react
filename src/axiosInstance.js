@@ -1,22 +1,44 @@
 import axios from 'axios';
 import AsyncStorage from '@react-native-async-storage/async-storage';
-import config from './config/config';
+import * as SecureStore from 'expo-secure-store'; 
+import config from './config/config'; 
 
 const instance = axios.create({
-  baseURL: config.API_URL,
+    baseURL: config.API_URL,
+    timeout: 15000,
+    headers: {
+        'Content-Type': 'application/json',
+    },
 });
 
 instance.interceptors.request.use(
-  async (config) => {
-    const token = await AsyncStorage.getItem('token');
-    if (token) {
-      config.headers.Authorization = `Bearer ${token}`;
+    async (configReq) => {
+        const token = await SecureStore.getItemAsync('token'); 
+        if (token) {
+            configReq.headers.Authorization = `Bearer ${token}`;
+        }
+        return configReq;
+    },
+    (error) => {
+        return Promise.reject(error);
     }
-    return config;
-  },
-  (error) => {
-    return Promise.reject(error);
-  }
 );
 
-export default instance;
+instance.interceptors.response.use(
+    (response) => response,
+    async (error) => {
+        const originalRequest = error.config;
+        if (error.response && error.response.status === 401 && !originalRequest._retry) {
+            originalRequest._retry = true; 
+            
+            await SecureStore.deleteItemAsync('token'); 
+            await AsyncStorage.removeItem('userName'); 
+            
+            console.error('Token expirado o no autorizado. Redirigir a la pantalla de login.');
+       
+        }
+        return Promise.reject(error);
+    }
+);
+
+export default instance; 

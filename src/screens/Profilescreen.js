@@ -5,6 +5,7 @@ import config from '../config/config';
 import axiosInstance from '../axiosInstance';
 import { LinearGradient } from 'expo-linear-gradient';
 import { useNavigation } from '@react-navigation/native';
+import * as SecureStore from 'expo-secure-store';
  
 const ProfileScreen = () => {
     const [perfil, setPerfil] = useState(null);
@@ -41,7 +42,7 @@ const ProfileScreen = () => {
                     console.error(`Status: ${error.response.status}, Data: ${JSON.stringify(error.response.data)}`);
                     if (error.response.status === 401) {
                         errorMessage = 'Sesión expirada o no autorizado. Por favor, inicia sesión de nuevo.';
-                        await AsyncStorage.removeItem('token');
+                        await SecureStore.deleteItemAsync('token'); 
                         await AsyncStorage.removeItem('userName');
                         navigation.replace('Login');
                     } else if (error.response.data && error.response.data.message) {
@@ -65,7 +66,7 @@ const ProfileScreen = () => {
     const handleLogout = async () => {
         setLoading(true);
         try {
-            await AsyncStorage.removeItem('token');
+            await SecureStore.deleteItemAsync('token');
             await AsyncStorage.removeItem('userName');
             showMessage('Sesión cerrada exitosamente.', false);
             setTimeout(() => {

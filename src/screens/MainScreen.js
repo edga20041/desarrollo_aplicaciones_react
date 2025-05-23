@@ -68,7 +68,7 @@ const MainScreen = () => {
         <StatusBar barStyle="light-content" backgroundColor="#1A1A2E" translucent />
         <View style={styles.container}>
           <View style={styles.headerRow}>
-          <TouchableOpacity onPress={() => navigation.navigate('Profilescreen')}>
+          <TouchableOpacity onPress={() => navigation.navigate('ProfileScreen')}>
           <Image
           source={require('../../assets/avatar.png')}
           style={styles.avatar}
