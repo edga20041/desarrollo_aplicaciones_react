@@ -1,12 +1,12 @@
 import React, { useState, useEffect } from 'react';
 import { View, Text, StyleSheet, ScrollView, Button, ActivityIndicator, Alert, SafeAreaView, StatusBar } from 'react-native';
 import { useNavigation, useRoute } from '@react-navigation/native';
-import AsyncStorage from '@react-native-async-storage/async-storage';
 import MapView, { Marker, Polyline } from 'react-native-maps';
 import Geocoder from 'react-native-geocoding';
 import config from '../config/config';
 import axiosInstance from '../axiosInstance';
 import { LinearGradient } from 'expo-linear-gradient';
+import * as SecureStore from 'expo-secure-store';
 
 const DetalleEntregaHistorial = () => {
     const navigation = useNavigation();
@@ -36,7 +36,7 @@ const DetalleEntregaHistorial = () => {
         setError(null);
         try {
             console.log('Cargando detalle de entrega con ID:', id);
-            const token = await AsyncStorage.getItem('token');
+            const token = await SecureStore.getItemAsync('token');
             console.log('Token enviado:', token);
             const url = config.API_URL + config.ENTREGAS.GET_BY_ID.replace('{entrega_id}', id);
             console.log('URL de la petición de detalle de entrega:', url);

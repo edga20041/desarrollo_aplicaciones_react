@@ -5,6 +5,7 @@ import { useNavigation, useFocusEffect } from '@react-navigation/native';
 import { LinearGradient } from 'expo-linear-gradient';
 import EntregasPendientes from '../Components/EntregasPendientes';
 import HistorialEntregas from '../Components/HistorialEntregas';
+import * as SecureStore from 'expo-secure-store';
 
 const MainScreen = () => {
   const navigation = useNavigation();
@@ -22,9 +23,9 @@ const MainScreen = () => {
 
   useEffect(() => {
     const checkAuthentication = async () => {
-      const token = await AsyncStorage.getItem('token');
+      const token = await SecureStore.getItemAsync('token');
       if (!token) {
-        navigation.replace('Login');
+        navigation.reset('Login');
       }
     };
     checkAuthentication();
@@ -45,17 +46,6 @@ const MainScreen = () => {
     setGreeting(getGreeting());
   }, [navigation]);
 
-  const handleLogout = async () => {
-    try {
-      await AsyncStorage.removeItem('token');
-      await AsyncStorage.removeItem('userName');
-      navigation.reset({
-        index: 0,
-        routes: [{ name: 'Home' }],
-      });
-    } catch (error) {
-    }
-  };
 
   return (
     <LinearGradient

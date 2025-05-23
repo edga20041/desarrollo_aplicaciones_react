@@ -3,8 +3,8 @@ import { View, Text, StyleSheet, ActivityIndicator, Alert, TouchableOpacity, Saf
 import { useNavigation, useRoute } from '@react-navigation/native';
 import axios from '../axiosInstance';
 import config from '../config/config';
-import AsyncStorage from '@react-native-async-storage/async-storage';
 import { LinearGradient } from 'expo-linear-gradient';
+import * as SecureStore from 'expo-secure-store';
 
 const DetalleEntregaPendiente = () => {
   const navigation = useNavigation();
@@ -38,7 +38,7 @@ const DetalleEntregaPendiente = () => {
     setTimeout(async () => {
       setShowImage(false);
       try {
-        const token = await AsyncStorage.getItem('token');
+        const token = await SecureStore.getItemAsync('token');
         const url = config.API_URL + config.ENTREGAS.CAMBIAR_ESTADO; 
         const body = {
           entregaId: detalle.id,
