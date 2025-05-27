@@ -244,9 +244,12 @@ const AppContent = () => {
     },
     headerShadowVisible: false,
     contentStyle: {
-      backgroundColor: currentTheme.secondary,
+      backgroundColor: currentTheme.primary,
     },
     animation: "slide_from_right",
+    cardStyle: {
+      backgroundColor: currentTheme.primary,
+    },
   };
 
   return (

@@ -109,14 +109,34 @@ const ProfileScreen = () => {
   if (loading) {
     return (
       <LinearGradient
-        colors={["#1A1A2E", "#16213E", "#0F3460"]}
+        colors={
+          isDarkMode
+            ? ["#1A1A2E", "#16213E", "#0F3460"]
+            : ["#FFFFFF", "#F5F5F5", "#E8E8E8"]
+        }
         style={styles.gradient}
       >
-        <ActivityIndicator
-          size="large"
-          color="#F27121"
-          style={{ flex: 1, justifyContent: "center" }}
-        />
+        <SafeAreaView
+          style={[{ flex: 1 }, { backgroundColor: currentTheme.primary }]}
+        >
+          <StatusBar
+            barStyle={isDarkMode ? "light-content" : "dark-content"}
+            backgroundColor={currentTheme.primary}
+            translucent
+          />
+          <View
+            style={[
+              styles.container,
+              {
+                backgroundColor: "transparent",
+                justifyContent: "center",
+                alignItems: "center",
+              },
+            ]}
+          >
+            <ActivityIndicator size="large" color={currentTheme.accent} />
+          </View>
+        </SafeAreaView>
       </LinearGradient>
     );
   }
@@ -130,13 +150,15 @@ const ProfileScreen = () => {
       }
       style={styles.gradient}
     >
-      <SafeAreaView style={{ flex: 1 }}>
+      <SafeAreaView
+        style={[{ flex: 1 }, { backgroundColor: currentTheme.primary }]}
+      >
         <StatusBar
           barStyle={isDarkMode ? "light-content" : "dark-content"}
-          backgroundColor={isDarkMode ? "#1A1A2E" : "#FFFFFF"}
+          backgroundColor={currentTheme.primary}
           translucent
         />
-        <View style={styles.container}>
+        <View style={[styles.container, { backgroundColor: "transparent" }]}>
           <View style={styles.themeToggleContainer}>
             <Text style={[styles.themeText, { color: currentTheme.text }]}>
               {isDarkMode ? "Modo oscuro" : "Modo claro"}

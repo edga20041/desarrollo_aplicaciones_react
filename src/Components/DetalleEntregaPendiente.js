@@ -81,9 +81,29 @@ const DetalleEntregaPendiente = () => {
             ? ["#1A1A2E", "#16213E", "#0F3460"]
             : ["#FFFFFF", "#F5F5F5", "#E8E8E8"]
         }
-        style={{ flex: 1, justifyContent: "center", alignItems: "center" }}
+        style={styles.gradient}
       >
-        <ActivityIndicator size="large" color={currentTheme.accent} />
+        <SafeAreaView
+          style={[{ flex: 1 }, { backgroundColor: currentTheme.primary }]}
+        >
+          <StatusBar
+            barStyle={isDarkMode ? "light-content" : "dark-content"}
+            backgroundColor={currentTheme.primary}
+            translucent
+          />
+          <View
+            style={[
+              styles.container,
+              {
+                backgroundColor: "transparent",
+                justifyContent: "center",
+                alignItems: "center",
+              },
+            ]}
+          >
+            <ActivityIndicator size="large" color={currentTheme.accent} />
+          </View>
+        </SafeAreaView>
       </LinearGradient>
     );
   }
@@ -96,11 +116,31 @@ const DetalleEntregaPendiente = () => {
             ? ["#1A1A2E", "#16213E", "#0F3460"]
             : ["#FFFFFF", "#F5F5F5", "#E8E8E8"]
         }
-        style={{ flex: 1, justifyContent: "center", alignItems: "center" }}
+        style={styles.gradient}
       >
-        <Text style={{ color: currentTheme.text, fontSize: 18 }}>
-          No se encontró la entrega.
-        </Text>
+        <SafeAreaView
+          style={[{ flex: 1 }, { backgroundColor: currentTheme.primary }]}
+        >
+          <StatusBar
+            barStyle={isDarkMode ? "light-content" : "dark-content"}
+            backgroundColor={currentTheme.primary}
+            translucent
+          />
+          <View
+            style={[
+              styles.container,
+              {
+                backgroundColor: "transparent",
+                justifyContent: "center",
+                alignItems: "center",
+              },
+            ]}
+          >
+            <Text style={{ color: currentTheme.text, fontSize: 18 }}>
+              No se encontró la entrega.
+            </Text>
+          </View>
+        </SafeAreaView>
       </LinearGradient>
     );
   }
@@ -116,7 +156,9 @@ const DetalleEntregaPendiente = () => {
       start={{ x: 0, y: 0 }}
       end={{ x: 1, y: 1 }}
     >
-      <SafeAreaView style={{ flex: 1 }}>
+      <SafeAreaView
+        style={[{ flex: 1 }, { backgroundColor: currentTheme.primary }]}
+      >
         <StatusBar
           barStyle={isDarkMode ? "light-content" : "dark-content"}
           backgroundColor={currentTheme.primary}
@@ -130,7 +172,7 @@ const DetalleEntregaPendiente = () => {
             resizeMode="contain"
           />
         ) : (
-          <View style={styles.container}>
+          <View style={[styles.container, { backgroundColor: "transparent" }]}>
             <Text style={[styles.title, { color: currentTheme.accent }]}>
               Detalle de Entrega Pendiente
             </Text>
