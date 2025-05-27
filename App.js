@@ -33,7 +33,7 @@ import Geocoder from "react-native-geocoding";
 import config from "./src/config/config";
 import DetalleEntregaPendiente from "./src/Components/DetalleEntregaPendiente";
 import ProfileScreen from "./src/screens/Profilescreen";
-import { ThemeProvider } from "./src/context/ThemeContext";
+import { ThemeProvider, useTheme } from "./src/context/ThemeContext";
 
 const Stack = createNativeStackNavigator();
 const { width, height } = Dimensions.get("window");
@@ -42,6 +42,8 @@ function HomeScreen({ navigation }) {
   const translateY = useRef(new Animated.Value(50)).current;
   const opacity = useRef(new Animated.Value(0)).current;
   const [isRendered, setIsRendered] = useState(false);
+  const { isDarkMode } = useTheme();
+  const currentTheme = theme[isDarkMode ? "dark" : "light"];
 
   useEffect(() => {
     console.log("HomeScreen mounted");
@@ -79,23 +81,33 @@ function HomeScreen({ navigation }) {
   if (!fontsLoaded) {
     console.log("Fonts loading...");
     return (
-      <View style={styles.loadingContainer}>
-        <Text style={styles.loadingText}>Cargando...</Text>
+      <View
+        style={[
+          styles.loadingContainer,
+          { backgroundColor: currentTheme.primary },
+        ]}
+      >
+        <Text style={[styles.loadingText, { color: currentTheme.text }]}>
+          Cargando...
+        </Text>
       </View>
     );
   }
-  console.log("Fonts loaded");
 
   return (
     <SafeAreaView style={styles.container}>
       <StatusBar
-        barStyle="light-content"
-        backgroundColor="#1A1A2E"
+        barStyle={isDarkMode ? "light-content" : "dark-content"}
+        backgroundColor={currentTheme.primary}
         translucent
       />
 
       <LinearGradient
-        colors={["#1A1A2E", "#16213E", "#0F3460"]}
+        colors={
+          isDarkMode
+            ? ["#1A1A2E", "#16213E", "#0F3460"]
+            : ["#FFFFFF", "#F5F5F5", "#E8E8E8"]
+        }
         style={styles.gradient}
         start={{ x: 0, y: 0 }}
         end={{ x: 1, y: 1 }}
@@ -105,7 +117,12 @@ function HomeScreen({ navigation }) {
           duration={7000}
           style={styles.logoContainer}
         >
-          <View style={styles.logoCircle}>
+          <View
+            style={[
+              styles.logoCircle,
+              { backgroundColor: currentTheme.accent },
+            ]}
+          >
             <Image
               source={require("./assets/logo.png")}
               style={{ width: 250, height: 200, resizeMode: "cover" }}
@@ -123,9 +140,23 @@ function HomeScreen({ navigation }) {
               },
             ]}
           >
-            <Text style={styles.welcomeText}>Bienvenido a</Text>
-            <Text style={styles.appName}>DeRemate</Text>
-            <Text style={styles.tagline}>
+            <Text style={[styles.welcomeText, { color: currentTheme.text }]}>
+              Bienvenido a
+            </Text>
+            <Text
+              style={[
+                styles.appName,
+                {
+                  color: currentTheme.text,
+                  textShadowColor: isDarkMode
+                    ? "rgba(0, 0, 0, 0.3)"
+                    : "rgba(0, 0, 0, 0.1)",
+                },
+              ]}
+            >
+              DeRemate
+            </Text>
+            <Text style={[styles.tagline, { color: currentTheme.text }]}>
               Tu plataforma de entregas confiable
             </Text>
 
@@ -146,11 +177,21 @@ function HomeScreen({ navigation }) {
               </TouchableOpacity>
 
               <TouchableOpacity
-                style={styles.registerButton}
+                style={[
+                  styles.registerButton,
+                  { borderColor: currentTheme.accent },
+                ]}
                 onPress={() => navigation.navigate("Register")}
                 activeOpacity={0.8}
               >
-                <Text style={styles.registerButtonText}>Registrarse</Text>
+                <Text
+                  style={[
+                    styles.registerButtonText,
+                    { color: currentTheme.text },
+                  ]}
+                >
+                  Registrarse
+                </Text>
               </TouchableOpacity>
             </View>
           </Animated.View>
@@ -158,7 +199,11 @@ function HomeScreen({ navigation }) {
 
         <View style={styles.bottomDecoration}>
           <LinearGradient
-            colors={["rgba(231, 76, 60, 0.7)", "rgba(241, 196, 15, 0.7)"]}
+            colors={
+              isDarkMode
+                ? ["rgba(231, 76, 60, 0.7)", "rgba(241, 196, 15, 0.7)"]
+                : ["rgba(231, 76, 60, 0.4)", "rgba(241, 196, 15, 0.4)"]
+            }
             style={styles.decorationGradient}
             start={{ x: 0, y: 0 }}
             end={{ x: 1, y: 0 }}
@@ -170,6 +215,9 @@ function HomeScreen({ navigation }) {
 }
 
 export default function App() {
+  const { isDarkMode } = useTheme();
+  const currentTheme = theme[isDarkMode ? "dark" : "light"];
+
   useEffect(() => {
     console.log("Iniciando Geocoder...");
     if (config.GOOGLE_MAPS_API_KEY) {
@@ -185,15 +233,16 @@ export default function App() {
 
   const screenOptions = {
     headerStyle: {
-      backgroundColor: "#1A1A2E",
+      backgroundColor: currentTheme.primary,
     },
-    headerTintColor: "#fff",
+    headerTintColor: currentTheme.text,
     headerTitleStyle: {
       fontFamily: "Montserrat_600SemiBold",
+      color: currentTheme.text,
     },
     headerShadowVisible: false,
     contentStyle: {
-      backgroundColor: "#0F3460",
+      backgroundColor: currentTheme.secondary,
     },
     animation: "slide_from_right",
   };
