@@ -53,7 +53,6 @@ const DetalleEntregaPendiente = () => {
     setShowImage(true);
 
     setTimeout(async () => {
-      setShowImage(false);
       try {
         const token = await SecureStore.getItemAsync("token");
         const url = config.API_URL + config.ENTREGAS.CAMBIAR_ESTADO;
@@ -69,8 +68,10 @@ const DetalleEntregaPendiente = () => {
         Alert.alert("Error", "No se pudo finalizar la entrega.");
       } finally {
         setFinalizando(false);
+        setShowImage(false);
+
       }
-    }, 7000);
+    }, 4000);
   };
 
   if (loading) {
