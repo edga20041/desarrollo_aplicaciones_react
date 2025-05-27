@@ -1,13 +1,13 @@
-import { Platform } from 'react-native';
+import { Platform } from "react-native";
 
 // Cambia esta IP por la IP local del backend (de quien lo esté corriendo)
-const LOCAL_IP = '192.168.0.232';
-const API_PORT = '8081';
+const LOCAL_IP = "192.168.1.36";
+const API_PORT = "8081";
 
 const getBaseUrl = () => {
-    if (Platform.OS === 'android') return `http://${LOCAL_IP}:${API_PORT}`;
-    if (Platform.OS === 'ios') return `http://${LOCAL_IP}:${API_PORT}`;
-    if (Platform.OS === 'web') return `http://localhost:${API_PORT}`;
+  if (Platform.OS === "android") return `http://${LOCAL_IP}:${API_PORT}`;
+  if (Platform.OS === "ios") return `http://${LOCAL_IP}:${API_PORT}`;
+  if (Platform.OS === "web") return `http://localhost:${API_PORT}`;
 };
 
 const config = {
