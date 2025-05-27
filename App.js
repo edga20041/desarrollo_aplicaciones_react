@@ -34,11 +34,12 @@ import config from "./src/config/config";
 import DetalleEntregaPendiente from "./src/Components/DetalleEntregaPendiente";
 import ProfileScreen from "./src/screens/Profilescreen";
 import { ThemeProvider, useTheme } from "./src/context/ThemeContext";
+import { theme } from "./src/styles/theme";
 
 const Stack = createNativeStackNavigator();
 const { width, height } = Dimensions.get("window");
 
-function HomeScreen({ navigation }) {
+const HomeScreen = ({ navigation }) => {
   const translateY = useRef(new Animated.Value(50)).current;
   const opacity = useRef(new Animated.Value(0)).current;
   const [isRendered, setIsRendered] = useState(false);
@@ -212,9 +213,10 @@ function HomeScreen({ navigation }) {
       </LinearGradient>
     </SafeAreaView>
   );
-}
+};
 
-export default function App() {
+// Separate component for theme-dependent content
+const AppContent = () => {
   const { isDarkMode } = useTheme();
   const currentTheme = theme[isDarkMode ? "dark" : "light"];
 
@@ -248,93 +250,99 @@ export default function App() {
   };
 
   return (
+    <NavigationContainer>
+      <Stack.Navigator initialRouteName="Home" screenOptions={screenOptions}>
+        <Stack.Screen
+          name="Home"
+          component={HomeScreen}
+          options={{ headerShown: false }}
+        />
+        <Stack.Screen
+          name="Register"
+          component={RegisterAuth}
+          options={{
+            title: "Crear Cuenta",
+            headerBackTitle: "Volver",
+          }}
+        />
+        <Stack.Screen
+          name="Login"
+          component={LoginAuth}
+          options={{
+            title: "Iniciar Sesión",
+            headerBackTitle: "Volver",
+          }}
+        />
+        <Stack.Screen
+          name="Main"
+          component={MainScreen}
+          options={{ headerShown: false }}
+        />
+        <Stack.Screen
+          name="RecoverPassword"
+          component={RecoverPasswordScreen}
+          options={{
+            title: "Recuperar Contraseña",
+            headerBackTitle: "Volver",
+          }}
+        />
+        <Stack.Screen
+          name="VerifyCodePassword"
+          component={VerifyCodePasswordScreen}
+          options={{
+            title: "Verificar Código",
+            headerBackTitle: "Volver",
+          }}
+        />
+        <Stack.Screen
+          name="ResetPassword"
+          component={ResetPasswordScreen}
+          options={{
+            title: "Nueva Contraseña",
+            headerBackTitle: "Volver",
+          }}
+        />
+        <Stack.Screen
+          name="Historial"
+          component={HistorialEntregas}
+          options={{
+            title: "Historial de Entregas",
+            headerBackTitle: "Volver",
+          }}
+        />
+        <Stack.Screen
+          name="Detalle Entrega Historial"
+          component={DetalleEntregaHistorial}
+          options={{
+            title: "Detalle de Entrega",
+            headerBackTitle: "Volver",
+          }}
+        />
+        <Stack.Screen
+          name="ProfileScreen"
+          component={ProfileScreen}
+          options={{
+            title: "Mi Perfil",
+            headerBackTitle: "Volver",
+          }}
+        />
+        <Stack.Screen
+          name="Detalle Entrega Pendiente"
+          component={DetalleEntregaPendiente}
+          options={{
+            title: "Detalle de Entrega",
+            headerBackTitle: "Volver",
+          }}
+        />
+      </Stack.Navigator>
+    </NavigationContainer>
+  );
+};
+
+export default function App() {
+  return (
     <ThemeProvider>
-      <NavigationContainer>
-        <Stack.Navigator initialRouteName="Home" screenOptions={screenOptions}>
-          <Stack.Screen
-            name="Home"
-            component={HomeScreen}
-            options={{ headerShown: false }}
-          />
-          <Stack.Screen
-            name="Register"
-            component={RegisterAuth}
-            options={{
-              title: "Crear Cuenta",
-              headerBackTitle: "Volver",
-            }}
-          />
-          <Stack.Screen
-            name="Login"
-            component={LoginAuth}
-            options={{
-              title: "Iniciar Sesión",
-              headerBackTitle: "Volver",
-            }}
-          />
-          <Stack.Screen
-            name="Main"
-            component={MainScreen}
-            options={{ headerShown: false }}
-          />
-          <Stack.Screen
-            name="RecoverPassword"
-            component={RecoverPasswordScreen}
-            options={{
-              title: "Recuperar Contraseña",
-              headerBackTitle: "Volver",
-            }}
-          />
-          <Stack.Screen
-            name="VerifyCodePassword"
-            component={VerifyCodePasswordScreen}
-            options={{
-              title: "Verificar Código",
-              headerBackTitle: "Volver",
-            }}
-          />
-          <Stack.Screen
-            name="ResetPassword"
-            component={ResetPasswordScreen}
-            options={{
-              title: "Nueva Contraseña",
-              headerBackTitle: "Volver",
-            }}
-          />
-          <Stack.Screen
-            name="Historial"
-            component={HistorialEntregas}
-            options={{
-              title: "Historial de Entregas",
-              headerBackTitle: "Volver",
-            }}
-          />
-          <Stack.Screen
-            name="Detalle Entrega Historial"
-            component={DetalleEntregaHistorial}
-            options={{
-              title: "Detalle de Entrega",
-              headerBackTitle: "Volver",
-            }}
-          />
-          <Stack.Screen
-            name="ProfileScreen"
-            component={ProfileScreen}
-            options={{
-              title: "Mi Perfil",
-              headerBackTitle: "Volver",
-            }}
-          />
-          <Stack.Screen
-            name="Detalle Entrega Pendiente"
-            component={DetalleEntregaPendiente}
-            options={{
-              title: "Detalle de Entrega",
-              headerBackTitle: "Volver",
-            }}
-          />
-        </Stack.Navigator>
-      </NavigationContainer>
+      <AppContent />
     </ThemeProvider>
   );
 }
