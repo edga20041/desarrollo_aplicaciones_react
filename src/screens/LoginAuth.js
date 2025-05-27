@@ -70,13 +70,11 @@ const LoginAuth = () => {
                 if (name) {
                     await AsyncStorage.setItem('userName', name);
                 }
-                showMessage('¡Bienvenido!', false);
-                setTimeout(() => {
+                //showMessage('¡Bienvenido!', false);
                     navigation.reset({
                         index: 0,
                         routes: [{ name: 'Main' }],
                     });
-                }, 1500); 
             } else {
                 showMessage('Token no recibido del servidor.', true);
             }
