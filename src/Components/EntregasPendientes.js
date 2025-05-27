@@ -1,13 +1,24 @@
-import React, { useEffect, useState } from 'react';
-import { View, Text, FlatList, ActivityIndicator, StyleSheet, TouchableOpacity} from 'react-native';
-import axios from '../axiosInstance';
-import { useNavigation } from '@react-navigation/native';
-import config from '../config/config';
+import React, { useEffect, useState } from "react";
+import {
+  View,
+  Text,
+  FlatList,
+  ActivityIndicator,
+  StyleSheet,
+  TouchableOpacity,
+} from "react-native";
+import axios from "../axiosInstance";
+import { useNavigation } from "@react-navigation/native";
+import config from "../config/config";
+import { useTheme } from "../context/ThemeContext";
+import { theme } from "../styles/theme";
 
-const EntregasPendientes = ({refresh}) => {
+const EntregasPendientes = ({ refresh }) => {
   const [entregas, setEntregas] = useState([]);
   const [loading, setLoading] = useState(true);
-   const navigation = useNavigation();
+  const navigation = useNavigation();
+  const { isDarkMode } = useTheme();
+  const currentTheme = theme[isDarkMode ? "dark" : "light"];
 
   useEffect(() => {
     const fetchEntregas = async () => {
@@ -24,44 +35,84 @@ const EntregasPendientes = ({refresh}) => {
   }, [refresh]);
 
   if (loading) {
-    return <ActivityIndicator size="large" color="#2d3a4b" />;
+    return <ActivityIndicator size="large" color={currentTheme.accent} />;
   }
 
   if (entregas.length === 0) {
-    return <Text style={{ textAlign: 'center', marginTop: 20 }}>No hay entregas pendientes.</Text>;
+    return (
+      <Text
+        style={{
+          textAlign: "center",
+          marginTop: 20,
+          color: currentTheme.text,
+          fontSize: 16,
+        }}
+      >
+        No hay entregas pendientes.
+      </Text>
+    );
   }
 
   const handleEntregaPress = (entregaId) => {
-    navigation.navigate('Detalle Entrega Pendiente', { entrega_id: entregaId });
+    navigation.navigate("Detalle Entrega Pendiente", { entrega_id: entregaId });
   };
 
   return (
     <FlatList
       data={entregas}
-      keyExtractor={item => item.id.toString()}
+      keyExtractor={(item) => item.id.toString()}
       renderItem={({ item }) => (
-        <TouchableOpacity onPress={() => handleEntregaPress(item.id)}>
-          <View style={styles.card}>
-            <Text style={styles.title}>Entrega #{item.id}</Text>
-            <Text>Cliente: {item.cliente}</Text>
-            <Text>Producto: {item.producto}</Text>
+        <TouchableOpacity
+          onPress={() => handleEntregaPress(item.id)}
+          activeOpacity={0.7}
+        >
+          <View
+            style={[
+              styles.card,
+              {
+                backgroundColor: currentTheme.cardBg,
+                borderColor: currentTheme.cardBorder,
+              },
+            ]}
+          >
+            <Text style={[styles.title, { color: currentTheme.cardText }]}>
+              Entrega #{item.id}
+            </Text>
+            <Text style={[styles.text, { color: currentTheme.cardText }]}>
+              Cliente: {item.cliente}
+            </Text>
+            <Text style={[styles.text, { color: currentTheme.cardText }]}>
+              Producto: {item.producto}
+            </Text>
           </View>
         </TouchableOpacity>
       )}
+      style={{ paddingHorizontal: 16 }}
     />
   );
 };
 
 const styles = StyleSheet.create({
   card: {
-    backgroundColor: '#f6f8fc',
     borderRadius: 12,
     padding: 16,
     marginBottom: 12,
     borderWidth: 1,
-    borderColor: '#2d3a4b',
+    elevation: 2,
+    shadowColor: "#000",
+    shadowOffset: { width: 0, height: 2 },
+    shadowOpacity: 0.1,
+    shadowRadius: 4,
   },
-  title: { fontWeight: 'bold', marginBottom: 4 },
+  title: {
+    fontWeight: "bold",
+    marginBottom: 8,
+    fontSize: 16,
+  },
+  text: {
+    fontSize: 14,
+    marginBottom: 4,
+  },
 });
 
 export default EntregasPendientes;
