@@ -5,7 +5,7 @@ import {
   StyleSheet,
   ActivityIndicator,
   Alert,
-  TouchableOpacity,
+  Pressable,
   SafeAreaView,
   StatusBar,
   Button,
@@ -53,7 +53,6 @@ const DetalleEntregaPendiente = () => {
     setShowImage(true);
 
     setTimeout(async () => {
-      setShowImage(false);
       try {
         const token = await SecureStore.getItemAsync("token");
         const url = config.API_URL + config.ENTREGAS.CAMBIAR_ESTADO;
@@ -69,8 +68,10 @@ const DetalleEntregaPendiente = () => {
         Alert.alert("Error", "No se pudo finalizar la entrega.");
       } finally {
         setFinalizando(false);
+        setShowImage(false);
+
       }
-    }, 7000);
+    }, 4000);
   };
 
   if (loading) {
@@ -222,7 +223,7 @@ const DetalleEntregaPendiente = () => {
                 </Text>
               </Text>
             </View>
-            <TouchableOpacity
+            <Pressable
               style={[
                 styles.qrButton,
                 {
@@ -239,8 +240,8 @@ const DetalleEntregaPendiente = () => {
               >
                 {finalizando ? "Finalizando..." : "QR"}
               </Text>
-            </TouchableOpacity>
-            <TouchableOpacity
+            </Pressable>
+            <Pressable
               style={[
                 styles.backButton,
                 {
@@ -251,7 +252,7 @@ const DetalleEntregaPendiente = () => {
               activeOpacity={0.8}
             >
               <Text style={styles.backButtonText}>Volver</Text>
-            </TouchableOpacity>
+            </Pressable>
           </View>
         )}
       </SafeAreaView>

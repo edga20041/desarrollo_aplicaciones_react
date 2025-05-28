@@ -5,7 +5,7 @@ import {
   FlatList,
   ActivityIndicator,
   StyleSheet,
-  TouchableOpacity,
+  Pressable,
 } from "react-native";
 import axios from "../axiosInstance";
 import { useNavigation } from "@react-navigation/native";
@@ -62,15 +62,16 @@ const HistorialEntregas = () => {
       data={historial}
       keyExtractor={(item) => item.id.toString()}
       renderItem={({ item }) => (
-        <TouchableOpacity onPress={() => handleEntregaPress(item.id)}>
-          <View
-            style={[
-              styles.card,
-              {
-                backgroundColor: currentTheme.cardBg,
-                borderColor: currentTheme.cardBorder,
-              },
-            ]}
+          <Pressable
+              onPress={() => handleEntregaPress(item.id)}
+              style={({ pressed }) => [
+                styles.card,
+                {
+                  backgroundColor: currentTheme.cardBg,
+                  borderColor: currentTheme.cardBorder,
+                  opacity: pressed ? 0.9 : 1
+                },
+              ]}
           >
             <Text style={[styles.title, { color: currentTheme.cardText }]}>
               Entrega #{item.id}
@@ -84,8 +85,8 @@ const HistorialEntregas = () => {
             <Text style={{ color: currentTheme.cardText }}>
               Estado: {estadoToString(item.estadoId)}
             </Text>
-          </View>
-        </TouchableOpacity>
+          </Pressable>
+
       )}
       style={{ paddingHorizontal: 16 }}
     />
