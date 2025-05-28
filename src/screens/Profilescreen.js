@@ -4,7 +4,7 @@ import {
   Text,
   StyleSheet,
   ActivityIndicator,
-  TouchableOpacity,
+  Pressable,
   SafeAreaView,
   StatusBar,
   Modal,
@@ -226,7 +226,7 @@ const ProfileScreen = () => {
               <Text style={[styles.errorText, { color: currentTheme.text }]}>
                 No se pudo cargar la información del perfil.
               </Text>
-              <TouchableOpacity
+              <Pressable
                 style={[
                   styles.retryButton,
                   { backgroundColor: currentTheme.buttonBg },
@@ -234,11 +234,11 @@ const ProfileScreen = () => {
                 onPress={() => fetchPerfil()}
               >
                 <Text style={styles.retryButtonText}>Reintentar</Text>
-              </TouchableOpacity>
+              </Pressable>
             </View>
           )}
 
-          <TouchableOpacity
+          <Pressable
             style={[
               styles.logoutButton,
               {
@@ -253,7 +253,7 @@ const ProfileScreen = () => {
             <Text style={[styles.logoutText, { color: currentTheme.error }]}>
               Cerrar sesión
             </Text>
-          </TouchableOpacity>
+          </Pressable>
         </View>
       </SafeAreaView>
 
@@ -263,7 +263,7 @@ const ProfileScreen = () => {
         visible={isModalVisible}
         onRequestClose={() => setIsModalVisible(false)}
       >
-        <TouchableOpacity
+        <Pressable
           style={styles.modalOverlay}
           activeOpacity={1}
           onPressOut={() => setIsModalVisible(false)}
@@ -284,7 +284,7 @@ const ProfileScreen = () => {
             >
               {message?.text}
             </Text>
-            <TouchableOpacity
+            <Pressable
               onPress={() => setIsModalVisible(false)}
               style={[
                 styles.modalButton,
@@ -292,9 +292,9 @@ const ProfileScreen = () => {
               ]}
             >
               <Text style={styles.modalButtonText}>Cerrar</Text>
-            </TouchableOpacity>
+            </Pressable>
           </View>
-        </TouchableOpacity>
+        </Pressable>
       </Modal>
     </LinearGradient>
   );

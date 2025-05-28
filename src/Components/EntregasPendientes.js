@@ -5,7 +5,7 @@ import {
   FlatList,
   ActivityIndicator,
   StyleSheet,
-  TouchableOpacity,
+  Pressable,
 } from "react-native";
 import axios from "../axiosInstance";
 import { useNavigation } from "@react-navigation/native";
@@ -62,7 +62,7 @@ const EntregasPendientes = ({ refresh }) => {
       data={entregas}
       keyExtractor={(item) => item.id.toString()}
       renderItem={({ item }) => (
-        <TouchableOpacity
+        <Pressable
           onPress={() => handleEntregaPress(item.id)}
           activeOpacity={0.7}
         >
@@ -85,7 +85,7 @@ const EntregasPendientes = ({ refresh }) => {
               Producto: {item.producto}
             </Text>
           </View>
-        </TouchableOpacity>
+        </Pressable>
       )}
       style={{ paddingHorizontal: 16 }}
     />

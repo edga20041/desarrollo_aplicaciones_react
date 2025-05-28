@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { View, Text, TextInput, TouchableOpacity, StyleSheet, ActivityIndicator, Modal, StatusBar } from 'react-native';
+import { View, Text, TextInput, Pressable, StyleSheet, ActivityIndicator, Modal, StatusBar } from 'react-native';
 import * as SecureStore from 'expo-secure-store'; 
 import AsyncStorage from '@react-native-async-storage/async-storage'; 
 import axios from '../axiosInstance';
@@ -123,19 +123,27 @@ const LoginAuth = () => {
             {loading ? (
                 <ActivityIndicator size="large" color="#E94057" style={styles.loadingSpinner} />
             ) : (
-                <TouchableOpacity style={styles.loginButton} onPress={handleLogin}>
+                <Pressable
+                    style={({ pressed }) => [
+                        styles.loginButton,
+                        pressed && { opacity: 0.9 }
+                    ]}
+                    onPress={handleLogin}
+                >
                     <LinearGradient colors={['#F27121', '#E94057']} style={styles.buttonGradient}>
                         <Text style={styles.loginButtonText}>Iniciar Sesión</Text>
                     </LinearGradient>
-                </TouchableOpacity>
+                </Pressable>
+
             )}
             <View style={styles.links}>
-                <TouchableOpacity onPress={() => navigation.navigate('RecoverPassword')}>
+                <Pressable onPress={() => navigation.navigate('RecoverPassword')}>
                     <Text style={styles.link}>¿Olvidaste tu contraseña?</Text>
-                </TouchableOpacity>
-                <TouchableOpacity onPress={() => navigation.navigate('Register')}>
+                </Pressable>
+
+                <Pressable onPress={() => navigation.navigate('Register')}>
                     <Text style={styles.link}>¿No tienes cuenta? Regístrate</Text>
-                </TouchableOpacity>
+                </Pressable>
             </View>
 
             <Modal
@@ -144,20 +152,26 @@ const LoginAuth = () => {
                 visible={isModalVisible}
                 onRequestClose={() => setIsModalVisible(false)}
             >
-                <TouchableOpacity
+                <Pressable
                     style={styles.modalOverlay}
-                    activeOpacity={1}
-                    onPressOut={() => setIsModalVisible(false)} 
+                    onPress={() => setIsModalVisible(false)}
                 >
-                    <View style={styles.modalContent}>
+                    <View style={styles.modalContent} onStartShouldSetResponder={() => true} onTouchEnd={(e) => e.stopPropagation()}>
                         <Text style={[styles.modalText, message?.isError ? styles.modalErrorText : styles.modalSuccessText]}>
                             {message?.text}
                         </Text>
-                        <TouchableOpacity onPress={() => setIsModalVisible(false)} style={styles.modalButton}>
+                        <Pressable
+                            onPress={() => setIsModalVisible(false)}
+                            style={({ pressed }) => [
+                                styles.modalButton,
+                                pressed && { opacity: 0.8 }
+                            ]}
+                        >
                             <Text style={styles.modalButtonText}>Cerrar</Text>
-                        </TouchableOpacity>
+                        </Pressable>
                     </View>
-                </TouchableOpacity>
+                </Pressable>
+
             </Modal>
         </View>
     );

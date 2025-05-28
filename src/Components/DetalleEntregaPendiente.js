@@ -5,7 +5,7 @@ import {
   StyleSheet,
   ActivityIndicator,
   Alert,
-  TouchableOpacity,
+  Pressable,
   SafeAreaView,
   StatusBar,
   Button,
@@ -223,7 +223,7 @@ const DetalleEntregaPendiente = () => {
                 </Text>
               </Text>
             </View>
-            <TouchableOpacity
+            <Pressable
               style={[
                 styles.qrButton,
                 {
@@ -240,8 +240,8 @@ const DetalleEntregaPendiente = () => {
               >
                 {finalizando ? "Finalizando..." : "QR"}
               </Text>
-            </TouchableOpacity>
-            <TouchableOpacity
+            </Pressable>
+            <Pressable
               style={[
                 styles.backButton,
                 {
@@ -252,7 +252,7 @@ const DetalleEntregaPendiente = () => {
               activeOpacity={0.8}
             >
               <Text style={styles.backButtonText}>Volver</Text>
-            </TouchableOpacity>
+            </Pressable>
           </View>
         )}
       </SafeAreaView>

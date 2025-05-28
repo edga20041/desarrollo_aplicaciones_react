@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { View, Text, TextInput, Button, StyleSheet, ActivityIndicator, Modal, TouchableOpacity } from 'react-native';
+import { View, Text, TextInput, Button, StyleSheet, ActivityIndicator, Modal, Pressable } from 'react-native';
 import axios from 'axios';
 import { useNavigation } from '@react-navigation/native';
 import * as SecureStore from 'expo-secure-store'; 
@@ -145,7 +145,7 @@ const VerifyCode = ({ email }) => {
                 visible={isModalVisible}
                 onRequestClose={() => setIsModalVisible(false)}
             >
-                <TouchableOpacity
+                <Pressable
                     style={styles.modalOverlay}
                     activeOpacity={1}
                     onPressOut={() => setIsModalVisible(false)} 
@@ -154,11 +154,11 @@ const VerifyCode = ({ email }) => {
                         <Text style={[styles.modalText, message?.isError ? styles.modalErrorText : styles.modalSuccessText]}>
                             {message?.text}
                         </Text>
-                        <TouchableOpacity onPress={() => setIsModalVisible(false)} style={styles.modalButton}>
+                        <Pressable onPress={() => setIsModalVisible(false)} style={styles.modalButton}>
                             <Text style={styles.modalButtonText}>Cerrar</Text>
-                        </TouchableOpacity>
+                        </Pressable>
                     </View>
-                </TouchableOpacity>
+                </Pressable>
             </Modal>
         </View>
     );
