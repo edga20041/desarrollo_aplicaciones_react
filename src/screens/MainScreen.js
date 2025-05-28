@@ -4,7 +4,7 @@ import {
   Text,
   StyleSheet,
   SafeAreaView,
-  TouchableOpacity,
+  Pressable,
   Image,
   StatusBar,
   Platform,
@@ -81,20 +81,22 @@ const MainScreen = () => {
         />
         <View style={styles.container}>
           <View style={styles.headerRow}>
-            <TouchableOpacity
-              onPress={() => navigation.navigate("ProfileScreen")}
+            <Pressable
+                onPress={() => navigation.navigate("ProfileScreen")}
+                style={({ pressed }) => pressed && { opacity: 0.7 }}
             >
               <Image
-                source={require("../../assets/avatar.png")}
-                style={[
-                  styles.avatar,
-                  {
-                    backgroundColor: currentTheme.cardBg,
-                    borderColor: currentTheme.cardBorder,
-                  },
-                ]}
+                  source={require("../../assets/avatar.png")}
+                  style={[
+                    styles.avatar,
+                    {
+                      backgroundColor: currentTheme.cardBg,
+                      borderColor: currentTheme.cardBorder,
+                    },
+                  ]}
               />
-            </TouchableOpacity>
+            </Pressable>
+
             <Text style={styles.greeting}>
               <Text style={{ fontWeight: "bold", color: currentTheme.text }}>
                 {greeting}
@@ -103,7 +105,7 @@ const MainScreen = () => {
             </Text>
           </View>
           <View style={styles.buttonRow}>
-            <TouchableOpacity
+            <Pressable
               style={[styles.customButton, showEntregas && styles.activeButton]}
               onPress={() => {
                 setShowEntregas(true);
@@ -130,8 +132,8 @@ const MainScreen = () => {
                   Ver Entregas
                 </Text>
               </LinearGradient>
-            </TouchableOpacity>
-            <TouchableOpacity
+            </Pressable>
+            <Pressable
               style={[
                 styles.customButton,
                 showHistorial && styles.activeButton,
@@ -161,7 +163,7 @@ const MainScreen = () => {
                   Ver Historial
                 </Text>
               </LinearGradient>
-            </TouchableOpacity>
+            </Pressable>
           </View>
           <View
             style={[

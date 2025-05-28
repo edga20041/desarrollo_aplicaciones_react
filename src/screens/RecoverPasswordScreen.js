@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { View, Text, ToastAndroid, StyleSheet, ActivityIndicator, TouchableOpacity } from 'react-native';
+import { View, Text, ToastAndroid, StyleSheet, ActivityIndicator, Pressable } from 'react-native';
 import axios from 'axios';
 import config from '../config/config';
 import Input from '../Components/Input';
@@ -66,7 +66,7 @@ const RecoverPasswordScreen = ({ navigation }) => {
         {loading ? (
           <ActivityIndicator size="large" color="#FF6F00" />
         ) : (
-          <TouchableOpacity onPress={handleRecoverPassword} activeOpacity={0.8}>
+          <Pressable onPress={handleRecoverPassword} activeOpacity={0.8}>
             <LinearGradient
               colors={['#E94057', '#F27121']}
               style={styles.orangeButton}
@@ -75,14 +75,14 @@ const RecoverPasswordScreen = ({ navigation }) => {
             >
               <Text style={styles.buttonText}>Enviar código</Text>
             </LinearGradient>
-          </TouchableOpacity>
+          </Pressable>
         )}
       </View>
 
       <View style={styles.buttonContainer}>
-        <TouchableOpacity onPress={() => navigation.navigate('Login')} activeOpacity={0.7}>
+        <Pressable onPress={() => navigation.navigate('Login')} activeOpacity={0.7}>
           <Text style={styles.link}>Volver al login</Text>
-        </TouchableOpacity>
+        </Pressable>
       </View>
     </View>
   );

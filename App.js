@@ -4,7 +4,7 @@ import { createNativeStackNavigator } from "@react-navigation/native-stack";
 import {
   View,
   Text,
-  TouchableOpacity,
+  Pressable,
   StatusBar,
   SafeAreaView,
   StyleSheet,
@@ -162,7 +162,7 @@ const HomeScreen = ({ navigation }) => {
             </Text>
 
             <View style={styles.buttonContainer}>
-              <TouchableOpacity
+              <Pressable
                 style={styles.loginButton}
                 onPress={() => navigation.navigate("Login")}
                 activeOpacity={0.8}
@@ -175,9 +175,9 @@ const HomeScreen = ({ navigation }) => {
                 >
                   <Text style={styles.loginButtonText}>Iniciar Sesión</Text>
                 </LinearGradient>
-              </TouchableOpacity>
+              </Pressable>
 
-              <TouchableOpacity
+              <Pressable
                 style={[
                   styles.registerButton,
                   { borderColor: currentTheme.accent },
@@ -193,7 +193,7 @@ const HomeScreen = ({ navigation }) => {
                 >
                   Registrarse
                 </Text>
-              </TouchableOpacity>
+              </Pressable>
             </View>
           </Animated.View>
         )}

@@ -5,7 +5,7 @@ import {
     View,
     Text,
     ActivityIndicator,
-    TouchableOpacity,
+    Pressable,
     StyleSheet
 } from 'react-native';
 import axios from 'axios';
@@ -123,11 +123,11 @@ const RegisterForm = ({ onRegisterSuccess }) => {
             {loading ? (
                 <ActivityIndicator size="large" color="#0000ff" />
             ) : (
-                <TouchableOpacity onPress={handleRegister}>
+                <Pressable onPress={handleRegister}>
                     <LinearGradient colors={['#F27121', '#E94057']} style={styles.registerButton}>
                         <Text style={styles.registerButtonText}>Registrarse</Text>
                     </LinearGradient>
-                </TouchableOpacity>
+                </Pressable>
             )}
         </View>
     );
