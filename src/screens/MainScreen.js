@@ -40,6 +40,7 @@ const MainScreen = () => {
         }
       };
       checkToken();
+      setRefreshEntregas((prev) => !prev);
     }, [navigation])
   );
 
