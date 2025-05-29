@@ -30,19 +30,21 @@ const MainScreen = () => {
 
   useFocusEffect(
     React.useCallback(() => {
-      setRefreshEntregas((prev) => !prev);
-    }, [])
+      const checkToken = async () => {
+        const token = await SecureStore.getItemAsync("token");
+        if (!token) {
+          navigation.reset({
+            index: 0,
+            routes: [{ name: "Login" }],
+          });
+        }
+      };
+      checkToken();
+    }, [navigation])
   );
 
   useEffect(() => {
-    const checkAuthentication = async () => {
-      const token = await SecureStore.getItemAsync("token");
-      if (!token) {
-        navigation.reset("Login");
-      }
-    };
-    checkAuthentication();
-
+    
     const fetchUserName = async () => {
       const name = await AsyncStorage.getItem("userName");
       setUserName(name || "Usuario");
@@ -165,6 +167,7 @@ const MainScreen = () => {
               </LinearGradient>
             </Pressable>
           </View>
+          
           <View
             style={[
               styles.fragmentContainer,

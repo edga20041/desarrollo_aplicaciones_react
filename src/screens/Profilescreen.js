@@ -14,7 +14,7 @@ import AsyncStorage from "@react-native-async-storage/async-storage";
 import config from "../config/config";
 import axiosInstance from "../axiosInstance";
 import { LinearGradient } from "expo-linear-gradient";
-import { useNavigation } from "@react-navigation/native";
+import { useNavigation,useFocusEffect } from "@react-navigation/native";
 import * as SecureStore from "expo-secure-store";
 import { useTheme } from "../context/ThemeContext";
 import { theme } from "../styles/theme";
@@ -33,6 +33,21 @@ const ProfileScreen = () => {
     setMessage({ text: msg, isError });
     setIsModalVisible(true);
   };
+
+  useFocusEffect(
+    React.useCallback(() => {
+      const checkToken = async () => {
+        const token = await SecureStore.getItemAsync("token");
+        if (!token) {
+          navigation.reset({
+            index: 0,
+            routes: [{ name: "Login" }],
+          });
+        }
+      };
+      checkToken();
+    }, [navigation])
+  );
 
   useEffect(() => {
     const fetchPerfil = async () => {
