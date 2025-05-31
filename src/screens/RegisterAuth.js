@@ -1,7 +1,8 @@
 import React, { useState } from 'react';
 import { View, Text, StyleSheet } from 'react-native';
 import RegisterForm from './RegisterForm'; 
-import VerifyCode from './VerifyCode'; 
+import VerifyCode from './VerifyCode';
+import {SafeAreaView} from "react-native-safe-area-context";
 
 const RegisterAuth = () => {
     const [email, setEmail] = useState(null);
@@ -12,7 +13,10 @@ const RegisterAuth = () => {
     };
 
     return (
-        <View style={styles.container}>
+        <SafeAreaView
+            style={[styles.container]}
+            edges={['top', 'right', 'left', 'bottom']}
+        >
             <View style={styles.formContainer}>
                 <Text style={styles.title}>
                     {email ? 'Verifica tu Correo Electrónico' : 'Registrarse'}
@@ -23,7 +27,8 @@ const RegisterAuth = () => {
                     <RegisterForm onRegisterSuccess={handleRegisterSuccess} />
                 )}
             </View>
-        </View>
+        </SafeAreaView>
+
     );
 };
 
