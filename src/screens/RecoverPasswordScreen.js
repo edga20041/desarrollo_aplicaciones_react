@@ -1,5 +1,6 @@
 import React, { useState } from 'react';
 import { View, Text, ToastAndroid, StyleSheet, ActivityIndicator, Pressable } from 'react-native';
+import { SafeAreaView } from 'react-native-safe-area-context';
 import axios from 'axios';
 import config from '../config/config';
 import Input from '../Components/Input';
@@ -46,7 +47,7 @@ const RecoverPasswordScreen = ({ navigation }) => {
   };
 
   return (
-    <View style={styles.container}>
+    <SafeAreaView style={styles.container} edges={['top', 'right', 'left', 'bottom']}>
       <Text style={styles.title}>Recuperar contraseña</Text>
 
       <Input
@@ -84,7 +85,7 @@ const RecoverPasswordScreen = ({ navigation }) => {
           <Text style={styles.link}>Volver al login</Text>
         </Pressable>
       </View>
-    </View>
+    </SafeAreaView>
   );
 };
 
