@@ -6,11 +6,11 @@ import {
   ActivityIndicator,
   Alert,
   Pressable,
-  SafeAreaView,
   StatusBar,
   Button,
   Image,
 } from "react-native";
+import { SafeAreaView} from "react-native-safe-area-context";
 import { useNavigation, useRoute } from "@react-navigation/native";
 import axios from "../axiosInstance";
 import config from "../config/config";
@@ -85,7 +85,7 @@ const DetalleEntregaPendiente = () => {
         style={styles.gradient}
       >
         <SafeAreaView
-          style={[{ flex: 1 }, { backgroundColor: currentTheme.primary }]}
+          style={[{ flex: 1 }, { backgroundColor: currentTheme.primary }]} edges={['top', 'right', 'left', 'bottom']}
         >
           <StatusBar
             barStyle={isDarkMode ? "light-content" : "dark-content"}
@@ -120,7 +120,7 @@ const DetalleEntregaPendiente = () => {
         style={styles.gradient}
       >
         <SafeAreaView
-          style={[{ flex: 1 }, { backgroundColor: currentTheme.primary }]}
+          style={[{ flex: 1 }, { backgroundColor: currentTheme.primary }]} edges={['top', 'right', 'left', 'bottom']}
         >
           <StatusBar
             barStyle={isDarkMode ? "light-content" : "dark-content"}
@@ -158,7 +158,7 @@ const DetalleEntregaPendiente = () => {
       end={{ x: 1, y: 1 }}
     >
       <SafeAreaView
-        style={[{ flex: 1 }, { backgroundColor: currentTheme.primary }]}
+        style={[{ flex: 1 }, { backgroundColor: currentTheme.primary }]} edges={['top', 'right', 'left', 'bottom']}
       >
         <StatusBar
           barStyle={isDarkMode ? "light-content" : "dark-content"}
