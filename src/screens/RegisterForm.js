@@ -13,7 +13,7 @@ import config from '../config/config';
 
 const validateFields = (nombre, apellido, dni, phoneNumber, email, password, confirmPassword) => {
     // Validaciones (descomentá si querés activarlas)
-    /*
+
     if (!nombre || !apellido || !dni || !phoneNumber || !email || !password || !confirmPassword) {
         return { valid: false, message: 'Todos los campos son obligatorios.' };
     }
@@ -50,7 +50,7 @@ const validateFields = (nombre, apellido, dni, phoneNumber, email, password, con
     if (nombre.length < 2 || apellido.length < 2) {
         return { valid: false, message: 'El nombre y el apellido deben tener al menos 2 caracteres.' };
     }
-    */
+
     return { valid: true };
 };
 
