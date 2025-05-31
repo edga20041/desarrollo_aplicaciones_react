@@ -5,11 +5,11 @@ import {
   StyleSheet,
   ActivityIndicator,
   Pressable,
-  SafeAreaView,
   StatusBar,
   Modal,
   Switch,
 } from "react-native";
+import { SafeAreaView} from "react-native-safe-area-context";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import config from "../config/config";
 import axiosInstance from "../axiosInstance";
@@ -117,7 +117,7 @@ const ProfileScreen = () => {
         style={styles.gradient}
       >
         <SafeAreaView
-          style={[{ flex: 1 }, { backgroundColor: currentTheme.primary }]}
+          style={[{ flex: 1 }, { backgroundColor: currentTheme.primary }]} edges={['top', 'right', 'left', 'bottom']}
         >
           <StatusBar
             barStyle={isDarkMode ? "light-content" : "dark-content"}
@@ -151,7 +151,7 @@ const ProfileScreen = () => {
       style={styles.gradient}
     >
       <SafeAreaView
-        style={[{ flex: 1 }, { backgroundColor: currentTheme.primary }]}
+        style={[{ flex: 1 }, { backgroundColor: currentTheme.primary }]} edges={['top', 'right', 'left', 'bottom']}
       >
         <StatusBar
           barStyle={isDarkMode ? "light-content" : "dark-content"}
