@@ -6,13 +6,13 @@ import {
   Text,
   Pressable,
   StatusBar,
-  SafeAreaView,
   StyleSheet,
   Dimensions,
   Image,
   Platform,
   Animated,
 } from "react-native";
+import { SafeAreaProvider, SafeAreaView} from "react-native-safe-area-context";
 import { LinearGradient } from "expo-linear-gradient";
 import {
   useFonts,
@@ -94,9 +94,8 @@ const HomeScreen = ({ navigation }) => {
       </View>
     );
   }
-
   return (
-    <SafeAreaView style={styles.container}>
+    <SafeAreaView style={[styles.container]} edges={['top', 'right', 'left', 'bottom']}>
       <StatusBar
         barStyle={isDarkMode ? "light-content" : "dark-content"}
         backgroundColor={currentTheme.primary}
@@ -344,9 +343,11 @@ const AppContent = () => {
 
 export default function App() {
   return (
+  <SafeAreaProvider>
     <ThemeProvider>
       <AppContent />
     </ThemeProvider>
+  </SafeAreaProvider>
   );
 }
 
