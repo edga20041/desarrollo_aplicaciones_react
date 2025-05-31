@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { View, Text, TextInput, Pressable, StyleSheet, ActivityIndicator, Modal, StatusBar } from 'react-native';
+import { SafeAreaView } from 'react-native-safe-area-context';
 import * as SecureStore from 'expo-secure-store'; 
 import AsyncStorage from '@react-native-async-storage/async-storage'; 
 import axios from '../axiosInstance';
@@ -99,8 +100,8 @@ const LoginAuth = () => {
     }
 
     return (
-        <View style={styles.container}>
-            <StatusBar barStyle="dark-content" backgroundColor="white" />
+        <SafeAreaView style={styles.container} edges={['top', 'right', 'left', 'bottom']}>
+        <StatusBar barStyle="dark-content" backgroundColor="white" />
             <Text style={styles.title}>Iniciar Sesión</Text>
             <Input
                 label="Correo electrónico"
@@ -175,7 +176,7 @@ const LoginAuth = () => {
                 </Pressable>
 
             </Modal>
-        </View>
+        </SafeAreaView>
     );
 };
 
