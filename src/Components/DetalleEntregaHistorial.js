@@ -7,9 +7,9 @@ import {
   Button,
   ActivityIndicator,
   Alert,
-  SafeAreaView,
   StatusBar,
 } from "react-native";
+import { SafeAreaView} from "react-native-safe-area-context";
 import { useNavigation, useRoute } from "@react-navigation/native";
 import MapView, { Marker, Polyline } from "react-native-maps";
 import Geocoder from "react-native-geocoding";
@@ -236,7 +236,7 @@ const DetalleEntregaHistorial = () => {
       start={{ x: 0, y: 0 }}
       end={{ x: 1, y: 1 }}
     >
-      <SafeAreaView style={{ flex: 1 }}>
+      <SafeAreaView style={{ flex: 1 }} edges={['top', 'right', 'left', 'bottom']}>
         <StatusBar
           barStyle={isDarkMode ? "light-content" : "dark-content"}
           backgroundColor={currentTheme.primary}
