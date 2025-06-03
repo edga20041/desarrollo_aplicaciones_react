@@ -36,6 +36,8 @@ import ProfileScreen from "./src/screens/Profilescreen";
 import { ThemeProvider, useTheme } from "./src/context/ThemeContext";
 import { theme } from "./src/styles/theme";
 import { Provider as PaperProvider } from "react-native-paper";
+import { navigationRef } from './src/Components/NavigationService';
+
 
 const Stack = createNativeStackNavigator();
 const { width, height } = Dimensions.get("window");
@@ -253,7 +255,7 @@ const AppContent = () => {
   };
 
   return (
-    <NavigationContainer>
+    <NavigationContainer ref={navigationRef}>
       <Stack.Navigator initialRouteName="Home" screenOptions={screenOptions}>
         <Stack.Screen
           name="Home"

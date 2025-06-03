@@ -2,6 +2,7 @@ import axios from 'axios';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import * as SecureStore from 'expo-secure-store'; 
 import config from './config/config'; 
+import {navigationRef} from './Components/NavigationService';
 
 const instance = axios.create({
     baseURL: config.API_URL,
@@ -35,7 +36,13 @@ instance.interceptors.response.use(
             await AsyncStorage.removeItem('userName'); 
             
             console.error('Token expirado o no autorizado. Redirigir a la pantalla de login.');
-       
+
+            if (navigationRef.isReady()) {
+                navigationRef.reset({
+                index: 0,
+                routes: [{ name: 'Login' }],
+                });
+            }
         }
         return Promise.reject(error);
     }
