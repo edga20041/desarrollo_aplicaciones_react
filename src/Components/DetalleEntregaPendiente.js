@@ -18,6 +18,7 @@ import { LinearGradient } from "expo-linear-gradient";
 import * as SecureStore from "expo-secure-store";
 import { useTheme } from "../context/ThemeContext";
 import { theme } from "../styles/theme";
+import { Icon } from "react-native-paper";
 
 const DetalleEntregaPendiente = () => {
   const navigation = useNavigation();
@@ -235,11 +236,19 @@ const DetalleEntregaPendiente = () => {
               disabled={finalizando}
               activeOpacity={0.8}
             >
-              <Text
-                style={[styles.qrButtonText, { color: currentTheme.accent }]}
-              >
-                {finalizando ? "Finalizando..." : "QR"}
-              </Text>
+              {finalizando ? (
+                <Text
+                  style={[styles.qrButtonText, { color: currentTheme.accent }]}
+                >
+                  Finalizando...
+                </Text>
+              ) : (
+                <Icon
+                  source="qrcode-scan"
+                  size={32}
+                  color={currentTheme.accent}
+                />
+              )}
             </Pressable>
             <Pressable
               style={[

@@ -17,6 +17,8 @@ import HistorialEntregas from "../Components/HistorialEntregas";
 import * as SecureStore from "expo-secure-store";
 import { useTheme } from "../context/ThemeContext";
 import { theme } from "../styles/theme";
+import { Icon } from 'react-native-paper';
+
 
 const MainScreen = () => {
   const navigation = useNavigation();
@@ -81,22 +83,16 @@ const MainScreen = () => {
         />
         <View style={styles.container}>
           <View style={styles.headerRow}>
-            <Pressable
-                onPress={() => navigation.navigate("ProfileScreen")}
-                style={({ pressed }) => pressed && { opacity: 0.7 }}
-            >
-              <Image
-                  source={require("../../assets/avatar.png")}
-                  style={[
-                    styles.avatar,
-                    {
-                      backgroundColor: currentTheme.cardBg,
-                      borderColor: currentTheme.cardBorder,
-                    },
-                  ]}
-              />
-            </Pressable>
-
+        <Pressable
+          onPress={() => navigation.navigate("ProfileScreen")}
+          style={({ pressed }) => [
+            styles.profileIcon,
+                { transform: [{ scale: pressed ? 0.95 : 1 }] },
+                { backgroundColor: currentTheme.cardBg, borderColor: currentTheme.cardBorder },
+          ]}
+        >
+          <Icon source="account-circle-outline" size={36} color={currentTheme.text} />
+        </Pressable>
             <Text style={styles.greeting}>
               <Text style={{ fontWeight: "bold", color: currentTheme.text }}>
                 {greeting}
@@ -123,6 +119,14 @@ const MainScreen = () => {
                 start={{ x: 0, y: 0 }}
                 end={{ x: 1, y: 0 }}
               >
+              <View style={{ flexDirection: "row", alignItems: "center" }}>
+                <View style={{ marginRight: 3 }}>
+                  <Icon
+                    source="format-list-bulleted"
+                    size={20}
+                    color={showEntregas ? "#fff" : currentTheme.text}
+                  />
+                </View>
                 <Text
                   style={[
                     styles.buttonText,
@@ -131,6 +135,7 @@ const MainScreen = () => {
                 >
                   Ver Entregas
                 </Text>
+              </View>
               </LinearGradient>
             </Pressable>
             <Pressable
@@ -154,6 +159,14 @@ const MainScreen = () => {
                 start={{ x: 0, y: 0 }}
                 end={{ x: 1, y: 0 }}
               >
+              <View style={{ flexDirection: "row", alignItems: "center" }}>
+                <View style={{ marginRight: 3 }}>
+                  <Icon
+                    source="truck-delivery-outline"
+                    size={20}
+                    color={showHistorial ? "#fff" : currentTheme.text}
+                  />
+                </View>
                 <Text
                   style={[
                     styles.buttonText,
@@ -162,6 +175,7 @@ const MainScreen = () => {
                 >
                   Ver Historial
                 </Text>
+              </View>
               </LinearGradient>
             </Pressable>
           </View>
@@ -277,6 +291,23 @@ const styles = StyleSheet.create({
     fontSize: 16,
     textAlign: "center",
   },
+    profileIcon: {
+    width: 52,
+    height: 52,
+    borderRadius: 26,
+    justifyContent: "center",
+    alignItems: "center",
+    backgroundColor: "#fff", // o currentTheme.cardBg si lo preferís dinámico
+    borderColor: "#e0e0e0",  // o currentTheme.cardBorder
+    borderWidth: 1.5,
+    shadowColor: "#000",
+    shadowOffset: { width: 0, height: 1 },
+    shadowOpacity: 0.1,
+    shadowRadius: 2,
+    elevation: 3,
+    marginRight: 5,
+    marginLeft: 5,
+  }
 });
 
 export default MainScreen;
