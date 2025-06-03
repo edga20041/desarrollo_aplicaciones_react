@@ -8,6 +8,7 @@ import {
   ActivityIndicator,
   Alert,
   StatusBar,
+  TouchableOpacity
 } from "react-native";
 import { SafeAreaView} from "react-native-safe-area-context";
 import { useNavigation, useRoute } from "@react-navigation/native";
@@ -236,16 +237,14 @@ const DetalleEntregaHistorial = () => {
       start={{ x: 0, y: 0 }}
       end={{ x: 1, y: 1 }}
     >
-      <SafeAreaView style={{ flex: 1 }} edges={['top', 'right', 'left', 'bottom']}>
+      <SafeAreaView style={{ flex: 1 }} edges={['right', 'left', 'bottom']}>
         <StatusBar
           barStyle={isDarkMode ? "light-content" : "dark-content"}
           backgroundColor={currentTheme.primary}
-          translucent
         />
-        <ScrollView style={styles.scrollView}>
           <View style={styles.container}>
-            <Text style={[styles.title, { color: currentTheme.text }]}>
-              Detalle de Entrega
+            <Text style={[styles.title, { color: currentTheme.accent }]}>
+              Detalle de Entrega Finalizada
             </Text>
             <View
               style={[
@@ -299,7 +298,7 @@ const DetalleEntregaHistorial = () => {
                 </Text>
               </Text>
             </View>
-            <Text style={[styles.mapTitle, { color: currentTheme.text }]}>
+            <Text style={[styles.mapTitle, { color: currentTheme.accent }]}>
               Ubicación de la Ruta
             </Text>
             {detalleRuta && (
@@ -378,8 +377,14 @@ const DetalleEntregaHistorial = () => {
                 )}
               </View>
             )}
+            {/* Botón Volver */}
+            <TouchableOpacity
+              style={[styles.volverButton, { backgroundColor: currentTheme.accent }]}
+              onPress={handleVolver}
+            >
+              <Text style={styles.volverButtonText}>Volver</Text>
+            </TouchableOpacity>
           </View>
-        </ScrollView>
       </SafeAreaView>
     </LinearGradient>
   );
@@ -393,7 +398,9 @@ const styles = StyleSheet.create({
     flex: 1,
   },
   container: {
-    padding: 20,
+    paddingHorizontal: 20,
+    paddingBottom: 20,
+    paddingTop: 20,
   },
   title: {
     fontSize: 24,
@@ -433,7 +440,7 @@ const styles = StyleSheet.create({
     padding: 8,
   },
   map: {
-    height: 300,
+    height: 250,
     width: "100%",
     borderRadius: 8,
   },
@@ -442,6 +449,18 @@ const styles = StyleSheet.create({
     fontSize: 14,
     paddingHorizontal: 8,
   },
+    volverButton: {
+    marginTop: 28,
+    paddingVertical: 14,
+    borderRadius: 8,
+    alignItems: "center",
+  },
+  volverButtonText: {
+    color: "#fff",
+    fontSize: 16,
+    fontWeight: "bold",
+    letterSpacing: 1,
+  }
 });
 
 export default DetalleEntregaHistorial;
