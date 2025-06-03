@@ -6,10 +6,12 @@ import {
     Text,
     ActivityIndicator,
     Pressable,
-    StyleSheet
+    StyleSheet,
+    TouchableOpacity,
 } from 'react-native';
 import axios from 'axios';
 import config from '../config/config';
+import MaterialCommunityIcons from 'react-native-vector-icons/MaterialCommunityIcons';
 
 const validateFields = (nombre, apellido, dni, phoneNumber, email, password, confirmPassword) => {
     // Validaciones (descomentá si querés activarlas)
@@ -64,6 +66,8 @@ const RegisterForm = ({ onRegisterSuccess }) => {
     const [confirmPassword, setConfirmPassword] = useState('');
     const [loading, setLoading] = useState(false);
     const [error, setError] = useState(null);
+    const [showPassword, setShowPassword] = useState(false);
+    const [showConfirmPassword, setShowConfirmPassword] = useState(false);
 
     const handleRegister = async () => {
         setError(null);
@@ -111,9 +115,39 @@ const RegisterForm = ({ onRegisterSuccess }) => {
             <Input label="DNI" value={dni} onChangeText={setDni} placeholder="Ingrese su DNI" keyboardType="numeric" />
             <Input label="Teléfono" value={phoneNumber} onChangeText={setPhoneNumber} placeholder="Ingrese su teléfono" keyboardType="numeric" />
             <Input label="Email" value={email} onChangeText={setEmail} placeholder="Ingrese su email" keyboardType="email-address" />
-            <Input label="Contraseña" value={password} onChangeText={setPassword} placeholder="Ingrese su contraseña" secureTextEntry />
-            <Input label="Confirmar Contraseña" value={confirmPassword} onChangeText={setConfirmPassword} placeholder="Confirme su contraseña" secureTextEntry />
+            <Input
+                label="Contraseña"
+                value={password}
+                onChangeText={setPassword}
+                placeholder="Ingrese su contraseña"
+                secureTextEntry={!showPassword}
+                rightIcon={
+                    <TouchableOpacity onPress={() => setShowPassword(prev => !prev)}>
+                        <MaterialCommunityIcons
+                            name={showPassword ? "eye-off-outline" : "eye-outline"}
+                            size={22}
+                            color="#888"
+                        />
+                    </TouchableOpacity>
+                }
+            />
 
+            <Input
+                label="Confirmar Contraseña"
+                value={confirmPassword}
+                onChangeText={setConfirmPassword}
+                placeholder="Confirme su contraseña"
+                secureTextEntry={!showConfirmPassword}
+                rightIcon={
+                    <TouchableOpacity onPress={() => setShowConfirmPassword(prev => !prev)}>
+                        <MaterialCommunityIcons
+                            name={showConfirmPassword ? "eye-off-outline" : "eye-outline"}
+                            size={22}
+                            color="#888"
+                        />
+                    </TouchableOpacity>
+                }
+            />
             {error && (
                 <View style={{ backgroundColor: '#f8d7da', padding: 10, borderRadius: 5, marginBottom: 10 }}>
                     <Text style={{ color: '#721c24' }}>Error: {error}</Text>
