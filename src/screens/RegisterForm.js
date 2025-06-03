@@ -56,7 +56,7 @@ const validateFields = (nombre, apellido, dni, phoneNumber, email, password, con
     return { valid: true };
 };
 
-const RegisterForm = ({ onRegisterSuccess }) => {
+const RegisterForm = ({ onRegisterSuccess, onInputFocus }) => {
     const [name, setName] = useState('');
     const [surname, setSurname] = useState('');
     const [dni, setDni] = useState('');
@@ -109,18 +109,52 @@ const RegisterForm = ({ onRegisterSuccess }) => {
     };
 
     return (
-        <View style={{ padding: 15 }}>
-            <Input label="Nombre" value={name} onChangeText={setName} placeholder="Ingrese su nombre" />
-            <Input label="Apellido" value={surname} onChangeText={setSurname} placeholder="Ingrese su apellido" />
-            <Input label="DNI" value={dni} onChangeText={setDni} placeholder="Ingrese su DNI" keyboardType="numeric" />
-            <Input label="Teléfono" value={phoneNumber} onChangeText={setPhoneNumber} placeholder="Ingrese su teléfono" keyboardType="numeric" />
-            <Input label="Email" value={email} onChangeText={setEmail} placeholder="Ingrese su email" keyboardType="email-address" />
+        <View style={styles.formContainer}>
+            <Input 
+                label="Nombre" 
+                value={name} 
+                onChangeText={setName} 
+                placeholder="Ingrese su nombre"
+                onFocus={onInputFocus}
+            />
+            <Input 
+                label="Apellido" 
+                value={surname} 
+                onChangeText={setSurname} 
+                placeholder="Ingrese su apellido"
+                onFocus={onInputFocus}
+            />
+            <Input 
+                label="DNI" 
+                value={dni} 
+                onChangeText={setDni} 
+                placeholder="Ingrese su DNI" 
+                keyboardType="numeric"
+                onFocus={onInputFocus}
+            />
+            <Input 
+                label="Teléfono" 
+                value={phoneNumber} 
+                onChangeText={setPhoneNumber} 
+                placeholder="Ingrese su teléfono" 
+                keyboardType="numeric"
+                onFocus={onInputFocus}
+            />
+            <Input 
+                label="Email" 
+                value={email} 
+                onChangeText={setEmail} 
+                placeholder="Ingrese su email" 
+                keyboardType="email-address"
+                onFocus={onInputFocus}
+            />
             <Input
                 label="Contraseña"
                 value={password}
                 onChangeText={setPassword}
                 placeholder="Ingrese su contraseña"
                 secureTextEntry={!showPassword}
+                onFocus={onInputFocus}
                 rightIcon={
                     <TouchableOpacity onPress={() => setShowPassword(prev => !prev)}>
                         <MaterialCommunityIcons
@@ -131,13 +165,13 @@ const RegisterForm = ({ onRegisterSuccess }) => {
                     </TouchableOpacity>
                 }
             />
-
             <Input
                 label="Confirmar Contraseña"
                 value={confirmPassword}
                 onChangeText={setConfirmPassword}
                 placeholder="Confirme su contraseña"
                 secureTextEntry={!showConfirmPassword}
+                onFocus={onInputFocus}
                 rightIcon={
                     <TouchableOpacity onPress={() => setShowConfirmPassword(prev => !prev)}>
                         <MaterialCommunityIcons
@@ -168,6 +202,10 @@ const RegisterForm = ({ onRegisterSuccess }) => {
 };
 
 const styles = StyleSheet.create({
+    formContainer: {
+        padding: 15,
+        width: '100%',
+    },
     registerButton: {
         borderRadius: 10,
         overflow: 'hidden',

@@ -1,266 +1,249 @@
-import React, { useState } from 'react';
-import { View, Text, TextInput, Button, StyleSheet, ActivityIndicator, Modal, Pressable } from 'react-native';
+import React, { useState, useRef, useEffect } from 'react';
+import {
+    View,
+    Text,
+    StyleSheet,
+    TouchableOpacity,
+    TextInput,
+    ActivityIndicator,
+    Alert,
+    Keyboard,
+} from 'react-native';
+import { LinearGradient } from 'expo-linear-gradient';
 import axios from 'axios';
-import { useNavigation } from '@react-navigation/native';
-import * as SecureStore from 'expo-secure-store'; 
-import AsyncStorage from '@react-native-async-storage/async-storage'; 
-import config from '../config/config'; 
+import config from '../config/config';
+import MaterialCommunityIcons from 'react-native-vector-icons/MaterialCommunityIcons';
 
-const VerifyCode = ({ email }) => {
-
-    const [code, setCode] = useState('');
+const VerifyCode = ({ email, onVerificationSuccess }) => {
+    const [code, setCode] = useState(['', '', '', '', '', '']);
     const [loading, setLoading] = useState(false);
-    const [message, setMessage] = useState(null);
-    const [isModalVisible, setIsModalVisible] = useState(false); 
-    const [verified, setVerified] = useState(false); 
+    const [error, setError] = useState(null);
+    const [timeLeft, setTimeLeft] = useState(60);
+    const [canResend, setCanResend] = useState(false);
+    const inputRefs = useRef([]);
 
-    const navigation = useNavigation();
+    useEffect(() => {
+        let timer;
+        if (timeLeft > 0) {
+            timer = setInterval(() => {
+                setTimeLeft(prev => prev - 1);
+            }, 1000);
+        } else {
+            setCanResend(true);
+        }
+        return () => clearInterval(timer);
+    }, [timeLeft]);
 
-    const showMessage = (msg, isError = false) => {
-        setMessage({ text: msg, isError });
-        setIsModalVisible(true);
+    const handleCodeChange = (text, index) => {
+        const newCode = [...code];
+        newCode[index] = text;
+        setCode(newCode);
+
+        if (text && index < 5) {
+            inputRefs.current[index + 1].focus();
+        }
+    };
+
+    const handleKeyPress = (e, index) => {
+        if (e.nativeEvent.key === 'Backspace' && !code[index] && index > 0) {
+            inputRefs.current[index - 1].focus();
+        }
     };
 
     const handleVerify = async () => {
-        setMessage(null); 
-        setLoading(true);
+        if (code.some(digit => !digit)) {
+            setError('Por favor, ingrese el código completo');
+            return;
+        }
 
-        if (!email) {
-            showMessage('Error: No se proporcionó el email para la verificación.', true);
-            setLoading(false);
-            return;
-        }
-        if (!code) {
-            showMessage('Por favor, ingresa el código de verificación.', true);
-            setLoading(false);
-            return;
-        }
+        setLoading(true);
+        setError(null);
 
         try {
-            const response = await axios.post(
-                `${config.API_URL}${config.AUTH.VERIFY}`,
-                { email, code }
-            );
+            const response = await axios.post(`${config.API_URL}${config.AUTH.VERIFY}`, {
+                email,
+                code: code.join('')
+            });
 
-            if (response.status === 200) {
-                setVerified(true);
-                const { token, name } = response.data;
-                if (token) {
-                    await SecureStore.setItemAsync('token', token); 
-                }
-                if (name) {
-                    await AsyncStorage.setItem('userName', name); 
-                }
-                console.log("Verification successful");
-                showMessage("¡Tu email ha sido verificado exitosamente!", false);
-                setTimeout(() => {
-                    navigation.replace('Login');
-                }, 1500);
-            } else {
-                showMessage('Código de verificación incorrecto.', true);
+            if (response.data.success) {
+                Alert.alert(
+                    '¡Verificación Exitosa!',
+                    'Tu cuenta ha sido verificada correctamente.',
+                    [{ text: 'OK', onPress: onVerificationSuccess }]
+                );
             }
         } catch (err) {
-            console.error("Error de verificación:", err.response?.data || err.message);
-            const errorMessage = err.response?.data?.message || err.message || 'Error de conexión desconocido.';
-            showMessage(`Error de conexión: ${errorMessage}`, true);
+            setError(err.response?.data?.message || 'Error al verificar el código');
         } finally {
             setLoading(false);
         }
     };
 
-    const handleResend = async () => {
-        setMessage(null); 
-        setLoading(true);
+    const handleResendCode = async () => {
+        if (!canResend) return;
 
-        if (!email) {
-            showMessage('Error: No se proporcionó el email para reenviar el código.', true);
-            setLoading(false);
-            return;
-        }
+        setLoading(true);
+        setError(null);
 
         try {
-            const response = await axios.post(
-                `${config.API_URL}${config.AUTH.RESEND_CODE}`,
-                { email }
-            );
-            console.log(response.data.message);
-            showMessage(response.data.message || "Código reenviado exitosamente.", false);
+            await axios.post(`${config.API_URL}${config.AUTH.RESEND_CODE}`, { email });
+            setTimeLeft(60);
+            setCanResend(false);
+            Alert.alert('Código Reenviado', 'Se ha enviado un nuevo código a tu correo electrónico.');
         } catch (err) {
-            console.error("Error al reenviar código:", err.response?.data || err.message);
-            const errorMessage = err.response?.data?.message || err.message || 'Error de conexión desconocido.';
-            showMessage(`Error de conexión: ${errorMessage}`, true);
+            setError(err.response?.data?.message || 'Error al reenviar el código');
         } finally {
             setLoading(false);
         }
     };
-
-    if (verified) {
-        return (
-            <View style={styles.container}>
-                <Text style={styles.verifiedText}>¡Tu email ha sido verificado!</Text>
-                <Text style={styles.verifiedSubText}>Redirigiendo al inicio...</Text>
-                <ActivityIndicator size="large" color="#4B9CE2" style={{ marginTop: 20 }} />
-            </View>
-        );
-    }
 
     return (
         <View style={styles.container}>
-            <Text style={styles.title}>Verificación de Código</Text>
-            <Text style={styles.instructionText}>
-                Por favor, ingresa el código de verificación enviado a {email || 'tu correo electrónico'}.
-            </Text>
-
-            <View style={styles.inputContainer}>
-                <Text style={styles.label}>Código de Verificación</Text>
-                <TextInput
-                    style={styles.input}
-                    value={code}
-                    onChangeText={(text) => setCode(text)}
-                    placeholder="Ingresa tu código"
-                    keyboardType="numeric"
-                    editable={!loading}
-                />
+            <View style={styles.infoContainer}>
+                <MaterialCommunityIcons name="email-check-outline" size={50} color="#E94057" />
+                <Text style={styles.infoText}>
+                    Hemos enviado un código de verificación a:
+                </Text>
+                <Text style={styles.emailText}>{email}</Text>
             </View>
 
-            <View style={styles.buttonContainer}>
-                <Button
-                    title={loading ? 'Verificando...' : 'Verificar'}
-                    onPress={handleVerify}
-                    disabled={loading || code.length === 0} 
-                    color="#4B9CE2"
-                />
-                <View style={{ height: 15 }} /> 
-                <Button
-                    title={loading ? 'Enviando...' : 'Reenviar Código'}
-                    onPress={handleResend}
-                    disabled={loading}
-                    color="#B0B0B0"
-                />
+            <View style={styles.codeContainer}>
+                {code.map((digit, index) => (
+                    <TextInput
+                        key={index}
+                        ref={ref => inputRefs.current[index] = ref}
+                        style={styles.codeInput}
+                        value={digit}
+                        onChangeText={text => handleCodeChange(text, index)}
+                        onKeyPress={e => handleKeyPress(e, index)}
+                        keyboardType="number-pad"
+                        maxLength={1}
+                        selectTextOnFocus
+                    />
+                ))}
             </View>
 
-            <Modal
-                animationType="fade"
-                transparent={true}
-                visible={isModalVisible}
-                onRequestClose={() => setIsModalVisible(false)}
-            >
-                <Pressable
-                    style={styles.modalOverlay}
-                    activeOpacity={1}
-                    onPressOut={() => setIsModalVisible(false)} 
-                >
-                    <View style={styles.modalContent}>
-                        <Text style={[styles.modalText, message?.isError ? styles.modalErrorText : styles.modalSuccessText]}>
-                            {message?.text}
-                        </Text>
-                        <Pressable onPress={() => setIsModalVisible(false)} style={styles.modalButton}>
-                            <Text style={styles.modalButtonText}>Cerrar</Text>
-                        </Pressable>
-                    </View>
-                </Pressable>
-            </Modal>
+            {error && (
+                <View style={styles.errorContainer}>
+                    <MaterialCommunityIcons name="alert-circle-outline" size={20} color="#721c24" />
+                    <Text style={styles.errorText}>{error}</Text>
+                </View>
+            )}
+
+            <View style={styles.timerContainer}>
+                <Text style={styles.timerText}>
+                    {canResend ? '¿No recibiste el código?' : `Reenviar código en ${timeLeft}s`}
+                </Text>
+                {canResend && (
+                    <TouchableOpacity onPress={handleResendCode} disabled={loading}>
+                        <Text style={styles.resendText}>Reenviar código</Text>
+                    </TouchableOpacity>
+                )}
+            </View>
+
+            {loading ? (
+                <ActivityIndicator size="large" color="#E94057" />
+            ) : (
+                <TouchableOpacity onPress={handleVerify} style={styles.verifyButton}>
+                    <LinearGradient
+                        colors={['#F27121', '#E94057']}
+                        style={styles.gradient}
+                    >
+                        <Text style={styles.verifyButtonText}>Verificar Código</Text>
+                    </LinearGradient>
+                </TouchableOpacity>
+            )}
         </View>
     );
 };
 
 const styles = StyleSheet.create({
     container: {
-        flex: 1,
-        justifyContent: 'center',
+        width: '100%',
         alignItems: 'center',
         padding: 20,
-        backgroundColor: '#f8f8f8',
     },
-    title: {
-        fontSize: 24,
-        fontWeight: 'bold',
-        marginBottom: 20,
-        color: '#333',
-    },
-    instructionText: {
-        fontSize: 16,
-        textAlign: 'center',
+    infoContainer: {
+        alignItems: 'center',
         marginBottom: 30,
-        color: '#555',
     },
-    inputContainer: {
-        width: '100%',
-        marginVertical: 10,
-    },
-    label: {
+    infoText: {
         fontSize: 16,
-        color: '#333',
-        marginBottom: 5,
+        color: '#666',
+        textAlign: 'center',
+        marginTop: 10,
+        fontFamily: 'Montserrat_400Regular',
     },
-    input: {
-        height: 50,
-        borderColor: '#ccc',
-        borderWidth: 1,
-        borderRadius: 8,
-        paddingLeft: 15,
-        backgroundColor: 'white',
-        color: 'black',
+    emailText: {
         fontSize: 18,
-    },
-    buttonContainer: {
-        marginTop: 40,
-        width: '100%',
-        minHeight: 100,
-        flexDirection: 'column',
-        justifyContent: 'space-between',
-        paddingVertical: 10,
-        alignItems: 'center',
-    },
-    verifiedText: {
-        fontSize: 22,
+        color: '#E94057',
         fontWeight: 'bold',
-        color: 'green',
-        marginBottom: 10,
+        marginTop: 5,
+        fontFamily: 'Montserrat_600SemiBold',
     },
-    verifiedSubText: {
-        fontSize: 16,
-        color: '#555',
-    },
-    modalOverlay: {
-        flex: 1,
+    codeContainer: {
+        flexDirection: 'row',
         justifyContent: 'center',
-        alignItems: 'center',
-        backgroundColor: 'rgba(0, 0, 0, 0.5)',
+        marginBottom: 20,
     },
-    modalContent: {
-        backgroundColor: 'white',
-        padding: 25,
+    codeInput: {
+        width: 45,
+        height: 55,
+        borderWidth: 2,
+        borderColor: '#E94057',
         borderRadius: 10,
+        marginHorizontal: 5,
+        textAlign: 'center',
+        fontSize: 24,
+        fontFamily: 'Montserrat_600SemiBold',
+        color: '#333',
+    },
+    errorContainer: {
+        flexDirection: 'row',
         alignItems: 'center',
-        elevation: 5,
+        backgroundColor: '#f8d7da',
+        padding: 10,
+        borderRadius: 5,
+        marginBottom: 15,
+        width: '100%',
+    },
+    errorText: {
+        color: '#721c24',
+        marginLeft: 5,
+        fontFamily: 'Montserrat_400Regular',
+    },
+    timerContainer: {
+        alignItems: 'center',
+        marginBottom: 20,
+    },
+    timerText: {
+        color: '#666',
+        marginBottom: 5,
+        fontFamily: 'Montserrat_400Regular',
+    },
+    resendText: {
+        color: '#E94057',
+        textDecorationLine: 'underline',
+        fontFamily: 'Montserrat_600SemiBold',
+    },
+    verifyButton: {
+        width: '100%',
+        borderRadius: 10,
+        overflow: 'hidden',
         shadowColor: '#000',
         shadowOffset: { width: 0, height: 2 },
         shadowOpacity: 0.25,
         shadowRadius: 3.84,
-        width: '80%',
+        elevation: 5,
     },
-    modalText: {
-        fontSize: 18,
-        marginBottom: 20,
-        textAlign: 'center',
+    gradient: {
+        paddingVertical: 15,
+        alignItems: 'center',
     },
-    modalErrorText: {
-        color: '#e74c3c',
-    },
-    modalSuccessText: {
-        color: 'green',
-    },
-    modalButton: {
-        backgroundColor: '#4B9CE2',
-        paddingVertical: 10,
-        paddingHorizontal: 20,
-        borderRadius: 5,
-        marginTop: 10,
-    },
-    modalButtonText: {
+    verifyButtonText: {
         color: 'white',
-        fontSize: 16,
+        fontSize: 18,
+        fontFamily: 'Montserrat_600SemiBold',
     },
 });
 

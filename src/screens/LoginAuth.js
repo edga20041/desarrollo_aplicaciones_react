@@ -142,7 +142,7 @@ const LoginAuth = () => {
                     <Text style={styles.link}>¿Olvidaste tu contraseña?</Text>
                 </Pressable>
 
-                <Pressable onPress={() => navigation.navigate('Register')}>
+                <Pressable onPress={() => navigation.navigate('Register', { screen: 'Register' })}>
                     <Text style={styles.link}>¿No tienes cuenta? Regístrate</Text>
                 </Pressable>
             </View>
