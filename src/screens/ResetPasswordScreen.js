@@ -27,7 +27,6 @@ const ResetPasswordScreen = ({ navigation, route }) => {
   };
 
   const isValidPassword = (password) => {
-    // Al menos 8 caracteres, una mayúscula, una minúscula y un número
     return password.length >= 8 && /(?=.*[a-z])(?=.*[A-Z])(?=.*\d)/.test(password);
   };
 
@@ -56,7 +55,7 @@ const ResetPasswordScreen = ({ navigation, route }) => {
 
       showMessage(response.data.message || "¡Contraseña restablecida con éxito!", false);
       setTimeout(() => {
-        navigation.navigate('Login');
+        navigation.replace('Login');
       }, 2000);
     } catch (error) {
       console.error('Error al restablecer contraseña:', error);
