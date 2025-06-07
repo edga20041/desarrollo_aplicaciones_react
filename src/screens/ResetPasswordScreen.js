@@ -1,25 +1,56 @@
-import React, { useState } from 'react';
-import { View, Text, StyleSheet, ActivityIndicator, Modal, Pressable, StatusBar } from 'react-native';
+import React, { useState, useRef, useEffect } from 'react';
+import { View, Text, StyleSheet, ActivityIndicator, Modal, Pressable, StatusBar, ScrollView, Keyboard, Platform, Dimensions, TouchableOpacity } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import axios from 'axios';
 import config from '../config/config';
 import Input from '../Components/Input';
 import { LinearGradient } from 'expo-linear-gradient';
 import { useFonts, Montserrat_400Regular, Montserrat_600SemiBold, Montserrat_700Bold } from '@expo-google-fonts/montserrat';
+import MaterialCommunityIcons from 'react-native-vector-icons/MaterialCommunityIcons';
+import { useTheme } from '../context/ThemeContext';
+import { theme } from '../styles/theme';
 
 const ResetPasswordScreen = ({ navigation, route }) => {
   const { token, email } = route.params;
+  const { isDarkMode } = useTheme();
+  const currentTheme = theme[isDarkMode ? "dark" : "light"];
   const [newPassword, setNewPassword] = useState('');
   const [confirmPassword, setConfirmPassword] = useState('');
   const [loading, setLoading] = useState(false);
   const [message, setMessage] = useState(null);
   const [isModalVisible, setIsModalVisible] = useState(false);
+  const [keyboardHeight, setKeyboardHeight] = useState(0);
+  const [showNewPassword, setShowNewPassword] = useState(false);
+  const [showConfirmPassword, setShowConfirmPassword] = useState(false);
+  const scrollViewRef = useRef(null);
+  const windowHeight = Dimensions.get('window').height;
 
   const [fontsLoaded] = useFonts({
     Montserrat_400Regular,
     Montserrat_600SemiBold,
     Montserrat_700Bold,
   });
+
+  useEffect(() => {
+    const keyboardWillShow = Keyboard.addListener(
+      Platform.OS === 'ios' ? 'keyboardWillShow' : 'keyboardDidShow',
+      (e) => {
+        setKeyboardHeight(e.endCoordinates.height);
+      }
+    );
+
+    const keyboardWillHide = Keyboard.addListener(
+      Platform.OS === 'ios' ? 'keyboardWillHide' : 'keyboardDidHide',
+      () => {
+        setKeyboardHeight(0);
+      }
+    );
+
+    return () => {
+      keyboardWillShow.remove();
+      keyboardWillHide.remove();
+    };
+  }, []);
 
   const showMessage = (msg, isError = false) => {
     setMessage({ text: msg, isError });
@@ -78,104 +109,181 @@ const ResetPasswordScreen = ({ navigation, route }) => {
 
   if (!fontsLoaded) {
     return (
-        <View style={styles.loadingContainer}>
-          <ActivityIndicator size="large" color="#E94057" />
-          <Text style={styles.loadingText}>Cargando...</Text>
-        </View>
+      <View style={styles.loadingContainer}>
+        <ActivityIndicator size="large" color={currentTheme.accent} />
+        <Text style={[styles.loadingText, { color: currentTheme.text }]}>Cargando...</Text>
+      </View>
     );
   }
 
   return (
+    <LinearGradient
+      colors={
+        isDarkMode
+          ? ["#1A1A2E", "#16213E", "#0F3460"]
+          : ["#FFFFFF", "#F5F5F5", "#E8E8E8"]
+      }
+      style={styles.gradient}
+      start={{ x: 0, y: 0 }}
+      end={{ x: 1, y: 1 }}
+    >
       <SafeAreaView style={styles.container} edges={['top', 'right', 'left', 'bottom']}>
-        <StatusBar barStyle="dark-content" backgroundColor="white" />
-
-        <Text style={styles.title}>Nueva Contraseña</Text>
-        <Text style={styles.subtitle}>
-          {email ? `Establece una nueva contraseña para ${email}` : 'Establece tu nueva contraseña segura'}
-        </Text>
-
-        <Input
-            label="Nueva contraseña"
-            placeholder="Ingresa tu nueva contraseña"
-            secureTextEntry
-            value={newPassword}
-            onChangeText={setNewPassword}
-            style={styles.input}
-            labelStyle={styles.label}
-            inputStyle={styles.inputField}
+        <StatusBar
+          barStyle={isDarkMode ? "light-content" : "dark-content"}
+          backgroundColor={currentTheme.primary}
         />
+        <ScrollView 
+          ref={scrollViewRef}
+          contentContainerStyle={[
+            styles.scrollContainer,
+            { paddingBottom: keyboardHeight + 20 }
+          ]}
+          showsVerticalScrollIndicator={false}
+          keyboardShouldPersistTaps="handled"
+        >
+          <View style={styles.formContainer}>
+            <View style={styles.infoContainer}>
+              <MaterialCommunityIcons name="lock-reset" size={50} color={currentTheme.accent} />
+              <Text style={[styles.title, { color: currentTheme.accent }]}>Nueva Contraseña</Text>
+              <Text style={[styles.subtitle, { color: isDarkMode ? "#fff" : "#666" }]}>
+                {email ? `Establece una nueva contraseña para ${email}` : 'Establece tu nueva contraseña segura'}
+              </Text>
+            </View>
 
-        <Input
-            label="Confirmar contraseña"
-            placeholder="Confirma tu nueva contraseña"
-            secureTextEntry
-            value={confirmPassword}
-            onChangeText={setConfirmPassword}
-            style={styles.input}
-            labelStyle={styles.label}
-            inputStyle={styles.inputField}
-        />
+            <Input
+              label="Nueva contraseña"
+              placeholder="Ingresa tu nueva contraseña"
+              secureTextEntry={!showNewPassword}
+              value={newPassword}
+              onChangeText={setNewPassword}
+              style={styles.input}
+              labelStyle={[styles.label, { color: isDarkMode ? "#fff" : "#555" }]}
+              inputStyle={[styles.inputField, { 
+                borderColor: isDarkMode ? "#fff" : "#ccc",
+                color: isDarkMode ? "#fff" : "#333",
+                backgroundColor: "transparent"
+              }]}
+              placeholderTextColor={isDarkMode ? "#aaa" : "#999"}
+              rightIcon={
+                <TouchableOpacity onPress={() => setShowNewPassword(prev => !prev)}>
+                  <MaterialCommunityIcons
+                    name={showNewPassword ? "eye-off-outline" : "eye-outline"}
+                    size={22}
+                    color={isDarkMode ? "#fff" : "#666"}
+                  />
+                </TouchableOpacity>
+              }
+            />
 
-        <View style={styles.passwordRequirements}>
-          <Text style={styles.requirementsTitle}>Requisitos de la contraseña:</Text>
-          <Text style={styles.requirementItem}>• Mínimo 8 caracteres</Text>
-          <Text style={styles.requirementItem}>• Al menos una letra mayúscula</Text>
-          <Text style={styles.requirementItem}>• Al menos una letra minúscula</Text>
-          <Text style={styles.requirementItem}>• Al menos un número</Text>
-        </View>
+            <Input
+              label="Confirmar contraseña"
+              placeholder="Confirma tu nueva contraseña"
+              secureTextEntry={!showConfirmPassword}
+              value={confirmPassword}
+              onChangeText={setConfirmPassword}
+              style={styles.input}
+              labelStyle={[styles.label, { color: isDarkMode ? "#fff" : "#555" }]}
+              inputStyle={[styles.inputField, { 
+                borderColor: isDarkMode ? "#fff" : "#ccc",
+                color: isDarkMode ? "#fff" : "#333",
+                backgroundColor: "transparent"
+              }]}
+              placeholderTextColor={isDarkMode ? "#aaa" : "#999"}
+              rightIcon={
+                <TouchableOpacity onPress={() => setShowConfirmPassword(prev => !prev)}>
+                  <MaterialCommunityIcons
+                    name={showConfirmPassword ? "eye-off-outline" : "eye-outline"}
+                    size={22}
+                    color={isDarkMode ? "#fff" : "#666"}
+                  />
+                </TouchableOpacity>
+              }
+            />
 
-        {loading ? (
-            <ActivityIndicator size="large" color="#E94057" style={styles.loadingSpinner} />
-        ) : (
-            <Pressable
+            <View style={[styles.passwordRequirements, { 
+              backgroundColor: isDarkMode ? 'rgba(255,255,255,0.1)' : '#f8f9fa',
+              borderLeftColor: currentTheme.accent
+            }]}>
+              <Text style={[styles.requirementsTitle, { color: isDarkMode ? "#fff" : "#333" }]}>
+                Requisitos de la contraseña:
+              </Text>
+              <Text style={[styles.requirementItem, { color: isDarkMode ? "#ddd" : "#666" }]}>
+                • Mínimo 8 caracteres
+              </Text>
+              <Text style={[styles.requirementItem, { color: isDarkMode ? "#ddd" : "#666" }]}>
+                • Al menos una letra mayúscula
+              </Text>
+              <Text style={[styles.requirementItem, { color: isDarkMode ? "#ddd" : "#666" }]}>
+                • Al menos una letra minúscula
+              </Text>
+              <Text style={[styles.requirementItem, { color: isDarkMode ? "#ddd" : "#666" }]}>
+                • Al menos un número
+              </Text>
+            </View>
+
+            {loading ? (
+              <ActivityIndicator size="large" color={currentTheme.accent} />
+            ) : (
+              <Pressable
                 style={({ pressed }) => [
                   styles.resetButton,
                   pressed && { opacity: 0.9 }
                 ]}
                 onPress={handleResetPassword}
-            >
-              <LinearGradient colors={['#F27121', '#E94057']} style={styles.buttonGradient}>
-                <Text style={styles.resetButtonText}>Restablecer Contraseña</Text>
-              </LinearGradient>
-            </Pressable>
-        )}
+              >
+                <LinearGradient colors={['#F27121', '#E94057']} style={styles.buttonGradient}>
+                  <Text style={styles.resetButtonText}>Restablecer Contraseña</Text>
+                </LinearGradient>
+              </Pressable>
+            )}
+          </View>
+        </ScrollView>
 
         <Modal
-            animationType="fade"
-            transparent={true}
-            visible={isModalVisible}
-            onRequestClose={() => setIsModalVisible(false)}
+          animationType="fade"
+          transparent={true}
+          visible={isModalVisible}
+          onRequestClose={() => setIsModalVisible(false)}
         >
           <Pressable
-              style={styles.modalOverlay}
-              onPress={() => setIsModalVisible(false)}
+            style={styles.modalOverlay}
+            onPress={() => setIsModalVisible(false)}
           >
-            <View style={styles.modalContent} onStartShouldSetResponder={() => true} onTouchEnd={(e) => e.stopPropagation()}>
-              <Text style={[styles.modalText, message?.isError ? styles.modalErrorText : styles.modalSuccessText]}>
+            <View style={[styles.modalContent, { backgroundColor: isDarkMode ? '#1A1A2E' : 'white' }]}>
+              <Text style={[
+                styles.modalText,
+                message?.isError ? styles.modalErrorText : styles.modalSuccessText,
+                { color: isDarkMode ? '#fff' : '#000' }
+              ]}>
                 {message?.text}
               </Text>
               <Pressable
-                  onPress={() => setIsModalVisible(false)}
-                  style={({ pressed }) => [
-                    styles.modalButton,
-                    pressed && { opacity: 0.8 }
-                  ]}
+                onPress={() => setIsModalVisible(false)}
+                style={({ pressed }) => [
+                  styles.modalButton,
+                  pressed && { opacity: 0.8 }
+                ]}
               >
-                <Text style={styles.modalButtonText}>Cerrar</Text>
+                <Text style={[styles.modalButtonText, { color: currentTheme.accent }]}>Cerrar</Text>
               </Pressable>
             </View>
           </Pressable>
         </Modal>
       </SafeAreaView>
+    </LinearGradient>
   );
 };
 
 const styles = StyleSheet.create({
+  gradient: {
+    flex: 1,
+  },
   container: {
     flex: 1,
-    padding: 35,
+  },
+  scrollContainer: {
+    flexGrow: 1,
     justifyContent: 'center',
-    backgroundColor: 'white',
   },
   loadingContainer: {
     flex: 1,
@@ -185,65 +293,67 @@ const styles = StyleSheet.create({
   loadingText: {
     fontSize: 16,
     fontFamily: 'Montserrat_400Regular',
+    marginTop: 10,
   },
-  loadingSpinner: {
-    marginTop: 20,
+  formContainer: {
+    padding: 20,
+    borderRadius: 15,
+    width: '95%',
+    alignSelf: 'center',
+    alignItems: 'center'
+  },
+  infoContainer: {
+    alignItems: 'center',
+    marginBottom: 30,
   },
   title: {
     fontSize: 28,
     marginBottom: 15,
     textAlign: 'center',
     fontFamily: 'Montserrat_600SemiBold',
-    color: 'black',
   },
   subtitle: {
     fontSize: 16,
-    marginBottom: 30,
     textAlign: 'center',
     fontFamily: 'Montserrat_400Regular',
-    color: '#666',
     lineHeight: 22,
   },
   input: {
+    width: '100%',
     marginBottom: 20,
   },
   label: {
     fontSize: 16,
-    color: '#555',
     marginBottom: 8,
     fontFamily: 'Montserrat_400Regular',
   },
   inputField: {
     borderWidth: 1,
-    borderColor: '#ccc',
     borderRadius: 8,
     paddingVertical: 12,
     paddingHorizontal: 15,
     fontSize: 16,
-    color: '#333',
     fontFamily: 'Montserrat_400Regular',
   },
   passwordRequirements: {
-    backgroundColor: '#f8f9fa',
     padding: 15,
     borderRadius: 8,
     marginBottom: 25,
     borderLeftWidth: 4,
-    borderLeftColor: '#E94057',
+    width: '100%',
   },
   requirementsTitle: {
     fontSize: 14,
     fontFamily: 'Montserrat_600SemiBold',
-    color: '#333',
     marginBottom: 8,
   },
   requirementItem: {
     fontSize: 13,
     fontFamily: 'Montserrat_400Regular',
-    color: '#666',
     marginBottom: 3,
   },
   resetButton: {
+    width: '100%',
     borderRadius: 10,
     overflow: 'hidden',
     shadowColor: '#000',
@@ -251,7 +361,6 @@ const styles = StyleSheet.create({
     shadowOpacity: 0.25,
     shadowRadius: 3.84,
     elevation: 5,
-    marginTop: 10,
   },
   buttonGradient: {
     paddingVertical: 14,
@@ -269,7 +378,6 @@ const styles = StyleSheet.create({
     backgroundColor: 'rgba(0, 0, 0, 0.5)',
   },
   modalContent: {
-    backgroundColor: 'white',
     padding: 25,
     borderRadius: 10,
     alignItems: 'center',
@@ -281,28 +389,25 @@ const styles = StyleSheet.create({
     width: '80%',
   },
   modalText: {
-    fontSize: 18,
-    marginBottom: 20,
+    fontSize: 16,
     textAlign: 'center',
+    marginBottom: 20,
     fontFamily: 'Montserrat_400Regular',
   },
   modalErrorText: {
-    color: '#e74c3c',
+    color: '#dc3545',
   },
   modalSuccessText: {
-    color: 'green',
+    color: '#28a745',
   },
   modalButton: {
-    backgroundColor: '#4B9CE2',
     paddingVertical: 10,
     paddingHorizontal: 20,
     borderRadius: 5,
-    marginTop: 10,
   },
   modalButtonText: {
-    color: 'white',
     fontSize: 16,
-    fontFamily: 'Montserrat_400Regular',
+    fontFamily: 'Montserrat_600SemiBold',
   },
 });
 

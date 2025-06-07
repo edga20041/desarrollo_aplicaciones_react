@@ -12,6 +12,8 @@ import {
 import axios from 'axios';
 import config from '../config/config';
 import MaterialCommunityIcons from 'react-native-vector-icons/MaterialCommunityIcons';
+import { useTheme } from '../context/ThemeContext';
+import { theme } from '../styles/theme';
 
 const validateFields = (nombre, apellido, dni, phoneNumber, email, password, confirmPassword) => {
     // Validaciones (descomentá si querés activarlas)
@@ -57,6 +59,8 @@ const validateFields = (nombre, apellido, dni, phoneNumber, email, password, con
 };
 
 const RegisterForm = ({ onRegisterSuccess, onInputFocus }) => {
+    const { isDarkMode } = useTheme();
+    const currentTheme = theme[isDarkMode ? "dark" : "light"];
     const [name, setName] = useState('');
     const [surname, setSurname] = useState('');
     const [dni, setDni] = useState('');
@@ -109,13 +113,21 @@ const RegisterForm = ({ onRegisterSuccess, onInputFocus }) => {
     };
 
     return (
-        <View style={styles.formContainer}>
+        <View style={[styles.formContainer, { backgroundColor: 'transparent' }]}>
             <Input 
                 label="Nombre" 
                 value={name} 
                 onChangeText={setName} 
                 placeholder="Ingrese su nombre"
                 onFocus={onInputFocus}
+                labelStyle={[styles.label, { color: "#fff" }]}
+                inputStyle={[styles.inputField, { 
+                    borderColor: "#fff",
+                    borderWidth: 1,
+                    color: "#fff",
+                    backgroundColor: "transparent"
+                }]}
+                placeholderTextColor="#fff"
             />
             <Input 
                 label="Apellido" 
@@ -123,6 +135,14 @@ const RegisterForm = ({ onRegisterSuccess, onInputFocus }) => {
                 onChangeText={setSurname} 
                 placeholder="Ingrese su apellido"
                 onFocus={onInputFocus}
+                labelStyle={[styles.label, { color: "#fff" }]}
+                inputStyle={[styles.inputField, { 
+                    borderColor: "#fff",
+                    borderWidth: 1,
+                    color: "#fff",
+                    backgroundColor: "transparent"
+                }]}
+                placeholderTextColor="#fff"
             />
             <Input 
                 label="DNI" 
@@ -131,6 +151,14 @@ const RegisterForm = ({ onRegisterSuccess, onInputFocus }) => {
                 placeholder="Ingrese su DNI" 
                 keyboardType="numeric"
                 onFocus={onInputFocus}
+                labelStyle={[styles.label, { color: "#fff" }]}
+                inputStyle={[styles.inputField, { 
+                    borderColor: "#fff",
+                    borderWidth: 1,
+                    color: "#fff",
+                    backgroundColor: "transparent"
+                }]}
+                placeholderTextColor="#fff"
             />
             <Input 
                 label="Teléfono" 
@@ -139,6 +167,14 @@ const RegisterForm = ({ onRegisterSuccess, onInputFocus }) => {
                 placeholder="Ingrese su teléfono" 
                 keyboardType="numeric"
                 onFocus={onInputFocus}
+                labelStyle={[styles.label, { color: "#fff" }]}
+                inputStyle={[styles.inputField, { 
+                    borderColor: "#fff",
+                    borderWidth: 1,
+                    color: "#fff",
+                    backgroundColor: "transparent"
+                }]}
+                placeholderTextColor="#fff"
             />
             <Input 
                 label="Email" 
@@ -147,6 +183,14 @@ const RegisterForm = ({ onRegisterSuccess, onInputFocus }) => {
                 placeholder="Ingrese su email" 
                 keyboardType="email-address"
                 onFocus={onInputFocus}
+                labelStyle={[styles.label, { color: "#fff" }]}
+                inputStyle={[styles.inputField, { 
+                    borderColor: "#fff",
+                    borderWidth: 1,
+                    color: "#fff",
+                    backgroundColor: "transparent"
+                }]}
+                placeholderTextColor="#fff"
             />
             <Input
                 label="Contraseña"
@@ -155,12 +199,20 @@ const RegisterForm = ({ onRegisterSuccess, onInputFocus }) => {
                 placeholder="Ingrese su contraseña"
                 secureTextEntry={!showPassword}
                 onFocus={onInputFocus}
+                labelStyle={[styles.label, { color: "#fff" }]}
+                inputStyle={[styles.inputField, { 
+                    borderColor: "#fff",
+                    borderWidth: 1,
+                    color: "#fff",
+                    backgroundColor: "transparent"
+                }]}
+                placeholderTextColor="#fff"
                 rightIcon={
                     <TouchableOpacity onPress={() => setShowPassword(prev => !prev)}>
                         <MaterialCommunityIcons
                             name={showPassword ? "eye-off-outline" : "eye-outline"}
                             size={22}
-                            color="#888"
+                            color="#fff"
                         />
                     </TouchableOpacity>
                 }
@@ -172,27 +224,41 @@ const RegisterForm = ({ onRegisterSuccess, onInputFocus }) => {
                 placeholder="Confirme su contraseña"
                 secureTextEntry={!showConfirmPassword}
                 onFocus={onInputFocus}
+                labelStyle={[styles.label, { color: "#fff" }]}
+                inputStyle={[styles.inputField, { 
+                    borderColor: "#fff",
+                    borderWidth: 1,
+                    color: "#fff",
+                    backgroundColor: "transparent"
+                }]}
+                placeholderTextColor="#fff"
                 rightIcon={
                     <TouchableOpacity onPress={() => setShowConfirmPassword(prev => !prev)}>
                         <MaterialCommunityIcons
                             name={showConfirmPassword ? "eye-off-outline" : "eye-outline"}
                             size={22}
-                            color="#888"
+                            color="#fff"
                         />
                     </TouchableOpacity>
                 }
             />
             {error && (
-                <View style={{ backgroundColor: '#f8d7da', padding: 10, borderRadius: 5, marginBottom: 10 }}>
-                    <Text style={{ color: '#721c24' }}>Error: {error}</Text>
+                <View style={[styles.errorContainer, { backgroundColor: '#f8d7da' }]}>
+                    <Text style={[styles.errorText, { color: '#721c24' }]}>Error: {error}</Text>
                 </View>
             )}
 
             {loading ? (
-                <ActivityIndicator size="large" color="#0000ff" />
+                <ActivityIndicator size="large" color={currentTheme.accent} />
             ) : (
-                <Pressable onPress={handleRegister}>
-                    <LinearGradient colors={['#F27121', '#E94057']} style={styles.registerButton}>
+                <Pressable 
+                    onPress={handleRegister}
+                    style={({ pressed }) => [
+                        styles.registerButton,
+                        pressed && { opacity: 0.9 }
+                    ]}
+                >
+                    <LinearGradient colors={['#F27121', '#E94057']} style={styles.buttonGradient}>
                         <Text style={styles.registerButtonText}>Registrarse</Text>
                     </LinearGradient>
                 </Pressable>
@@ -203,8 +269,28 @@ const RegisterForm = ({ onRegisterSuccess, onInputFocus }) => {
 
 const styles = StyleSheet.create({
     formContainer: {
-        padding: 15,
         width: '100%',
+    },
+    label: {
+        fontSize: 15,
+        marginBottom: 6,
+        fontFamily: 'Montserrat_400Regular',
+        marginLeft: '2.5%'
+    },
+    inputField: {
+        borderRadius: 8,
+        paddingVertical: 10,
+        paddingHorizontal: 15,
+        fontSize: 15,
+        fontFamily: 'Montserrat_400Regular',
+    },
+    errorContainer: {
+        padding: 10,
+        borderRadius: 5,
+        marginBottom: 10,
+    },
+    errorText: {
+        fontFamily: 'Montserrat_400Regular',
     },
     registerButton: {
         borderRadius: 10,
@@ -214,10 +300,11 @@ const styles = StyleSheet.create({
         shadowOpacity: 0.25,
         shadowRadius: 3.84,
         elevation: 5,
-        paddingVertical: 12,
-        paddingHorizontal: 25,
-        alignItems: 'center',
         marginTop: 10,
+    },
+    buttonGradient: {
+        paddingVertical: 14,
+        alignItems: 'center',
     },
     registerButtonText: {
         color: 'white',

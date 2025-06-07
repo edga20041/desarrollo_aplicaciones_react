@@ -242,6 +242,11 @@ const DetalleEntregaHistorial = () => {
           barStyle={isDarkMode ? "light-content" : "dark-content"}
           backgroundColor={currentTheme.primary}
         />
+        <ScrollView 
+          style={{ flex: 1 }}
+          contentContainerStyle={styles.scrollContent}
+          showsVerticalScrollIndicator={true}
+        >
           <View style={styles.container}>
             <Text style={[styles.title, { color: currentTheme.accent }]}>
               Detalle de Entrega Finalizada
@@ -385,6 +390,7 @@ const DetalleEntregaHistorial = () => {
               <Text style={styles.volverButtonText}>Volver</Text>
             </TouchableOpacity>
           </View>
+        </ScrollView>
       </SafeAreaView>
     </LinearGradient>
   );
@@ -394,13 +400,13 @@ const styles = StyleSheet.create({
   gradient: {
     flex: 1,
   },
-  scrollView: {
-    flex: 1,
+  scrollContent: {
+    flexGrow: 1,
+    paddingBottom: 20,
   },
   container: {
-    paddingHorizontal: 20,
-    paddingBottom: 20,
-    paddingTop: 20,
+    flex: 1,
+    padding: 20,
   },
   title: {
     fontSize: 24,
