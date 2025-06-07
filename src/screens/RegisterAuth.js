@@ -61,7 +61,7 @@ const RegisterAuth = () => {
     const handleVerificationSuccess = () => {
         navigation.reset({
             index: 0,
-            routes: [{ name: 'Login' }],
+            routes: [{ name: 'LoginAuth' }],
         });
     };
 
