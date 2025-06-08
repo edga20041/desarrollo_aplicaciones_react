@@ -20,7 +20,8 @@ const estadoToString = (estadoId) => {
   return estadoId;
 };
 
-const HistorialEntregas = () => {
+const HistorialEntregas = ({ limitItems }) => {
+  const limit = limitItems || 10;
   const [historial, setHistorial] = useState([]);
   const [loading, setLoading] = useState(true);
   const navigation = useNavigation();
@@ -188,7 +189,7 @@ const HistorialEntregas = () => {
 
   return (
     <FlatList
-      data={historial}
+      data={historial.slice(0, limit)}
       keyExtractor={(item) => item.id.toString()}
       renderItem={renderEntrega}
       contentContainerStyle={styles.listContainer}

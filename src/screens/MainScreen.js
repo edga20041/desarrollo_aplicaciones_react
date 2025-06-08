@@ -8,6 +8,8 @@ import {
   StatusBar,
   Platform,
   Animated,
+  ScrollView,
+  FlatList,
 } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
 import AsyncStorage from "@react-native-async-storage/async-storage";
@@ -255,61 +257,91 @@ const MainScreen = () => {
 
             <View style={styles.mainContent}>
               {showDefaultView && (
-                <>
-                  <View>
-                    <Text
-                      style={[
-                        styles.sectionTitle,
-                        { color: currentTheme.text },
-                      ]}
-                    >
-                      Siguiente{" "}
-                      <Text
-                        style={{
-                          color: currentTheme.accent,
-                          fontWeight: "bold",
-                        }}
-                      >
-                        entrega
-                      </Text>
-                    </Text>
-                    <EntregasPendientes
-                      refresh={refreshEntregas}
-                      limitItems={1}
-                    />
-                    <Pressable
-                      onPress={() => {
-                        animatePress();
-                        setShowDefaultView(false);
-                        setShowEntregas(true);
-                        setShowHistorial(false);
-                      }}
-                      style={({ pressed }) => [
-                        styles.viewMoreButton,
-                        {
-                          backgroundColor: pressed
-                            ? currentTheme.accent + "10"
-                            : "transparent",
-                        },
-                        { gap: 10, marginTop: 0 },
-                      ]}
-                    >
-                      <Text
-                        style={[
-                          styles.viewMoreText,
-                          { color: currentTheme.accent },
-                        ]}
-                      >
-                        Ver todas las entregas pendientes
-                      </Text>
-                      <Icon
-                        source="arrow-right-circle"
-                        size={20}
-                        color={currentTheme.accent}
-                      />
-                    </Pressable>
-                  </View>
-                </>
+                <FlatList
+                  data={[{ type: "nextDelivery" }, { type: "recentActivity" }]}
+                  renderItem={({ item }) => {
+                    if (item.type === "nextDelivery") {
+                      return (
+                        <View style={styles.section}>
+                          <Text
+                            style={[
+                              styles.sectionTitle,
+                              { color: currentTheme.text },
+                            ]}
+                          >
+                            Siguiente{" "}
+                            <Text
+                              style={{
+                                color: currentTheme.accent,
+                                fontWeight: "bold",
+                              }}
+                            >
+                              entrega
+                            </Text>
+                          </Text>
+                          <EntregasPendientes
+                            refresh={refreshEntregas}
+                            limitItems={1}
+                          />
+                          <Pressable
+                            onPress={() => {
+                              animatePress();
+                              setShowDefaultView(false);
+                              setShowEntregas(true);
+                              setShowHistorial(false);
+                            }}
+                            style={({ pressed }) => [
+                              styles.viewMoreButton,
+                              {
+                                backgroundColor: pressed
+                                  ? currentTheme.accent + "10"
+                                  : "transparent",
+                              },
+                            ]}
+                          >
+                            <Text
+                              style={[
+                                styles.viewMoreText,
+                                { color: currentTheme.accent },
+                              ]}
+                            >
+                              Ver todas las entregas pendientes
+                            </Text>
+                            <Icon
+                              source="arrow-right-circle"
+                              size={20}
+                              color={currentTheme.accent}
+                            />
+                          </Pressable>
+                        </View>
+                      );
+                    } else {
+                      return (
+                        <View style={styles.section}>
+                          <Text
+                            style={[
+                              styles.sectionTitle,
+                              { color: currentTheme.text },
+                            ]}
+                          >
+                            Actividad{" "}
+                            <Text
+                              style={{
+                                color: currentTheme.accent,
+                                fontWeight: "bold",
+                              }}
+                            >
+                              Reciente
+                            </Text>
+                          </Text>
+                          <HistorialEntregas limitItems={2} />
+                        </View>
+                      );
+                    }
+                  }}
+                  keyExtractor={(item) => item.type}
+                  showsVerticalScrollIndicator={false}
+                />
               )}
               {showEntregas && <EntregasPendientes refresh={refreshEntregas} />}
               {showHistorial && <HistorialEntregas />}
@@ -426,15 +458,48 @@ const styles = StyleSheet.create({
     flexDirection: "row",
     alignItems: "center",
     justifyContent: "center",
-    paddingVertical: 12,
+    paddingVertical: 1,
     paddingHorizontal: 16,
     borderRadius: 12,
-    marginTop: 16,
     alignSelf: "center",
+    gap: 10,
   },
   viewMoreText: {
     fontSize: 15,
     fontWeight: "500",
+  },
+  section: {
+    marginBottom: 24,
+  },
+  activityContainer: {
+    borderRadius: 16,
+    padding: 16,
+    elevation: 2,
+    shadowColor: "#000",
+    shadowOffset: { width: 0, height: 2 },
+    shadowOpacity: 0.1,
+    shadowRadius: 4,
+  },
+  activityItem: {
+    flexDirection: "row",
+    alignItems: "center",
+    gap: 16,
+  },
+  activityContent: {
+    flex: 1,
+  },
+  activityTitle: {
+    fontSize: 16,
+    fontWeight: "500",
+  },
+  activityTime: {
+    fontSize: 14,
+    marginTop: 4,
+  },
+  activityDivider: {
+    height: 1,
+    backgroundColor: "#E0E0E0",
+    marginVertical: 12,
   },
 });
 
