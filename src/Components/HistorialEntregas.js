@@ -137,15 +137,34 @@ const HistorialEntregas = () => {
             <View
               style={[
                 styles.statusBadge,
-                { backgroundColor: currentTheme.accent + "20" },
+                {
+                  backgroundColor:
+                    estadoToString(item.estadoId) === "Finalizado"
+                      ? "#4CAF5020"
+                      : currentTheme.accent + "20",
+                },
               ]}
             >
               <Icon
                 source="check-circle-outline"
                 size={16}
-                color={currentTheme.accent}
+                color={
+                  estadoToString(item.estadoId) === "Finalizado"
+                    ? "#4CAF50"
+                    : currentTheme.accent
+                }
               />
-              <Text style={[styles.statusText, { color: currentTheme.accent }]}>
+              <Text
+                style={[
+                  styles.statusText,
+                  {
+                    color:
+                      estadoToString(item.estadoId) === "Finalizado"
+                        ? "#4CAF50"
+                        : currentTheme.accent,
+                  },
+                ]}
+              >
                 {estadoToString(item.estadoId)}
               </Text>
             </View>
