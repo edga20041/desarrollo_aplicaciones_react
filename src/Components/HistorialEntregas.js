@@ -190,7 +190,7 @@ const HistorialEntregas = ({ limitItems }) => {
 
   return (
     <FlatList
-      data={historial.slice(0, limit)}
+      data={historial.slice().reverse().slice(0, limit)}
       keyExtractor={(item) => item.id.toString()}
       renderItem={renderEntrega}
       contentContainerStyle={styles.listContainer}

@@ -130,16 +130,31 @@ const MainScreen = () => {
                       backgroundColor: currentTheme.cardBg,
                       borderColor: currentTheme.cardBorder,
                       marginRight: 8,
+                      overflow: "hidden",
                     },
                   ]}
                 >
+                  <LinearGradient
+                    colors={
+                      showDefaultView
+                        ? ["#E94057", "#F27121"]
+                        : [currentTheme.cardBg, currentTheme.cardBg]
+                    }
+                    style={StyleSheet.absoluteFill}
+                    start={{ x: 0, y: 0 }}
+                    end={{ x: 1, y: 0 }}
+                  />
                   <Animated.View
                     style={[
                       styles.headerIconContainer,
                       { transform: [{ scale: scaleAnim }] },
                     ]}
                   >
-                    <Icon source="home" size={32} color={currentTheme.text} />
+                    <Icon
+                      source="home"
+                      size={32}
+                      color={showDefaultView ? "#fff" : currentTheme.text}
+                    />
                   </Animated.View>
                 </Pressable>
                 <Pressable
