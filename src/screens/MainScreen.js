@@ -8,7 +8,7 @@ import {
   StatusBar,
   Platform,
 } from "react-native";
-import { SafeAreaView} from "react-native-safe-area-context";
+import { SafeAreaView } from "react-native-safe-area-context";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import { useNavigation, useFocusEffect } from "@react-navigation/native";
 import { LinearGradient } from "expo-linear-gradient";
@@ -17,13 +17,13 @@ import HistorialEntregas from "../Components/HistorialEntregas";
 import * as SecureStore from "expo-secure-store";
 import { useTheme } from "../context/ThemeContext";
 import { theme } from "../styles/theme";
-import { Icon } from 'react-native-paper';
-
+import { Icon } from "react-native-paper";
 
 const MainScreen = () => {
   const navigation = useNavigation();
   const [greeting, setGreeting] = useState("");
   const [userName, setUserName] = useState("");
+  const [showDefaultView, setShowDefaultView] = useState(true);
   const [showEntregas, setShowEntregas] = useState(false);
   const [showHistorial, setShowHistorial] = useState(false);
   const [refreshEntregas, setRefreshEntregas] = useState(false);
@@ -75,7 +75,10 @@ const MainScreen = () => {
       start={{ x: 0, y: 0 }}
       end={{ x: 1, y: 1 }}
     >
-      <SafeAreaView style={styles.safeArea} edges={['top', 'right', 'left', 'bottom']}>
+      <SafeAreaView
+        style={styles.safeArea}
+        edges={["top", "right", "left", "bottom"]}
+      >
         <StatusBar
           barStyle={isDarkMode ? "light-content" : "dark-content"}
           backgroundColor={currentTheme.primary}
@@ -83,16 +86,23 @@ const MainScreen = () => {
         />
         <View style={styles.container}>
           <View style={styles.headerRow}>
-        <Pressable
-          onPress={() => navigation.navigate("ProfileScreen")}
-          style={({ pressed }) => [
-            styles.profileIcon,
+            <Pressable
+              onPress={() => navigation.navigate("ProfileScreen")}
+              style={({ pressed }) => [
+                styles.profileIcon,
                 { transform: [{ scale: pressed ? 0.95 : 1 }] },
-                { backgroundColor: currentTheme.cardBg, borderColor: currentTheme.cardBorder },
-          ]}
-        >
-          <Icon source="account-circle-outline" size={36} color={currentTheme.text} />
-        </Pressable>
+                {
+                  backgroundColor: currentTheme.cardBg,
+                  borderColor: currentTheme.cardBorder,
+                },
+              ]}
+            >
+              <Icon
+                source="account-circle-outline"
+                size={36}
+                color={currentTheme.text}
+              />
+            </Pressable>
             <Text style={styles.greeting}>
               <Text style={{ fontWeight: "bold", color: currentTheme.text }}>
                 {greeting}
@@ -104,6 +114,7 @@ const MainScreen = () => {
             <Pressable
               style={[styles.customButton, showEntregas && styles.activeButton]}
               onPress={() => {
+                setShowDefaultView(false);
                 setShowEntregas(true);
                 setShowHistorial(false);
               }}
@@ -119,23 +130,23 @@ const MainScreen = () => {
                 start={{ x: 0, y: 0 }}
                 end={{ x: 1, y: 0 }}
               >
-              <View style={{ flexDirection: "row", alignItems: "center" }}>
-                <View style={{ marginRight: 3 }}>
-                  <Icon
-                    source="format-list-bulleted"
-                    size={20}
-                    color={showEntregas ? "#fff" : currentTheme.text}
-                  />
+                <View style={{ flexDirection: "row", alignItems: "center" }}>
+                  <View style={{ marginRight: 3 }}>
+                    <Icon
+                      source="format-list-bulleted"
+                      size={20}
+                      color={showEntregas ? "#fff" : currentTheme.text}
+                    />
+                  </View>
+                  <Text
+                    style={[
+                      styles.buttonText,
+                      { color: showEntregas ? "#fff" : currentTheme.text },
+                    ]}
+                  >
+                    Ver Entregas
+                  </Text>
                 </View>
-                <Text
-                  style={[
-                    styles.buttonText,
-                    { color: showEntregas ? "#fff" : currentTheme.text },
-                  ]}
-                >
-                  Ver Entregas
-                </Text>
-              </View>
               </LinearGradient>
             </Pressable>
             <Pressable
@@ -144,6 +155,7 @@ const MainScreen = () => {
                 showHistorial && styles.activeButton,
               ]}
               onPress={() => {
+                setShowDefaultView(false);
                 setShowEntregas(false);
                 setShowHistorial(true);
               }}
@@ -159,23 +171,23 @@ const MainScreen = () => {
                 start={{ x: 0, y: 0 }}
                 end={{ x: 1, y: 0 }}
               >
-              <View style={{ flexDirection: "row", alignItems: "center" }}>
-                <View style={{ marginRight: 3 }}>
-                  <Icon
-                    source="truck-delivery-outline"
-                    size={20}
-                    color={showHistorial ? "#fff" : currentTheme.text}
-                  />
+                <View style={{ flexDirection: "row", alignItems: "center" }}>
+                  <View style={{ marginRight: 3 }}>
+                    <Icon
+                      source="truck-delivery-outline"
+                      size={20}
+                      color={showHistorial ? "#fff" : currentTheme.text}
+                    />
+                  </View>
+                  <Text
+                    style={[
+                      styles.buttonText,
+                      { color: showHistorial ? "#fff" : currentTheme.text },
+                    ]}
+                  >
+                    Ver Historial
+                  </Text>
                 </View>
-                <Text
-                  style={[
-                    styles.buttonText,
-                    { color: showHistorial ? "#fff" : currentTheme.text },
-                  ]}
-                >
-                  Ver Historial
-                </Text>
-              </View>
               </LinearGradient>
             </Pressable>
           </View>
@@ -185,6 +197,22 @@ const MainScreen = () => {
               { backgroundColor: "transparent" },
             ]}
           >
+            {showDefaultView && (
+              <>
+                <Text
+                  style={[styles.sectionTitle, { color: currentTheme.text }]}
+                >
+                  Siguientes{" "}
+                  <Text
+                    style={{ color: currentTheme.accent, fontWeight: "bold" }}
+                  >
+                    2
+                  </Text>{" "}
+                  entregas
+                </Text>
+                <EntregasPendientes refresh={refreshEntregas} limitItems={2} />
+              </>
+            )}
             {showEntregas && <EntregasPendientes refresh={refreshEntregas} />}
             {showHistorial && <HistorialEntregas />}
           </View>
@@ -202,7 +230,7 @@ const styles = StyleSheet.create({
   safeArea: {
     flex: 1,
     backgroundColor: "transparent",
-    paddingTop: 5
+    paddingTop: 5,
   },
   container: {
     flex: 1,
@@ -291,14 +319,14 @@ const styles = StyleSheet.create({
     fontSize: 16,
     textAlign: "center",
   },
-    profileIcon: {
+  profileIcon: {
     width: 52,
     height: 52,
     borderRadius: 26,
     justifyContent: "center",
     alignItems: "center",
     backgroundColor: "#fff", // o currentTheme.cardBg si lo preferís dinámico
-    borderColor: "#e0e0e0",  // o currentTheme.cardBorder
+    borderColor: "#e0e0e0", // o currentTheme.cardBorder
     borderWidth: 1.5,
     shadowColor: "#000",
     shadowOffset: { width: 0, height: 1 },
@@ -307,7 +335,13 @@ const styles = StyleSheet.create({
     elevation: 3,
     marginRight: 5,
     marginLeft: 5,
-  }
+  },
+  sectionTitle: {
+    fontSize: 22,
+    fontWeight: "600",
+    marginBottom: 16,
+    paddingHorizontal: 16,
+  },
 });
 
 export default MainScreen;

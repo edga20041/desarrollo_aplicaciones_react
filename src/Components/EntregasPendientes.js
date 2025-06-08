@@ -13,7 +13,7 @@ import config from "../config/config";
 import { useTheme } from "../context/ThemeContext";
 import { theme } from "../styles/theme";
 
-const EntregasPendientes = ({ refresh }) => {
+const EntregasPendientes = ({ refresh, limitItems }) => {
   const [entregas, setEntregas] = useState([]);
   const [loading, setLoading] = useState(true);
   const navigation = useNavigation();
@@ -53,13 +53,17 @@ const EntregasPendientes = ({ refresh }) => {
     );
   }
 
+  const displayedEntregas = limitItems
+    ? entregas.slice(0, limitItems)
+    : entregas;
+
   const handleEntregaPress = (entregaId) => {
     navigation.navigate("Detalle Entrega Pendiente", { entrega_id: entregaId });
   };
 
   return (
     <FlatList
-      data={entregas}
+      data={displayedEntregas}
       keyExtractor={(item) => item.id.toString()}
       renderItem={({ item }) => (
         <Pressable
