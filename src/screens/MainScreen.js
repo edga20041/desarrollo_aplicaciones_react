@@ -229,15 +229,40 @@ const MainScreen = () => {
             <View style={styles.mainContent}>
               {showDefaultView && (
                 <>
-                  <Text
-                    style={[styles.sectionTitle, { color: currentTheme.text }]}
-                  >
-                    Próximas Entregas
-                  </Text>
-                  <EntregasPendientes
-                    refresh={refreshEntregas}
-                    limitItems={2}
-                  />
+                  <View>
+                    <Text
+                      style={[
+                        styles.sectionTitle,
+                        { color: currentTheme.text },
+                      ]}
+                    >
+                      Entrega{" "}
+                      <Text
+                        style={{
+                          color: currentTheme.accent,
+                          fontWeight: "bold",
+                        }}
+                      >
+                        Recomendada
+                      </Text>
+                    </Text>
+                    <EntregasPendientes
+                      refresh={refreshEntregas}
+                      limitItems={1}
+                    />
+                    <Text
+                      style={{
+                        color: currentTheme.text,
+                        opacity: 0.7,
+                        textAlign: "center",
+                        maxWidth: "80%",
+                        alignSelf: "center",
+                      }}
+                    >
+                      Presiona en el botón de Ver Entregas para navegar entre
+                      las opciones
+                    </Text>
+                  </View>
                 </>
               )}
               {showEntregas && <EntregasPendientes refresh={refreshEntregas} />}
