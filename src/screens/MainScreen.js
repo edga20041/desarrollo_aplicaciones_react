@@ -114,32 +114,59 @@ const MainScreen = () => {
                   {userName}!
                 </Text>
               </View>
-              <Pressable
-                onPress={() => {
-                  animatePress();
-                  navigation.navigate("ProfileScreen");
-                }}
-                style={({ pressed }) => [
-                  styles.profileButton,
-                  {
-                    backgroundColor: currentTheme.cardBg,
-                    borderColor: currentTheme.cardBorder,
-                  },
-                ]}
-              >
-                <Animated.View
-                  style={[
-                    styles.profileIconContainer,
-                    { transform: [{ scale: scaleAnim }] },
+              <View style={styles.headerButtons}>
+                <Pressable
+                  onPress={() => {
+                    animatePress();
+                    setShowDefaultView(true);
+                    setShowEntregas(false);
+                    setShowHistorial(false);
+                  }}
+                  style={({ pressed }) => [
+                    styles.headerButton,
+                    {
+                      backgroundColor: currentTheme.cardBg,
+                      borderColor: currentTheme.cardBorder,
+                      marginRight: 8,
+                    },
                   ]}
                 >
-                  <Icon
-                    source="account-circle-outline"
-                    size={32}
-                    color={currentTheme.text}
-                  />
-                </Animated.View>
-              </Pressable>
+                  <Animated.View
+                    style={[
+                      styles.headerIconContainer,
+                      { transform: [{ scale: scaleAnim }] },
+                    ]}
+                  >
+                    <Icon source="home" size={32} color={currentTheme.text} />
+                  </Animated.View>
+                </Pressable>
+                <Pressable
+                  onPress={() => {
+                    animatePress();
+                    navigation.navigate("ProfileScreen");
+                  }}
+                  style={({ pressed }) => [
+                    styles.headerButton,
+                    {
+                      backgroundColor: currentTheme.cardBg,
+                      borderColor: currentTheme.cardBorder,
+                    },
+                  ]}
+                >
+                  <Animated.View
+                    style={[
+                      styles.headerIconContainer,
+                      { transform: [{ scale: scaleAnim }] },
+                    ]}
+                  >
+                    <Icon
+                      source="account-circle-outline"
+                      size={32}
+                      color={currentTheme.text}
+                    />
+                  </Animated.View>
+                </Pressable>
+              </View>
             </View>
           </View>
 
@@ -327,21 +354,24 @@ const styles = StyleSheet.create({
     fontSize: 24,
     fontWeight: "bold",
   },
-  profileButton: {
+  headerButtons: {
+    flexDirection: "row",
+    alignItems: "center",
+  },
+  headerButton: {
     width: 48,
     height: 48,
     borderRadius: 24,
     justifyContent: "center",
     alignItems: "center",
     borderWidth: 1.5,
-    marginLeft: 16,
     elevation: 2,
     shadowColor: "#000",
     shadowOffset: { width: 0, height: 2 },
     shadowOpacity: 0.1,
     shadowRadius: 4,
   },
-  profileIconContainer: {
+  headerIconContainer: {
     width: "100%",
     height: "100%",
     justifyContent: "center",
