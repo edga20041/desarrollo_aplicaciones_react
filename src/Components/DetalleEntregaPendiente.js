@@ -10,7 +10,7 @@ import {
   Button,
   Image,
 } from "react-native";
-import { SafeAreaView} from "react-native-safe-area-context";
+import { SafeAreaView } from "react-native-safe-area-context";
 import { useNavigation, useRoute } from "@react-navigation/native";
 import axios from "../axiosInstance";
 import config from "../config/config";
@@ -19,6 +19,7 @@ import * as SecureStore from "expo-secure-store";
 import { useTheme } from "../context/ThemeContext";
 import { theme } from "../styles/theme";
 import { Icon } from "react-native-paper";
+import { formatDate } from "../utils/dateFormatter";
 
 const DetalleEntregaPendiente = () => {
   const navigation = useNavigation();
@@ -70,7 +71,6 @@ const DetalleEntregaPendiente = () => {
       } finally {
         setFinalizando(false);
         setShowImage(false);
-
       }
     }, 4000);
   };
@@ -86,7 +86,8 @@ const DetalleEntregaPendiente = () => {
         style={styles.gradient}
       >
         <SafeAreaView
-          style={[{ flex: 1 }, { backgroundColor: currentTheme.primary }]} edges={['top', 'right', 'left', 'bottom']}
+          style={[{ flex: 1 }, { backgroundColor: currentTheme.primary }]}
+          edges={["top", "right", "left", "bottom"]}
         >
           <StatusBar
             barStyle={isDarkMode ? "light-content" : "dark-content"}
@@ -121,7 +122,8 @@ const DetalleEntregaPendiente = () => {
         style={styles.gradient}
       >
         <SafeAreaView
-          style={[{ flex: 1 }, { backgroundColor: currentTheme.primary }]} edges={['top', 'right', 'left', 'bottom']}
+          style={[{ flex: 1 }, { backgroundColor: currentTheme.primary }]}
+          edges={["top", "right", "left", "bottom"]}
         >
           <StatusBar
             barStyle={isDarkMode ? "light-content" : "dark-content"}
@@ -159,7 +161,8 @@ const DetalleEntregaPendiente = () => {
       end={{ x: 1, y: 1 }}
     >
       <SafeAreaView
-        style={[{ flex: 1 }, { backgroundColor: currentTheme.primary }]} edges={['top', 'right', 'left', 'bottom']}
+        style={[{ flex: 1 }, { backgroundColor: currentTheme.primary }]}
+        edges={["top", "right", "left", "bottom"]}
       >
         <StatusBar
           barStyle={isDarkMode ? "light-content" : "dark-content"}
@@ -220,7 +223,7 @@ const DetalleEntregaPendiente = () => {
               <Text style={[styles.label, { color: currentTheme.cardText }]}>
                 Fecha Creación:{" "}
                 <Text style={[styles.value, { color: currentTheme.cardText }]}>
-                  {detalle.fechaCreacion}
+                  {formatDate(detalle.fechaCreacion)}
                 </Text>
               </Text>
             </View>

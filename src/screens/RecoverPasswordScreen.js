@@ -1,23 +1,39 @@
-import React, { useState, useRef, useEffect } from 'react';
-import { View, Text, ToastAndroid, StyleSheet, ActivityIndicator, Pressable, StatusBar, ScrollView, Keyboard, Platform, Dimensions } from 'react-native';
-import { SafeAreaView } from 'react-native-safe-area-context';
-import axios from 'axios';
-import config from '../config/config';
-import Input from '../Components/Input';
-import { useFonts, Montserrat_400Regular, Montserrat_600SemiBold } from '@expo-google-fonts/montserrat';
-import { LinearGradient } from 'expo-linear-gradient';
-import MaterialCommunityIcons from 'react-native-vector-icons/MaterialCommunityIcons';
-import { useTheme } from '../context/ThemeContext';
-import { theme } from '../styles/theme';
+import React, { useState, useRef, useEffect } from "react";
+import {
+  View,
+  Text,
+  ToastAndroid,
+  StyleSheet,
+  ActivityIndicator,
+  Pressable,
+  StatusBar,
+  ScrollView,
+  Keyboard,
+  Platform,
+  Dimensions,
+} from "react-native";
+import { SafeAreaView } from "react-native-safe-area-context";
+import axios from "axios";
+import config from "../config/config";
+import Input from "../Components/Input";
+import {
+  useFonts,
+  Montserrat_400Regular,
+  Montserrat_600SemiBold,
+} from "@expo-google-fonts/montserrat";
+import { LinearGradient } from "expo-linear-gradient";
+import MaterialCommunityIcons from "react-native-vector-icons/MaterialCommunityIcons";
+import { useTheme } from "../context/ThemeContext";
+import { theme } from "../styles/theme";
 
 const RecoverPasswordScreen = ({ navigation }) => {
   const { isDarkMode } = useTheme();
   const currentTheme = theme[isDarkMode ? "dark" : "light"];
-  const [email, setEmail] = useState('');
+  const [email, setEmail] = useState("");
   const [loading, setLoading] = useState(false);
   const [keyboardHeight, setKeyboardHeight] = useState(0);
   const scrollViewRef = useRef(null);
-  const windowHeight = Dimensions.get('window').height;
+  const windowHeight = Dimensions.get("window").height;
 
   const [fontsLoaded] = useFonts({
     Montserrat_400Regular,
@@ -26,14 +42,14 @@ const RecoverPasswordScreen = ({ navigation }) => {
 
   useEffect(() => {
     const keyboardWillShow = Keyboard.addListener(
-      Platform.OS === 'ios' ? 'keyboardWillShow' : 'keyboardDidShow',
+      Platform.OS === "ios" ? "keyboardWillShow" : "keyboardDidShow",
       (e) => {
         setKeyboardHeight(e.endCoordinates.height);
       }
     );
 
     const keyboardWillHide = Keyboard.addListener(
-      Platform.OS === 'ios' ? 'keyboardWillHide' : 'keyboardDidHide',
+      Platform.OS === "ios" ? "keyboardWillHide" : "keyboardDidHide",
       () => {
         setKeyboardHeight(0);
       }
@@ -48,11 +64,11 @@ const RecoverPasswordScreen = ({ navigation }) => {
   const handleInputFocus = (event) => {
     if (scrollViewRef.current) {
       const fieldY = event.nativeEvent.target;
-      
+
       setTimeout(() => {
         scrollViewRef.current.scrollTo({
-          y: fieldY - (windowHeight * 0.3),
-          animated: true
+          y: fieldY - windowHeight * 0.3,
+          animated: true,
         });
       }, 100);
     }
@@ -62,14 +78,19 @@ const RecoverPasswordScreen = ({ navigation }) => {
     return (
       <View style={styles.loadingContainer}>
         <ActivityIndicator size="large" color={currentTheme.accent} />
-        <Text style={[styles.loadingText, { color: currentTheme.text }]}>Cargando...</Text>
+        <Text style={[styles.loadingText, { color: currentTheme.text }]}>
+          Cargando...
+        </Text>
       </View>
     );
   }
 
   const handleRecoverPassword = async () => {
     if (!email) {
-      ToastAndroid.show("Por favor, ingresa tu correo electrónico.", ToastAndroid.SHORT);
+      ToastAndroid.show(
+        "Por favor, ingresa tu correo electrónico.",
+        ToastAndroid.SHORT
+      );
       return;
     }
 
@@ -78,11 +99,17 @@ const RecoverPasswordScreen = ({ navigation }) => {
 
     try {
       await axios.post(`${config.API_URL}${config.AUTH.RECOVER}`, { email });
-      ToastAndroid.show("Correo enviado con un código de verificación.", ToastAndroid.SHORT);
-      navigation.navigate('VerifyCodePassword', { email });
+      ToastAndroid.show(
+        "Correo enviado con un código de verificación.",
+        ToastAndroid.SHORT
+      );
+      navigation.navigate("VerifyCodePassword", { email });
     } catch (error) {
       console.error(error);
-      ToastAndroid.show("No se pudo enviar el correo. Verifica el email.", ToastAndroid.SHORT);
+      ToastAndroid.show(
+        "No se pudo enviar el correo. Verifica el email.",
+        ToastAndroid.SHORT
+      );
     } finally {
       setLoading(false);
     }
@@ -99,25 +126,34 @@ const RecoverPasswordScreen = ({ navigation }) => {
       start={{ x: 0, y: 0 }}
       end={{ x: 1, y: 1 }}
     >
-      <SafeAreaView style={styles.container} edges={['top', 'right', 'left', 'bottom']}>
+      <SafeAreaView
+        style={styles.container}
+        edges={["top", "right", "left", "bottom"]}
+      >
         <StatusBar
           barStyle={isDarkMode ? "light-content" : "dark-content"}
           backgroundColor={currentTheme.primary}
         />
-        <ScrollView 
+        <ScrollView
           ref={scrollViewRef}
           contentContainerStyle={[
             styles.scrollContainer,
-            { paddingBottom: keyboardHeight + 20 }
+            { paddingBottom: keyboardHeight + 20 },
           ]}
           showsVerticalScrollIndicator={false}
           keyboardShouldPersistTaps="handled"
         >
           <View style={styles.logoContainer}>
-            <MaterialCommunityIcons name="truck-delivery" size={80} color={currentTheme.accent} />
+            <MaterialCommunityIcons
+              name="truck-delivery"
+              size={80}
+              color={currentTheme.accent}
+            />
           </View>
           <View style={styles.formContainer}>
-            <Text style={[styles.title, { color: currentTheme.accent }]}>Recuperar contraseña</Text>
+            <Text style={[styles.title, { color: currentTheme.accent }]}>
+              Recuperar contraseña
+            </Text>
 
             <Input
               label="Correo electrónico"
@@ -126,32 +162,45 @@ const RecoverPasswordScreen = ({ navigation }) => {
               value={email}
               onChangeText={setEmail}
               onFocus={handleInputFocus}
-              labelStyle={[styles.label, { color: "#fff" }]}
-              inputStyle={[styles.inputField, { 
-                borderColor: "#fff",
+              labelStyle={[
+                styles.label,
+                { color: isDarkMode ? "#fff" : "#333" },
+              ]}
+              inputStyle={{
+                borderColor: isDarkMode ? "#fff" : "#333",
                 borderWidth: 1,
-                color: "#fff",
-                backgroundColor: "transparent"
-              }]}
-              placeholderTextColor="#fff"
+                color: isDarkMode ? "#fff" : "#000",
+                backgroundColor: isDarkMode
+                  ? "transparent"
+                  : "rgba(255, 255, 255, 0.7)",
+              }}
+              placeholderTextColor={
+                isDarkMode ? "rgba(255,255,255,0.6)" : "rgba(0,0,0,0.4)"
+              }
             />
-            <Text style={[styles.helperText, { color: "#fff" }]}>
-              Ingresa el correo electrónico asociado a tu cuenta para recibir un código de recuperación.
+            <Text
+              style={[
+                styles.helperText,
+                { color: isDarkMode ? "#fff" : "#333" },
+              ]}
+            >
+              Ingresa el correo electrónico asociado a tu cuenta para recibir un
+              código de recuperación.
             </Text>
 
             <View style={styles.buttonContainer}>
               {loading ? (
                 <ActivityIndicator size="large" color={currentTheme.accent} />
               ) : (
-                <Pressable 
+                <Pressable
                   onPress={handleRecoverPassword}
                   style={({ pressed }) => [
                     styles.button,
-                    pressed && { opacity: 0.9 }
+                    pressed && { opacity: 0.9 },
                   ]}
                 >
                   <LinearGradient
-                    colors={['#F27121', '#E94057']}
+                    colors={["#F27121", "#E94057"]}
                     style={styles.buttonGradient}
                   >
                     <Text style={styles.buttonText}>Enviar código</Text>
@@ -161,11 +210,13 @@ const RecoverPasswordScreen = ({ navigation }) => {
             </View>
 
             <View style={styles.buttonContainer}>
-              <Pressable 
-                onPress={() => navigation.navigate('Login')}
+              <Pressable
+                onPress={() => navigation.navigate("Login")}
                 style={({ pressed }) => pressed && { opacity: 0.7 }}
               >
-                <Text style={[styles.link, { color: currentTheme.accent }]}>Volver al login</Text>
+                <Text style={[styles.link, { color: currentTheme.accent }]}>
+                  Volver al login
+                </Text>
               </Pressable>
             </View>
           </View>
@@ -186,64 +237,64 @@ const styles = StyleSheet.create({
   },
   scrollContainer: {
     flexGrow: 1,
-    justifyContent: 'center',
+    justifyContent: "center",
   },
   loadingContainer: {
     flex: 1,
-    justifyContent: 'center',
-    alignItems: 'center',
+    justifyContent: "center",
+    alignItems: "center",
   },
   loadingText: {
     fontSize: 16,
-    fontFamily: 'Montserrat_400Regular',
+    fontFamily: "Montserrat_400Regular",
     marginTop: 10,
   },
   logoContainer: {
-    alignItems: 'center',
+    alignItems: "center",
     marginBottom: -15,
   },
   formContainer: {
     padding: 20,
     borderRadius: 15,
-    width: '95%',
-    alignSelf: 'center',
-    alignItems: 'center'
+    width: "95%",
+    alignSelf: "center",
+    alignItems: "center",
   },
   title: {
     fontSize: 28,
     marginBottom: 20,
-    textAlign: 'center',
-    fontFamily: 'Montserrat_600SemiBold',
+    textAlign: "center",
+    fontFamily: "Montserrat_600SemiBold",
   },
   label: {
     fontSize: 15,
     marginBottom: 6,
-    fontFamily: 'Montserrat_400Regular',
-    marginLeft: '2.5%'
+    fontFamily: "Montserrat_400Regular",
+    marginLeft: "2.5%",
   },
   inputField: {
     borderRadius: 8,
     paddingVertical: 10,
     paddingHorizontal: 15,
     fontSize: 15,
-    fontFamily: 'Montserrat_400Regular',
+    fontFamily: "Montserrat_400Regular",
   },
   helperText: {
     fontSize: 14,
     marginBottom: 20,
-    textAlign: 'center',
-    fontFamily: 'Montserrat_400Regular',
+    textAlign: "center",
+    fontFamily: "Montserrat_400Regular",
   },
   buttonContainer: {
     marginBottom: 15,
-    alignItems: 'center',
-    width: '100%',
+    alignItems: "center",
+    width: "100%",
   },
   button: {
-    width: '100%',
+    width: "100%",
     borderRadius: 10,
-    overflow: 'hidden',
-    shadowColor: '#000',
+    overflow: "hidden",
+    shadowColor: "#000",
     shadowOffset: { width: 0, height: 2 },
     shadowOpacity: 0.25,
     shadowRadius: 3.84,
@@ -251,16 +302,16 @@ const styles = StyleSheet.create({
   },
   buttonGradient: {
     paddingVertical: 14,
-    alignItems: 'center',
+    alignItems: "center",
   },
   buttonText: {
-    color: 'white',
+    color: "white",
     fontSize: 18,
-    fontFamily: 'Montserrat_600SemiBold',
+    fontFamily: "Montserrat_600SemiBold",
   },
   link: {
     fontSize: 16,
-    fontFamily: 'Montserrat_400Regular',
-    textAlign: 'center',
+    fontFamily: "Montserrat_400Regular",
+    textAlign: "center",
   },
 });
