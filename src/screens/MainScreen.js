@@ -7,6 +7,7 @@ import {
   Image,
   StatusBar,
   Platform,
+  Animated,
 } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
 import AsyncStorage from "@react-native-async-storage/async-storage";
@@ -27,8 +28,24 @@ const MainScreen = () => {
   const [showEntregas, setShowEntregas] = useState(false);
   const [showHistorial, setShowHistorial] = useState(false);
   const [refreshEntregas, setRefreshEntregas] = useState(false);
+  const [scaleAnim] = useState(new Animated.Value(1));
   const { isDarkMode } = useTheme();
   const currentTheme = theme[isDarkMode ? "dark" : "light"];
+
+  const animatePress = () => {
+    Animated.sequence([
+      Animated.timing(scaleAnim, {
+        toValue: 0.95,
+        duration: 100,
+        useNativeDriver: true,
+      }),
+      Animated.timing(scaleAnim, {
+        toValue: 1,
+        duration: 100,
+        useNativeDriver: true,
+      }),
+    ]).start();
+  };
 
   useFocusEffect(
     React.useCallback(() => {
@@ -85,136 +102,147 @@ const MainScreen = () => {
           translucent
         />
         <View style={styles.container}>
-          <View style={styles.headerRow}>
-            <Pressable
-              onPress={() => navigation.navigate("ProfileScreen")}
-              style={({ pressed }) => [
-                styles.profileIcon,
-                { transform: [{ scale: pressed ? 0.95 : 1 }] },
-                {
-                  backgroundColor: currentTheme.cardBg,
-                  borderColor: currentTheme.cardBorder,
-                },
-              ]}
-            >
-              <Icon
-                source="account-circle-outline"
-                size={36}
-                color={currentTheme.text}
-              />
-            </Pressable>
-            <Text style={styles.greeting}>
-              <Text style={{ fontWeight: "bold", color: currentTheme.text }}>
-                {greeting}
-              </Text>
-              <Text style={{ color: currentTheme.accent }}> {userName}!</Text>
-            </Text>
-          </View>
-          <View style={styles.buttonRow}>
-            <Pressable
-              style={[styles.customButton, showEntregas && styles.activeButton]}
-              onPress={() => {
-                setShowDefaultView(false);
-                setShowEntregas(true);
-                setShowHistorial(false);
-              }}
-              activeOpacity={0.85}
-            >
-              <LinearGradient
-                colors={
-                  showEntregas
-                    ? ["#E94057", "#F27121"]
-                    : [currentTheme.cardBg, currentTheme.cardBg]
-                }
-                style={styles.buttonGradient}
-                start={{ x: 0, y: 0 }}
-                end={{ x: 1, y: 0 }}
+          <View style={styles.header}>
+            <View style={styles.headerContent}>
+              <View style={styles.greetingContainer}>
+                <Text
+                  style={[styles.greetingLabel, { color: currentTheme.text }]}
+                >
+                  {greeting}
+                </Text>
+                <Text style={[styles.userName, { color: currentTheme.accent }]}>
+                  {userName}!
+                </Text>
+              </View>
+              <Pressable
+                onPress={() => {
+                  animatePress();
+                  navigation.navigate("ProfileScreen");
+                }}
+                style={({ pressed }) => [
+                  styles.profileButton,
+                  {
+                    backgroundColor: currentTheme.cardBg,
+                    borderColor: currentTheme.cardBorder,
+                  },
+                ]}
               >
-                <View style={{ flexDirection: "row", alignItems: "center" }}>
-                  <View style={{ marginRight: 3 }}>
+                <Animated.View
+                  style={[
+                    styles.profileIconContainer,
+                    { transform: [{ scale: scaleAnim }] },
+                  ]}
+                >
+                  <Icon
+                    source="account-circle-outline"
+                    size={32}
+                    color={currentTheme.text}
+                  />
+                </Animated.View>
+              </Pressable>
+            </View>
+          </View>
+
+          <View style={styles.content}>
+            <View style={styles.buttonContainer}>
+              <Pressable
+                style={[
+                  styles.customButton,
+                  showEntregas && styles.activeButton,
+                ]}
+                onPress={() => {
+                  animatePress();
+                  setShowDefaultView(false);
+                  setShowEntregas(true);
+                  setShowHistorial(false);
+                }}
+              >
+                <LinearGradient
+                  colors={
+                    showEntregas
+                      ? ["#E94057", "#F27121"]
+                      : [currentTheme.cardBg, currentTheme.cardBg]
+                  }
+                  style={styles.buttonGradient}
+                  start={{ x: 0, y: 0 }}
+                  end={{ x: 1, y: 0 }}
+                >
+                  <View style={styles.buttonContent}>
                     <Icon
                       source="format-list-bulleted"
-                      size={20}
+                      size={24}
                       color={showEntregas ? "#fff" : currentTheme.text}
                     />
+                    <Text
+                      style={[
+                        styles.buttonText,
+                        { color: showEntregas ? "#fff" : currentTheme.text },
+                      ]}
+                    >
+                      Ver Entregas
+                    </Text>
                   </View>
-                  <Text
-                    style={[
-                      styles.buttonText,
-                      { color: showEntregas ? "#fff" : currentTheme.text },
-                    ]}
-                  >
-                    Ver Entregas
-                  </Text>
-                </View>
-              </LinearGradient>
-            </Pressable>
-            <Pressable
-              style={[
-                styles.customButton,
-                showHistorial && styles.activeButton,
-              ]}
-              onPress={() => {
-                setShowDefaultView(false);
-                setShowEntregas(false);
-                setShowHistorial(true);
-              }}
-              activeOpacity={0.85}
-            >
-              <LinearGradient
-                colors={
-                  showHistorial
-                    ? ["#E94057", "#F27121"]
-                    : [currentTheme.cardBg, currentTheme.cardBg]
-                }
-                style={styles.buttonGradient}
-                start={{ x: 0, y: 0 }}
-                end={{ x: 1, y: 0 }}
+                </LinearGradient>
+              </Pressable>
+
+              <Pressable
+                style={[
+                  styles.customButton,
+                  showHistorial && styles.activeButton,
+                ]}
+                onPress={() => {
+                  animatePress();
+                  setShowDefaultView(false);
+                  setShowEntregas(false);
+                  setShowHistorial(true);
+                }}
               >
-                <View style={{ flexDirection: "row", alignItems: "center" }}>
-                  <View style={{ marginRight: 3 }}>
+                <LinearGradient
+                  colors={
+                    showHistorial
+                      ? ["#E94057", "#F27121"]
+                      : [currentTheme.cardBg, currentTheme.cardBg]
+                  }
+                  style={styles.buttonGradient}
+                  start={{ x: 0, y: 0 }}
+                  end={{ x: 1, y: 0 }}
+                >
+                  <View style={styles.buttonContent}>
                     <Icon
                       source="truck-delivery-outline"
-                      size={20}
+                      size={24}
                       color={showHistorial ? "#fff" : currentTheme.text}
                     />
+                    <Text
+                      style={[
+                        styles.buttonText,
+                        { color: showHistorial ? "#fff" : currentTheme.text },
+                      ]}
+                    >
+                      Ver Historial
+                    </Text>
                   </View>
+                </LinearGradient>
+              </Pressable>
+            </View>
+
+            <View style={styles.mainContent}>
+              {showDefaultView && (
+                <>
                   <Text
-                    style={[
-                      styles.buttonText,
-                      { color: showHistorial ? "#fff" : currentTheme.text },
-                    ]}
+                    style={[styles.sectionTitle, { color: currentTheme.text }]}
                   >
-                    Ver Historial
+                    Próximas Entregas
                   </Text>
-                </View>
-              </LinearGradient>
-            </Pressable>
-          </View>
-          <View
-            style={[
-              styles.fragmentContainer,
-              { backgroundColor: "transparent" },
-            ]}
-          >
-            {showDefaultView && (
-              <>
-                <Text
-                  style={[styles.sectionTitle, { color: currentTheme.text }]}
-                >
-                  Siguientes{" "}
-                  <Text
-                    style={{ color: currentTheme.accent, fontWeight: "bold" }}
-                  >
-                    2
-                  </Text>{" "}
-                  entregas
-                </Text>
-                <EntregasPendientes refresh={refreshEntregas} limitItems={2} />
-              </>
-            )}
-            {showEntregas && <EntregasPendientes refresh={refreshEntregas} />}
-            {showHistorial && <HistorialEntregas />}
+                  <EntregasPendientes
+                    refresh={refreshEntregas}
+                    limitItems={2}
+                  />
+                </>
+              )}
+              {showEntregas && <EntregasPendientes refresh={refreshEntregas} />}
+              {showHistorial && <HistorialEntregas />}
+            </View>
           </View>
         </View>
       </SafeAreaView>
@@ -230,117 +258,95 @@ const styles = StyleSheet.create({
   safeArea: {
     flex: 1,
     backgroundColor: "transparent",
-    paddingTop: 5,
   },
   container: {
     flex: 1,
-    alignItems: "center",
-    justifyContent: "flex-start",
-    padding: 20,
-    paddingTop: 0,
   },
-  headerRow: {
+  header: {
+    paddingHorizontal: 20,
+    paddingVertical: 16,
+  },
+  headerContent: {
     flexDirection: "row",
+    justifyContent: "space-between",
     alignItems: "center",
-    alignSelf: "flex-start",
-    marginTop: 20,
-    marginBottom: 30,
   },
-  avatar: {
-    width: 54,
-    height: 54,
-    borderRadius: 27,
-    marginRight: 16,
-    borderWidth: 2,
+  greetingContainer: {
+    flex: 1,
   },
-  greeting: {
-    fontSize: 22,
+  greetingLabel: {
+    fontSize: 16,
+    fontWeight: "500",
+    marginBottom: 4,
+  },
+  userName: {
+    fontSize: 24,
     fontWeight: "bold",
-    textAlign: "left",
-    marginTop: 0,
-    marginBottom: 0,
   },
-  buttonRow: {
-    flexDirection: "row",
+  profileButton: {
+    width: 48,
+    height: 48,
+    borderRadius: 24,
     justifyContent: "center",
+    alignItems: "center",
+    borderWidth: 1.5,
+    marginLeft: 16,
+    elevation: 2,
+    shadowColor: "#000",
+    shadowOffset: { width: 0, height: 2 },
+    shadowOpacity: 0.1,
+    shadowRadius: 4,
+  },
+  profileIconContainer: {
     width: "100%",
-    marginBottom: 30,
-    gap: 10,
+    height: "100%",
+    justifyContent: "center",
+    alignItems: "center",
+  },
+  content: {
+    flex: 1,
+    paddingHorizontal: 20,
+  },
+  buttonContainer: {
+    flexDirection: "row",
+    gap: 12,
+    marginBottom: 24,
   },
   customButton: {
     flex: 1,
-    marginHorizontal: 5,
-    borderRadius: 20,
+    borderRadius: 16,
     overflow: "hidden",
     elevation: 2,
-    shadowColor: "#2d3a4b",
+    shadowColor: "#000",
     shadowOffset: { width: 0, height: 2 },
-    shadowOpacity: 0.08,
+    shadowOpacity: 0.1,
     shadowRadius: 4,
   },
   activeButton: {
     elevation: 4,
-    shadowOpacity: 0.18,
+    shadowOpacity: 0.2,
   },
   buttonGradient: {
-    paddingVertical: 14,
+    paddingVertical: 16,
+    paddingHorizontal: 12,
+  },
+  buttonContent: {
+    flexDirection: "row",
     alignItems: "center",
-    borderRadius: 20,
+    justifyContent: "center",
+    gap: 8,
   },
   buttonText: {
-    fontWeight: "bold",
     fontSize: 16,
+    fontWeight: "600",
   },
-  fragmentContainer: {
+  mainContent: {
     flex: 1,
-    width: "100%",
-  },
-  logoutContainer: {
-    width: "100%",
-    marginTop: "auto",
-    marginBottom: 20,
-  },
-  logoutButton: {
-    backgroundColor: "#fff",
-    borderRadius: 20,
-    paddingVertical: 14,
-    alignItems: "center",
-    borderWidth: 2,
-    borderColor: "#E94057",
-    elevation: 2,
-    shadowColor: "#E94057",
-    shadowOffset: { width: 0, height: 2 },
-    shadowOpacity: 0.08,
-    shadowRadius: 4,
-  },
-  logoutText: {
-    color: "#E94057",
-    fontWeight: "bold",
-    fontSize: 16,
-    textAlign: "center",
-  },
-  profileIcon: {
-    width: 52,
-    height: 52,
-    borderRadius: 26,
-    justifyContent: "center",
-    alignItems: "center",
-    backgroundColor: "#fff", // o currentTheme.cardBg si lo preferís dinámico
-    borderColor: "#e0e0e0", // o currentTheme.cardBorder
-    borderWidth: 1.5,
-    shadowColor: "#000",
-    shadowOffset: { width: 0, height: 1 },
-    shadowOpacity: 0.1,
-    shadowRadius: 2,
-    elevation: 3,
-    marginRight: 5,
-    marginLeft: 5,
   },
   sectionTitle: {
-    fontSize: 22,
+    fontSize: 20,
     fontWeight: "600",
     marginBottom: 16,
-    paddingHorizontal: 16,
   },
 });
 
