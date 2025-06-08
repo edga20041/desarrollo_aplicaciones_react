@@ -236,32 +236,51 @@ const MainScreen = () => {
                         { color: currentTheme.text },
                       ]}
                     >
-                      Entrega{" "}
+                      Siguiente{" "}
                       <Text
                         style={{
                           color: currentTheme.accent,
                           fontWeight: "bold",
                         }}
                       >
-                        Recomendada
+                        entrega
                       </Text>
                     </Text>
                     <EntregasPendientes
                       refresh={refreshEntregas}
                       limitItems={1}
                     />
-                    <Text
-                      style={{
-                        color: currentTheme.text,
-                        opacity: 0.7,
-                        textAlign: "center",
-                        maxWidth: "80%",
-                        alignSelf: "center",
+                    <Pressable
+                      onPress={() => {
+                        animatePress();
+                        setShowDefaultView(false);
+                        setShowEntregas(true);
+                        setShowHistorial(false);
                       }}
+                      style={({ pressed }) => [
+                        styles.viewMoreButton,
+                        {
+                          backgroundColor: pressed
+                            ? currentTheme.accent + "10"
+                            : "transparent",
+                        },
+                        { gap: 10, marginTop: 0 },
+                      ]}
                     >
-                      Presiona en el botón de Ver Entregas para navegar entre
-                      las opciones
-                    </Text>
+                      <Text
+                        style={[
+                          styles.viewMoreText,
+                          { color: currentTheme.accent },
+                        ]}
+                      >
+                        Ver todas las entregas pendientes
+                      </Text>
+                      <Icon
+                        source="arrow-right-circle"
+                        size={20}
+                        color={currentTheme.accent}
+                      />
+                    </Pressable>
                   </View>
                 </>
               )}
@@ -372,6 +391,20 @@ const styles = StyleSheet.create({
     fontSize: 20,
     fontWeight: "600",
     marginBottom: 16,
+  },
+  viewMoreButton: {
+    flexDirection: "row",
+    alignItems: "center",
+    justifyContent: "center",
+    paddingVertical: 12,
+    paddingHorizontal: 16,
+    borderRadius: 12,
+    marginTop: 16,
+    alignSelf: "center",
+  },
+  viewMoreText: {
+    fontSize: 15,
+    fontWeight: "500",
   },
 });
 
