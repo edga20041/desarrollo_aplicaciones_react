@@ -8,9 +8,9 @@ import {
   ActivityIndicator,
   Alert,
   StatusBar,
-  TouchableOpacity
+  TouchableOpacity,
 } from "react-native";
-import { SafeAreaView} from "react-native-safe-area-context";
+import { SafeAreaView } from "react-native-safe-area-context";
 import { useNavigation, useRoute } from "@react-navigation/native";
 import MapView, { Marker, Polyline } from "react-native-maps";
 import Geocoder from "react-native-geocoding";
@@ -20,6 +20,7 @@ import { LinearGradient } from "expo-linear-gradient";
 import * as SecureStore from "expo-secure-store";
 import { useTheme } from "../context/ThemeContext";
 import { theme } from "../styles/theme";
+import { formatDate } from "../utils/dateFormatter";
 
 const DetalleEntregaHistorial = () => {
   const navigation = useNavigation();
@@ -237,12 +238,12 @@ const DetalleEntregaHistorial = () => {
       start={{ x: 0, y: 0 }}
       end={{ x: 1, y: 1 }}
     >
-      <SafeAreaView style={{ flex: 1 }} edges={['right', 'left', 'bottom']}>
+      <SafeAreaView style={{ flex: 1 }} edges={["right", "left", "bottom"]}>
         <StatusBar
           barStyle={isDarkMode ? "light-content" : "dark-content"}
           backgroundColor={currentTheme.primary}
         />
-        <ScrollView 
+        <ScrollView
           style={{ flex: 1 }}
           contentContainerStyle={styles.scrollContent}
           showsVerticalScrollIndicator={true}
@@ -293,13 +294,13 @@ const DetalleEntregaHistorial = () => {
               <Text style={[styles.label, { color: currentTheme.cardText }]}>
                 Fecha Creación:{" "}
                 <Text style={[styles.value, { color: currentTheme.cardText }]}>
-                  {detalleEntrega.fechaCreacion}
+                  {formatDate(detalleEntrega.fechaCreacion)}
                 </Text>
               </Text>
               <Text style={[styles.label, { color: currentTheme.cardText }]}>
                 Fecha Finalización:{" "}
                 <Text style={[styles.value, { color: currentTheme.cardText }]}>
-                  {detalleEntrega.fechaFinalizacion}
+                  {formatDate(detalleEntrega.fechaFinalizacion)}
                 </Text>
               </Text>
             </View>
@@ -384,7 +385,10 @@ const DetalleEntregaHistorial = () => {
             )}
             {/* Botón Volver */}
             <TouchableOpacity
-              style={[styles.volverButton, { backgroundColor: currentTheme.accent }]}
+              style={[
+                styles.volverButton,
+                { backgroundColor: currentTheme.accent },
+              ]}
               onPress={handleVolver}
             >
               <Text style={styles.volverButtonText}>Volver</Text>
@@ -455,7 +459,7 @@ const styles = StyleSheet.create({
     fontSize: 14,
     paddingHorizontal: 8,
   },
-    volverButton: {
+  volverButton: {
     marginTop: 28,
     paddingVertical: 14,
     borderRadius: 8,
@@ -466,7 +470,7 @@ const styles = StyleSheet.create({
     fontSize: 16,
     fontWeight: "bold",
     letterSpacing: 1,
-  }
+  },
 });
 
 export default DetalleEntregaHistorial;

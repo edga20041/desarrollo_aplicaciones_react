@@ -276,7 +276,7 @@ const MainScreen = () => {
                                 fontWeight: "bold",
                               }}
                             >
-                              entrega
+                              Entrega
                             </Text>
                           </Text>
                           <EntregasPendientes

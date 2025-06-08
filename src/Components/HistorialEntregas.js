@@ -14,6 +14,7 @@ import config from "../config/config";
 import { useTheme } from "../context/ThemeContext";
 import { theme } from "../styles/theme";
 import { Icon } from "react-native-paper";
+import { formatShortDate } from "../utils/dateFormatter";
 
 const estadoToString = (estadoId) => {
   if (estadoId === 3) return "Finalizado";
@@ -178,7 +179,7 @@ const HistorialEntregas = ({ limitItems }) => {
                 style={{ opacity: 0.5 }}
               />
               <Text style={[styles.dateText, { color: currentTheme.text }]}>
-                {new Date(item.fechaFinalizacion).toLocaleDateString()}
+                {formatShortDate(item.fechaFinalizacion)}
               </Text>
             </View>
           </View>
