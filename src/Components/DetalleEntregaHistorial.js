@@ -8,8 +8,9 @@ import {
   ActivityIndicator,
   Alert,
   StatusBar,
+  TouchableOpacity,
 } from "react-native";
-import { SafeAreaView} from "react-native-safe-area-context";
+import { SafeAreaView } from "react-native-safe-area-context";
 import { useNavigation, useRoute } from "@react-navigation/native";
 import MapView, { Marker, Polyline } from "react-native-maps";
 import Geocoder from "react-native-geocoding";
@@ -19,6 +20,7 @@ import { LinearGradient } from "expo-linear-gradient";
 import * as SecureStore from "expo-secure-store";
 import { useTheme } from "../context/ThemeContext";
 import { theme } from "../styles/theme";
+import { formatDate } from "../utils/dateFormatter";
 
 const DetalleEntregaHistorial = () => {
   const navigation = useNavigation();
@@ -236,16 +238,19 @@ const DetalleEntregaHistorial = () => {
       start={{ x: 0, y: 0 }}
       end={{ x: 1, y: 1 }}
     >
-      <SafeAreaView style={{ flex: 1 }} edges={['top', 'right', 'left', 'bottom']}>
+      <SafeAreaView style={{ flex: 1 }} edges={["right", "left", "bottom"]}>
         <StatusBar
           barStyle={isDarkMode ? "light-content" : "dark-content"}
           backgroundColor={currentTheme.primary}
-          translucent
         />
-        <ScrollView style={styles.scrollView}>
+        <ScrollView
+          style={{ flex: 1 }}
+          contentContainerStyle={styles.scrollContent}
+          showsVerticalScrollIndicator={true}
+        >
           <View style={styles.container}>
-            <Text style={[styles.title, { color: currentTheme.text }]}>
-              Detalle de Entrega
+            <Text style={[styles.title, { color: currentTheme.accent }]}>
+              Detalle de Entrega Finalizada
             </Text>
             <View
               style={[
@@ -289,17 +294,17 @@ const DetalleEntregaHistorial = () => {
               <Text style={[styles.label, { color: currentTheme.cardText }]}>
                 Fecha Creación:{" "}
                 <Text style={[styles.value, { color: currentTheme.cardText }]}>
-                  {detalleEntrega.fechaCreacion}
+                  {formatDate(detalleEntrega.fechaCreacion)}
                 </Text>
               </Text>
               <Text style={[styles.label, { color: currentTheme.cardText }]}>
                 Fecha Finalización:{" "}
                 <Text style={[styles.value, { color: currentTheme.cardText }]}>
-                  {detalleEntrega.fechaFinalizacion}
+                  {formatDate(detalleEntrega.fechaFinalizacion)}
                 </Text>
               </Text>
             </View>
-            <Text style={[styles.mapTitle, { color: currentTheme.text }]}>
+            <Text style={[styles.mapTitle, { color: currentTheme.accent }]}>
               Ubicación de la Ruta
             </Text>
             {detalleRuta && (
@@ -378,6 +383,16 @@ const DetalleEntregaHistorial = () => {
                 )}
               </View>
             )}
+            {/* Botón Volver */}
+            <TouchableOpacity
+              style={[
+                styles.volverButton,
+                { backgroundColor: currentTheme.accent },
+              ]}
+              onPress={handleVolver}
+            >
+              <Text style={styles.volverButtonText}>Volver</Text>
+            </TouchableOpacity>
           </View>
         </ScrollView>
       </SafeAreaView>
@@ -389,10 +404,12 @@ const styles = StyleSheet.create({
   gradient: {
     flex: 1,
   },
-  scrollView: {
-    flex: 1,
+  scrollContent: {
+    flexGrow: 1,
+    paddingBottom: 20,
   },
   container: {
+    flex: 1,
     padding: 20,
   },
   title: {
@@ -433,7 +450,7 @@ const styles = StyleSheet.create({
     padding: 8,
   },
   map: {
-    height: 300,
+    height: 250,
     width: "100%",
     borderRadius: 8,
   },
@@ -441,6 +458,18 @@ const styles = StyleSheet.create({
     marginTop: 8,
     fontSize: 14,
     paddingHorizontal: 8,
+  },
+  volverButton: {
+    marginTop: 28,
+    paddingVertical: 14,
+    borderRadius: 8,
+    alignItems: "center",
+  },
+  volverButtonText: {
+    color: "#fff",
+    fontSize: 16,
+    fontWeight: "bold",
+    letterSpacing: 1,
   },
 });
 

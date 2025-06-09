@@ -1,27 +1,57 @@
-import React from 'react';
-import { View, Text, TextInput } from 'react-native';
+import React from "react";
+import { View, Text, TextInput } from "react-native";
 
-const Input = ({ label, value, onChangeText, placeholder, keyboardType = 'default', secureTextEntry = false }) => {
-    return (
-        <View style={{ marginBottom: 10 }}>
-            <Text>{label}</Text>
-            <TextInput
-                style={{
-                    height: 40,
-                    borderColor: 'gray',
-                    borderWidth: 1,
-                    borderRadius: 5,
-                    paddingLeft: 10,
-                    marginBottom: 5,
-                }}
-                value={value}
-                onChangeText={onChangeText}
-                placeholder={placeholder}
-                keyboardType={keyboardType}
-                secureTextEntry={secureTextEntry}
-            />
-        </View>
-    );
+const Input = ({
+  label,
+  value,
+  onChangeText,
+  placeholder,
+  keyboardType = "default",
+  secureTextEntry = false,
+  rightIcon,
+  style,
+  labelStyle,
+  inputStyle,
+  placeholderTextColor,
+}) => {
+  return (
+    <View style={[{ marginBottom: 10 }, style]}>
+      <Text style={labelStyle}>{label}</Text>
+      <View
+        style={[
+          {
+            flexDirection: "row",
+            alignItems: "center",
+            borderRadius: 5,
+            paddingLeft: 10,
+            marginBottom: 5,
+            height: 45,
+            width: "95%",
+            alignSelf: "center",
+          },
+          inputStyle,
+        ]}
+      >
+        <TextInput
+          style={[
+            {
+              flex: 1,
+              height: 45,
+              fontSize: 15,
+            },
+            { color: inputStyle?.color || "#fff" },
+          ]}
+          value={value}
+          onChangeText={onChangeText}
+          placeholder={placeholder}
+          placeholderTextColor={placeholderTextColor}
+          keyboardType={keyboardType}
+          secureTextEntry={secureTextEntry}
+        />
+        {rightIcon && <View style={{ marginRight: 10 }}>{rightIcon}</View>}
+      </View>
+    </View>
+  );
 };
 
 export default Input;

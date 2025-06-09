@@ -10,7 +10,7 @@ import {
   Button,
   Image,
 } from "react-native";
-import { SafeAreaView} from "react-native-safe-area-context";
+import { SafeAreaView } from "react-native-safe-area-context";
 import { useNavigation, useRoute } from "@react-navigation/native";
 import axios from "../axiosInstance";
 import config from "../config/config";
@@ -18,6 +18,8 @@ import { LinearGradient } from "expo-linear-gradient";
 import * as SecureStore from "expo-secure-store";
 import { useTheme } from "../context/ThemeContext";
 import { theme } from "../styles/theme";
+import { Icon } from "react-native-paper";
+import { formatDate } from "../utils/dateFormatter";
 
 const DetalleEntregaPendiente = () => {
   const navigation = useNavigation();
@@ -69,7 +71,6 @@ const DetalleEntregaPendiente = () => {
       } finally {
         setFinalizando(false);
         setShowImage(false);
-
       }
     }, 4000);
   };
@@ -85,7 +86,8 @@ const DetalleEntregaPendiente = () => {
         style={styles.gradient}
       >
         <SafeAreaView
-          style={[{ flex: 1 }, { backgroundColor: currentTheme.primary }]} edges={['top', 'right', 'left', 'bottom']}
+          style={[{ flex: 1 }, { backgroundColor: currentTheme.primary }]}
+          edges={["top", "right", "left", "bottom"]}
         >
           <StatusBar
             barStyle={isDarkMode ? "light-content" : "dark-content"}
@@ -120,7 +122,8 @@ const DetalleEntregaPendiente = () => {
         style={styles.gradient}
       >
         <SafeAreaView
-          style={[{ flex: 1 }, { backgroundColor: currentTheme.primary }]} edges={['top', 'right', 'left', 'bottom']}
+          style={[{ flex: 1 }, { backgroundColor: currentTheme.primary }]}
+          edges={["top", "right", "left", "bottom"]}
         >
           <StatusBar
             barStyle={isDarkMode ? "light-content" : "dark-content"}
@@ -158,7 +161,8 @@ const DetalleEntregaPendiente = () => {
       end={{ x: 1, y: 1 }}
     >
       <SafeAreaView
-        style={[{ flex: 1 }, { backgroundColor: currentTheme.primary }]} edges={['top', 'right', 'left', 'bottom']}
+        style={[{ flex: 1 }, { backgroundColor: currentTheme.primary }]}
+        edges={["top", "right", "left", "bottom"]}
       >
         <StatusBar
           barStyle={isDarkMode ? "light-content" : "dark-content"}
@@ -219,7 +223,7 @@ const DetalleEntregaPendiente = () => {
               <Text style={[styles.label, { color: currentTheme.cardText }]}>
                 Fecha Creación:{" "}
                 <Text style={[styles.value, { color: currentTheme.cardText }]}>
-                  {detalle.fechaCreacion}
+                  {formatDate(detalle.fechaCreacion)}
                 </Text>
               </Text>
             </View>
@@ -235,11 +239,19 @@ const DetalleEntregaPendiente = () => {
               disabled={finalizando}
               activeOpacity={0.8}
             >
-              <Text
-                style={[styles.qrButtonText, { color: currentTheme.accent }]}
-              >
-                {finalizando ? "Finalizando..." : "QR"}
-              </Text>
+              {finalizando ? (
+                <Text
+                  style={[styles.qrButtonText, { color: currentTheme.accent }]}
+                >
+                  Finalizando...
+                </Text>
+              ) : (
+                <Icon
+                  source="qrcode-scan"
+                  size={32}
+                  color={currentTheme.accent}
+                />
+              )}
             </Pressable>
             <Pressable
               style={[

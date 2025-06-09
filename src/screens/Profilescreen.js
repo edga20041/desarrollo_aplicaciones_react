@@ -18,6 +18,7 @@ import { useNavigation } from "@react-navigation/native";
 import * as SecureStore from "expo-secure-store";
 import { useTheme } from "../context/ThemeContext";
 import { theme } from "../styles/theme";
+import { Icon } from "react-native-paper";
 
 const ProfileScreen = () => {
   const [perfil, setPerfil] = useState(null);
@@ -250,9 +251,18 @@ const ProfileScreen = () => {
             activeOpacity={0.85}
             disabled={loading}
           >
-            <Text style={[styles.logoutText, { color: currentTheme.error }]}>
-              Cerrar sesión
-            </Text>
+            <View style={{ flexDirection: "row", alignItems: "center" }}>
+              <View style={{ marginRight: 3 }}>
+                <Icon
+                  source="logout"
+                  size={20}
+                  color={currentTheme.error}
+                />
+              </View>
+              <Text style={[styles.logoutText, { color: currentTheme.error }]}>
+                Cerrar sesión
+              </Text>
+            </View>
           </Pressable>
         </View>
       </SafeAreaView>
