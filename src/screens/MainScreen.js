@@ -349,7 +349,10 @@ const MainScreen = () => {
                               Reciente
                             </Text>
                           </Text>
-                          <HistorialEntregas limitItems={2} />
+                          <HistorialEntregas
+                            limitItems={1}
+                            refresh={refreshEntregas}
+                          />
                         </View>
                       );
                     }
@@ -359,7 +362,7 @@ const MainScreen = () => {
                 />
               )}
               {showEntregas && <EntregasPendientes refresh={refreshEntregas} />}
-              {showHistorial && <HistorialEntregas />}
+              {showHistorial && <HistorialEntregas refresh={refreshEntregas} />}
             </View>
           </View>
         </View>
