@@ -21,8 +21,8 @@ const estadoToString = (estadoId) => {
   return estadoId;
 };
 
-const HistorialEntregas = ({ limitItems }) => {
-  const limit = limitItems || 10;
+const HistorialEntregas = ({ limitItems, refresh }) => {
+  const limit = limitItems || 20;
   const [historial, setHistorial] = useState([]);
   const [loading, setLoading] = useState(true);
   const navigation = useNavigation();
@@ -57,7 +57,7 @@ const HistorialEntregas = ({ limitItems }) => {
       }
     };
     fetchHistorial();
-  }, []);
+  }, [refresh]);
 
   if (loading) {
     return (
@@ -85,7 +85,19 @@ const HistorialEntregas = ({ limitItems }) => {
 
   const handleEntregaPress = (entregaId) => {
     animatePress();
-    navigation.navigate("Detalle Entrega Historial", { entrega_id: entregaId });
+    if (navigation && navigation.canGoBack) {
+      navigation.navigate("Detalle Entrega Historial", {
+        entrega_id: entregaId,
+      });
+    } else {
+      // If we're in MainScreen, navigate using the parent navigation
+      navigation.navigate("Historial");
+      setTimeout(() => {
+        navigation.navigate("Detalle Entrega Historial", {
+          entrega_id: entregaId,
+        });
+      }, 100);
+    }
   };
 
   const renderEntrega = ({ item }) => (
@@ -189,13 +201,33 @@ const HistorialEntregas = ({ limitItems }) => {
   );
 
   return (
-    <FlatList
-      data={historial.slice().reverse().slice(0, limit)}
-      keyExtractor={(item) => item.id.toString()}
-      renderItem={renderEntrega}
-      contentContainerStyle={styles.listContainer}
-      showsVerticalScrollIndicator={false}
-    />
+    <View style={{ flex: 1 }}>
+      <Text
+        style={{
+          height: 50,
+          color: currentTheme.text,
+          fontSize: 16,
+          fontWeight: "bold",
+          textAlign: "center",
+          marginTop: 10,
+        }}
+      >
+        {`Hoy completaste ${
+          historial.filter((item) => {
+            const today = new Date();
+            const entregaDate = new Date(item.fechaFinalizacion);
+            return today.toDateString() === entregaDate.toDateString();
+          }).length
+        } entregas`}
+      </Text>
+      <FlatList
+        data={historial.slice().reverse().slice(0, limit)}
+        keyExtractor={(item) => item.id.toString()}
+        renderItem={renderEntrega}
+        contentContainerStyle={styles.listContainer}
+        showsVerticalScrollIndicator={false}
+      />
+    </View>
   );
 };
 
