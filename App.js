@@ -347,11 +347,13 @@ const AppContent = () => {
 export default function App() {
   return (
   <SafeAreaProvider>
-    <ThemeProvider>
-      <PaperProvider>
-        <AppContent />
-      </PaperProvider>
-    </ThemeProvider>
+    <SafeAreaView style={{ flex: 1 }} edges={['top', 'right', 'left', 'bottom']}>
+      <ThemeProvider>
+        <PaperProvider>
+          <AppContent />
+        </PaperProvider>
+      </ThemeProvider>
+    </SafeAreaView>
   </SafeAreaProvider>
   );
 }
