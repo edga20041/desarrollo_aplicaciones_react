@@ -37,7 +37,6 @@ const ProfileScreen = () => {
 
   const navigation = useNavigation();
 
-  // Animated header values
   const headerHeight = scrollY.interpolate({
     inputRange: [0, 120],
     outputRange: [200, 80],
@@ -60,7 +59,6 @@ const ProfileScreen = () => {
 
     if (!result.canceled) {
       setProfileImage(result.assets[0].uri);
-      // Aquí podrías implementar la lógica para subir la imagen al servidor
     }
   };
 
@@ -441,11 +439,11 @@ const styles = StyleSheet.create({
     flexDirection: "row",
     alignItems: "center",
     position: "absolute",
-    top: 20,
+    top: 0,
     right: 20,
     backgroundColor: "rgba(255,255,255,0.2)",
     borderRadius: 20,
-    padding: 8,
+    padding: 5,
   },
   modalOverlay: {
     flex: 1,

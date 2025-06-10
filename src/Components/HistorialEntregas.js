@@ -74,7 +74,7 @@ const HistorialEntregas = ({ limitItems, refresh, renderHeader }) => {
         entrega_id: entregaId,
       });
     } else {
-      // If we're in MainScreen, navigate using the parent navigation
+
       navigation.navigate("Historial");
       setTimeout(() => {
         navigation.navigate("Detalle Entrega Historial", {

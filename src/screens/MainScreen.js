@@ -4,11 +4,8 @@ import {
   Text,
   StyleSheet,
   Pressable,
-  Image,
   StatusBar,
-  Platform,
   Animated,
-  ScrollView,
   FlatList,
 } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
@@ -378,7 +375,7 @@ const MainScreen = () => {
 const styles = StyleSheet.create({
   gradient: {
     flex: 1,
-    paddingTop: Platform.OS === "android" ? StatusBar.currentHeight : 0,
+    // paddingTop: Platform.OS === "android" ? StatusBar.currentHeight : 0,
   },
   safeArea: {
     flex: 1,
