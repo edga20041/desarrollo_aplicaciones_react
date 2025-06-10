@@ -21,7 +21,7 @@ const estadoToString = (estadoId) => {
   return estadoId;
 };
 
-const HistorialEntregas = ({ limitItems, refresh }) => {
+const HistorialEntregas = ({ limitItems, refresh, renderHeader }) => {
   const limit = limitItems || 20;
   const [historial, setHistorial] = useState([]);
   const [loading, setLoading] = useState(true);
@@ -63,22 +63,6 @@ const HistorialEntregas = ({ limitItems, refresh }) => {
     return (
       <View style={styles.loadingContainer}>
         <ActivityIndicator size="large" color={currentTheme.accent} />
-      </View>
-    );
-  }
-
-  if (historial.length === 0) {
-    return (
-      <View style={styles.emptyContainer}>
-        <Icon
-          source="history"
-          size={48}
-          color={currentTheme.text}
-          style={{ opacity: 0.5 }}
-        />
-        <Text style={[styles.emptyText, { color: currentTheme.text }]}>
-          No hay historial de entregas
-        </Text>
       </View>
     );
   }
@@ -202,31 +186,57 @@ const HistorialEntregas = ({ limitItems, refresh }) => {
 
   return (
     <View style={{ flex: 1 }}>
-      <Text
-        style={{
-          height: 50,
-          color: currentTheme.text,
-          fontSize: 16,
-          fontWeight: "bold",
-          textAlign: "center",
-          marginTop: 10,
-        }}
-      >
-        {`Hoy completaste ${
-          historial.filter((item) => {
-            const today = new Date();
-            const entregaDate = new Date(item.fechaFinalizacion);
-            return today.toDateString() === entregaDate.toDateString();
-          }).length
-        } entregas`}
-      </Text>
-      <FlatList
-        data={historial.slice().reverse().slice(0, limit)}
-        keyExtractor={(item) => item.id.toString()}
-        renderItem={renderEntrega}
-        contentContainerStyle={styles.listContainer}
-        showsVerticalScrollIndicator={false}
-      />
+      {renderHeader && renderHeader(historial.length > 0)}
+      {historial.length > 0 && (
+        <>
+          <Text
+            style={{
+              height: 50,
+              color: currentTheme.text,
+              fontSize: 16,
+              fontWeight: "bold",
+              textAlign: "center",
+              marginTop: 10,
+            }}
+          >
+            {`Hoy completaste ${
+              historial.filter((item) => {
+                const today = new Date();
+                const entregaDate = new Date(item.fechaFinalizacion);
+                return today.toDateString() === entregaDate.toDateString();
+              }).length
+            } entrega${
+              historial.filter((item) => {
+                const today = new Date();
+                const entregaDate = new Date(item.fechaFinalizacion);
+                return today.toDateString() === entregaDate.toDateString();
+              }).length > 1
+                ? "s"
+                : ""
+            }`}
+          </Text>
+          <FlatList
+            data={historial.slice().reverse().slice(0, limit)}
+            keyExtractor={(item) => item.id.toString()}
+            renderItem={renderEntrega}
+            contentContainerStyle={styles.listContainer}
+            showsVerticalScrollIndicator={false}
+          />
+        </>
+      )}
+      {!loading && historial.length === 0 && !renderHeader && (
+        <View style={styles.emptyContainer}>
+          <Icon
+            source="history"
+            size={48}
+            color={currentTheme.text}
+            style={{ opacity: 0.5 }}
+          />
+          <Text style={[styles.emptyText, { color: currentTheme.text }]}>
+            No hay historial de entregas
+          </Text>
+        </View>
+      )}
     </View>
   );
 };

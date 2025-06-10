@@ -332,28 +332,32 @@ const MainScreen = () => {
                       );
                     } else {
                       return (
-                        <View style={styles.section}>
-                          <Text
-                            style={[
-                              styles.sectionTitle,
-                              { color: currentTheme.text },
-                            ]}
-                          >
-                            Actividad{" "}
-                            <Text
-                              style={{
-                                color: currentTheme.accent,
-                                fontWeight: "bold",
-                              }}
-                            >
-                              Reciente
-                            </Text>
-                          </Text>
-                          <HistorialEntregas
-                            limitItems={1}
-                            refresh={refreshEntregas}
-                          />
-                        </View>
+                        <HistorialEntregas
+                          limitItems={1}
+                          refresh={refreshEntregas}
+                          renderHeader={(hasEntregas) =>
+                            hasEntregas ? (
+                              <View style={styles.section}>
+                                <Text
+                                  style={[
+                                    styles.sectionTitle,
+                                    { color: currentTheme.text },
+                                  ]}
+                                >
+                                  Actividad{" "}
+                                  <Text
+                                    style={{
+                                      color: currentTheme.accent,
+                                      fontWeight: "bold",
+                                    }}
+                                  >
+                                    Reciente
+                                  </Text>
+                                </Text>
+                              </View>
+                            ) : null
+                          }
+                        />
                       );
                     }
                   }}
