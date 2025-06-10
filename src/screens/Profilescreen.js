@@ -8,8 +8,11 @@ import {
   StatusBar,
   Modal,
   Switch,
+  Image,
+  Animated,
+  TouchableOpacity,
 } from "react-native";
-import { SafeAreaView} from "react-native-safe-area-context";
+import { SafeAreaView } from "react-native-safe-area-context";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import config from "../config/config";
 import axiosInstance from "../axiosInstance";
@@ -19,6 +22,8 @@ import * as SecureStore from "expo-secure-store";
 import { useTheme } from "../context/ThemeContext";
 import { theme } from "../styles/theme";
 import { Icon } from "react-native-paper";
+import * as ImagePicker from "expo-image-picker";
+import { SharedElement } from "react-navigation-shared-element";
 
 const ProfileScreen = () => {
   const [perfil, setPerfil] = useState(null);
@@ -27,8 +32,37 @@ const ProfileScreen = () => {
   const [isModalVisible, setIsModalVisible] = useState(false);
   const { isDarkMode, toggleTheme } = useTheme();
   const currentTheme = theme[isDarkMode ? "dark" : "light"];
+  const [profileImage, setProfileImage] = useState(null);
+  const [scrollY] = useState(new Animated.Value(0));
 
   const navigation = useNavigation();
+
+  // Animated header values
+  const headerHeight = scrollY.interpolate({
+    inputRange: [0, 120],
+    outputRange: [200, 80],
+    extrapolate: "clamp",
+  });
+
+  const imageSize = scrollY.interpolate({
+    inputRange: [0, 120],
+    outputRange: [120, 40],
+    extrapolate: "clamp",
+  });
+
+  const pickImage = async () => {
+    const result = await ImagePicker.launchImageLibraryAsync({
+      mediaTypes: ImagePicker.MediaTypeOptions.Images,
+      allowsEditing: true,
+      aspect: [1, 1],
+      quality: 1,
+    });
+
+    if (!result.canceled) {
+      setProfileImage(result.assets[0].uri);
+      // Aquí podrías implementar la lógica para subir la imagen al servidor
+    }
+  };
 
   const showMessage = (msg, isError = false) => {
     setMessage({ text: msg, isError });
@@ -45,7 +79,7 @@ const ProfileScreen = () => {
 
         if (response.data) {
           setPerfil(response.data);
-        //  showMessage("Perfil cargado exitosamente.", false);
+          //  showMessage("Perfil cargado exitosamente.", false);
         } else {
           showMessage(
             "Respuesta vacía del servidor al cargar el perfil.",
@@ -107,6 +141,48 @@ const ProfileScreen = () => {
     }
   };
 
+  const renderProfileHeader = () => (
+    <Animated.View style={[styles.header, { height: headerHeight }]}>
+      <LinearGradient
+        colors={isDarkMode ? ["#1A1A2E", "#16213E"] : ["#F27121", "#E94057"]}
+        style={styles.headerGradient}
+      >
+        <Pressable onPress={pickImage}>
+          <Animated.View
+            style={[
+              styles.profileImageContainer,
+              { height: imageSize, width: imageSize },
+            ]}
+          >
+            <Image
+              source={require("../../assets/avatar.png")}
+              style={styles.profileImage}
+            />
+            <View style={styles.editImageButton}>
+              <Icon source="camera" size={16} color="#fff" />
+            </View>
+          </Animated.View>
+        </Pressable>
+        <Text style={styles.profileName}>
+          {perfil?.name} {perfil?.surname}
+        </Text>
+      </LinearGradient>
+    </Animated.View>
+  );
+
+  const renderProfileOption = (icon, title, onPress) => (
+    <TouchableOpacity
+      style={[styles.optionCard, { backgroundColor: currentTheme.cardBg }]}
+      onPress={onPress}
+    >
+      <Icon source={icon} size={24} color={currentTheme.accent} />
+      <Text style={[styles.optionText, { color: currentTheme.text }]}>
+        {title}
+      </Text>
+      <Icon source="chevron-right" size={24} color={currentTheme.accent} />
+    </TouchableOpacity>
+  );
+
   if (loading) {
     return (
       <LinearGradient
@@ -118,13 +194,9 @@ const ProfileScreen = () => {
         style={styles.gradient}
       >
         <SafeAreaView
-          style={[{ flex: 1 }, { backgroundColor: currentTheme.primary }]} edges={['top', 'right', 'left', 'bottom']}
+          style={[{ flex: 1 }, { backgroundColor: "transparent" }]}
+          edges={["top", "right", "left", "bottom"]}
         >
-          <StatusBar
-            barStyle={isDarkMode ? "light-content" : "dark-content"}
-            backgroundColor={currentTheme.primary}
-            translucent
-          />
           <View
             style={[
               styles.container,
@@ -152,118 +224,78 @@ const ProfileScreen = () => {
       style={styles.gradient}
     >
       <SafeAreaView
-        style={[{ flex: 1 }, { backgroundColor: currentTheme.primary }]} edges={['top', 'right', 'left', 'bottom']}
+        style={[{ flex: 1 }, { backgroundColor: "transparent" }]}
+        edges={["top", "right", "left", "bottom"]}
       >
         <StatusBar
           barStyle={isDarkMode ? "light-content" : "dark-content"}
-          backgroundColor={currentTheme.primary}
+          backgroundColor="transparent"
           translucent
         />
-        <View style={[styles.container, { backgroundColor: "transparent" }]}>
-          <View style={styles.themeToggleContainer}>
-            <Text style={[styles.themeText, { color: currentTheme.text }]}>
-              {isDarkMode ? "Modo oscuro" : "Modo claro"}
-            </Text>
-            <Switch
-              value={isDarkMode}
-              onValueChange={toggleTheme}
-              trackColor={{ false: "#767577", true: "#F27121" }}
-              thumbColor={isDarkMode ? "#f4f3f4" : "#f4f3f4"}
-            />
-          </View>
 
-          <Text style={[styles.title, { color: currentTheme.accent }]}>
-            Mi Perfil
-          </Text>
-          {perfil ? (
-            <View
-              style={[
-                styles.card,
-                {
-                  backgroundColor: currentTheme.cardBg,
-                  borderColor: currentTheme.cardBorder,
-                },
-              ]}
-            >
-              <Text style={[styles.label, { color: currentTheme.cardText }]}>
-                ID:{" "}
-                <Text style={[styles.value, { color: currentTheme.cardText }]}>
-                  {perfil.id}
-                </Text>
-              </Text>
-              <Text style={[styles.label, { color: currentTheme.cardText }]}>
-                Nombre:{" "}
-                <Text style={[styles.value, { color: currentTheme.cardText }]}>
-                  {perfil.name}
-                </Text>
-              </Text>
-              <Text style={[styles.label, { color: currentTheme.cardText }]}>
-                Apellido:{" "}
-                <Text style={[styles.value, { color: currentTheme.cardText }]}>
-                  {perfil.surname}
-                </Text>
-              </Text>
-              <Text style={[styles.label, { color: currentTheme.cardText }]}>
-                Email:{" "}
-                <Text style={[styles.value, { color: currentTheme.cardText }]}>
-                  {perfil.email}
-                </Text>
-              </Text>
-              <Text style={[styles.label, { color: currentTheme.cardText }]}>
-                Teléfono:{" "}
-                <Text style={[styles.value, { color: currentTheme.cardText }]}>
-                  {perfil.phoneNumber}
-                </Text>
-              </Text>
-              <Text style={[styles.label, { color: currentTheme.cardText }]}>
-                DNI:{" "}
-                <Text style={[styles.value, { color: currentTheme.cardText }]}>
-                  {perfil.dni}
-                </Text>
-              </Text>
-            </View>
-          ) : (
-            <View style={styles.noDataContainer}>
-              <Text style={[styles.errorText, { color: currentTheme.text }]}>
-                No se pudo cargar la información del perfil.
-              </Text>
-              <Pressable
-                style={[
-                  styles.retryButton,
-                  { backgroundColor: currentTheme.buttonBg },
-                ]}
-                onPress={() => fetchPerfil()}
-              >
-                <Text style={styles.retryButtonText}>Reintentar</Text>
-              </Pressable>
-            </View>
+        <Animated.ScrollView
+          style={[styles.container, { backgroundColor: "transparent" }]}
+          onScroll={Animated.event(
+            [{ nativeEvent: { contentOffset: { y: scrollY } } }],
+            { useNativeDriver: false }
           )}
+          scrollEventThrottle={16}
+        >
+          {renderProfileHeader()}
 
-          <Pressable
-            style={[
-              styles.logoutButton,
-              {
-                backgroundColor: currentTheme.cardBg,
-                borderColor: currentTheme.error,
-              },
-            ]}
-            onPress={handleLogout}
-            activeOpacity={0.85}
-            disabled={loading}
-          >
-            <View style={{ flexDirection: "row", alignItems: "center" }}>
-              <View style={{ marginRight: 3 }}>
-                <Icon
-                  source="logout"
-                  size={20}
-                  color={currentTheme.error}
-                />
+          <View style={styles.content}>
+            <View
+              style={[styles.card, { backgroundColor: currentTheme.cardBg }]}
+            >
+              <View style={styles.infoRow}>
+                <Icon source="email" size={24} color={currentTheme.accent} />
+                <Text style={[styles.infoText, { color: currentTheme.text }]}>
+                  {perfil?.email}
+                </Text>
               </View>
-              <Text style={[styles.logoutText, { color: currentTheme.error }]}>
-                Cerrar sesión
-              </Text>
+              <View style={styles.infoRow}>
+                <Icon source="phone" size={24} color={currentTheme.accent} />
+                <Text style={[styles.infoText, { color: currentTheme.text }]}>
+                  {perfil?.phoneNumber}
+                </Text>
+              </View>
+              <View style={styles.infoRow}>
+                <Icon
+                  source="card-account-details"
+                  size={24}
+                  color={currentTheme.accent}
+                />
+                <Text style={[styles.infoText, { color: currentTheme.text }]}>
+                  {perfil?.dni}
+                </Text>
+              </View>
             </View>
-          </Pressable>
+
+            <TouchableOpacity
+              style={[
+                styles.logoutButton,
+                { backgroundColor: currentTheme.error },
+              ]}
+              onPress={handleLogout}
+            >
+              <Icon source="logout" size={24} color="#fff" />
+              <Text style={styles.logoutText}>Cerrar sesión</Text>
+            </TouchableOpacity>
+          </View>
+        </Animated.ScrollView>
+
+        <View style={styles.themeToggleContainer}>
+          <Icon
+            source={isDarkMode ? "weather-night" : "weather-sunny"}
+            size={24}
+            color={currentTheme.text}
+          />
+          <Switch
+            value={isDarkMode}
+            onValueChange={toggleTheme}
+            trackColor={{ false: "#767577", true: "#F27121" }}
+            thumbColor={isDarkMode ? "#f4f3f4" : "#f4f3f4"}
+          />
         </View>
       </SafeAreaView>
 
@@ -316,70 +348,104 @@ const styles = StyleSheet.create({
   },
   container: {
     flex: 1,
-    padding: 24,
-    justifyContent: "center",
   },
-  title: {
-    fontSize: 24,
-    fontWeight: "bold",
-    color: "#F27121",
-    marginBottom: 20,
-    textAlign: "center",
+  header: {
+    width: "100%",
+    overflow: "hidden",
   },
-  card: {
-    backgroundColor: "#fff",
-    borderRadius: 16,
-    padding: 20,
-    marginBottom: 30,
-    borderWidth: 2,
-    borderColor: "#16213E",
-    shadowColor: "#0F3460",
-    shadowOffset: { width: 0, height: 2 },
-    shadowOpacity: 0.12,
-    shadowRadius: 6,
-    elevation: 3,
-  },
-  label: {
-    fontWeight: "bold",
-    color: "#16213E",
-    marginBottom: 4,
-    fontSize: 16,
-  },
-  value: {
-    fontWeight: "normal",
-    color: "#222",
-    marginBottom: 8,
-  },
-  errorText: {
-    color: "#fff",
-    fontSize: 18,
-    textAlign: "center",
-    marginTop: 20,
-  },
-  logoutButton: {
-    backgroundColor: "#fff",
-    borderRadius: 20,
-    paddingVertical: 14,
-    alignItems: "center",
-    borderWidth: 2,
-    borderColor: "#E94057",
-    elevation: 2,
-    shadowColor: "#E94057",
-    shadowOffset: { width: 0, height: 2 },
-    shadowOpacity: 0.08,
-    shadowRadius: 4,
-  },
-  logoutText: {
-    color: "#E94057",
-    fontWeight: "bold",
-    fontSize: 16,
-    textAlign: "center",
-  },
-  loadingContainer: {
+  headerGradient: {
     flex: 1,
     justifyContent: "center",
     alignItems: "center",
-    backgroundColor: "#f8f8f8",
+    padding: 20,
+  },
+  profileImageContainer: {
+    borderRadius: 60,
+    overflow: "hidden",
+    borderWidth: 3,
+    borderColor: "#fff",
+  },
+  profileImage: {
+    width: "100%",
+    height: "100%",
+    borderRadius: 60,
+  },
+  editImageButton: {
+    position: "absolute",
+    bottom: 0,
+    right: 0,
+    backgroundColor: "rgba(0,0,0,0.6)",
+    borderRadius: 12,
+    padding: 4,
+  },
+  profileName: {
+    fontSize: 24,
+    fontWeight: "bold",
+    color: "#fff",
+    marginTop: 10,
+  },
+  content: {
+    padding: 20,
+  },
+  card: {
+    borderRadius: 16,
+    padding: 20,
+    marginBottom: 20,
+    shadowColor: "#000",
+    shadowOffset: { width: 0, height: 2 },
+    shadowOpacity: 0.1,
+    shadowRadius: 8,
+    elevation: 3,
+  },
+  infoRow: {
+    flexDirection: "row",
+    alignItems: "center",
+    marginBottom: 16,
+  },
+  infoText: {
+    fontSize: 16,
+    marginLeft: 12,
+  },
+  optionCard: {
+    flexDirection: "row",
+    alignItems: "center",
+    padding: 16,
+    borderRadius: 12,
+    marginBottom: 12,
+    shadowColor: "#000",
+    shadowOffset: { width: 0, height: 1 },
+    shadowOpacity: 0.1,
+    shadowRadius: 4,
+    elevation: 2,
+  },
+  optionText: {
+    flex: 1,
+    fontSize: 16,
+    marginLeft: 12,
+  },
+  logoutButton: {
+    flexDirection: "row",
+    alignItems: "center",
+    justifyContent: "center",
+    padding: 16,
+    borderRadius: 12,
+    marginTop: 20,
+  },
+  logoutText: {
+    color: "#fff",
+    fontSize: 16,
+    fontWeight: "bold",
+    marginLeft: 8,
+  },
+  themeToggleContainer: {
+    flexDirection: "row",
+    alignItems: "center",
+    position: "absolute",
+    top: 20,
+    right: 20,
+    backgroundColor: "rgba(255,255,255,0.2)",
+    borderRadius: 20,
+    padding: 8,
   },
   modalOverlay: {
     flex: 1,
@@ -420,37 +486,6 @@ const styles = StyleSheet.create({
   modalButtonText: {
     color: "white",
     fontSize: 16,
-  },
-  noDataContainer: {
-    alignItems: "center",
-    marginTop: 50,
-  },
-  retryButton: {
-    backgroundColor: "#4B9CE2",
-    paddingVertical: 10,
-    paddingHorizontal: 20,
-    borderRadius: 5,
-    marginTop: 10,
-  },
-  retryButtonText: {
-    color: "white",
-    fontSize: 16,
-    fontWeight: "bold",
-  },
-  themeToggleContainer: {
-    flexDirection: "row",
-    justifyContent: "space-between",
-    alignItems: "center",
-    paddingHorizontal: 24,
-    paddingVertical: 16,
-    position: "absolute",
-    top: 40,
-    right: 0,
-    left: 0,
-  },
-  themeText: {
-    fontSize: 16,
-    fontWeight: "500",
   },
 });
 
