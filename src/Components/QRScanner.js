@@ -26,8 +26,7 @@ const QRScanner = ({ navigation }) => {
     setLoading(true);
 
     try {
-      const result = await processQRCode(data);
-
+      const result = await processQRCode(data); //Aca llama al backend para procesar el código QR
       Alert.alert(
         'Código QR Detectado',
         `Datos: ${data}\n\nRespuesta del servidor: ${JSON.stringify(result)}`,
