@@ -212,7 +212,26 @@ const DetalleEntregaPendiente = () => {
                   borderColor: currentTheme.accent,
                 },
               ]}
-              onPress={() => navigation.navigate("QRScanner", { entrega_id: detalle.id,  repartidor_id: detalle.repartidorId })}
+             onPress={async () => {
+  try {
+    const url = `${config.API_URL}${config.QR.GENERAR_VISTA}?text=${detalle.id}`;
+    console.log("URL que se va a llamar:", url);
+
+    const response = await axios.get(url);
+    console.log("Status:", response.status);
+    console.log("Respuesta:", response.data);
+
+    console.log("QR generado y abierto en la PC");
+
+    navigation.navigate("QRScanner", {
+      entrega_id: detalle.id,
+      repartidor_id: detalle.repartidorId,
+    });
+  } catch (error) {
+    console.error("Error al generar el QR:", error);
+    Alert.alert("Error", "No se pudo generar el QR");
+  }
+}}
               disabled={finalizando}
               activeOpacity={0.8}
             >

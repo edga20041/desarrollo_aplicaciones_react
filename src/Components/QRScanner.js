@@ -15,14 +15,7 @@ const QRScanner = ({ navigation,route }) => {
   const [permission, requestPermission] = useCameraPermissions();
 
   useEffect(() => {
-     
-    requestPermission();
-
-    const qrUrl = `${config.API_URL}${config.QR.GENERAR_VISTA}?text=${entrega_id}`;
-    fetch(qrUrl)
-    .then(() => console.log("QR generado y abierto en la PC"))
-    .catch((err) => console.error("Error al generar QR:", err));
-
+    requestPermission()
 }, [])
 
 
