@@ -3,21 +3,28 @@ import { StyleSheet, View, Text, Alert } from 'react-native';
 import { CameraView, useCameraPermissions } from 'expo-camera';
 import { Button, ActivityIndicator, Surface } from 'react-native-paper';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
-import { useQRCodeService } from '../services/qrCodeService';
+import axios from '../axiosInstance';
+import config from '../config/config';
 
-const QRScanner = ({ navigation }) => {
+const QRScanner = ({ navigation,route }) => {
   const [scanned, setScanned] = useState(false);
   const [loading, setLoading] = useState(false);
   const insets = useSafeAreaInsets();
-  const { processQRCode } = useQRCodeService();
+  const { entrega_id, repartidor_id } = route.params;
 
   const [permission, requestPermission] = useCameraPermissions();
 
   useEffect(() => {
-    (async () => {
-      requestPermission();
-    })();
-  }, []);
+     
+    requestPermission();
+
+    const qrUrl = `${config.API_URL}${config.QR.GENERAR_VISTA}?text=${entrega_id}`;
+    fetch(qrUrl)
+    .then(() => console.log("QR generado y abierto en la PC"))
+    .catch((err) => console.error("Error al generar QR:", err));
+
+}, [])
+
 
   const handleBarCodeScanned = async ({ type, data }) => {
     if (scanned) return;
@@ -26,11 +33,26 @@ const QRScanner = ({ navigation }) => {
     setLoading(true);
 
     try {
-      const result = await processQRCode(data); //Aca llama al backend para procesar el código QR
+      const entregaId = data;
+      const url = config.API_URL + config.ENTREGAS.CAMBIAR_ESTADO;
+      const body = {
+        entregaId,
+        estadoId: 2,
+        repartidorId: repartidor_id,
+      };
+      const response = await axios.patch(url, body);
       Alert.alert(
-        'Código QR Detectado',
-        `Datos: ${data}\n\nRespuesta del servidor: ${JSON.stringify(result)}`,
-        [{ text: 'Aceptar', onPress: () => setScanned(false) }]
+        'Código QR escaneado',
+        `ID: ${entregaId}\nEstado actualizado: ${response.data.estado}`,
+        [
+          {
+            text: 'Aceptar',
+            onPress: () => {
+              setScanned(false);
+              navigation.goBack();
+            },
+          },
+        ]
       );
     } catch (error) {
       Alert.alert('Error', `Error al procesar el código QR: ${error.message}`, [

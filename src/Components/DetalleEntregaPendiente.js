@@ -21,6 +21,7 @@ import { theme } from "../styles/theme";
 import { Icon } from "react-native-paper";
 import { formatDate } from "../utils/dateFormatter";
 
+
 const DetalleEntregaPendiente = () => {
   const navigation = useNavigation();
   const route = useRoute();
@@ -50,31 +51,7 @@ const DetalleEntregaPendiente = () => {
     fetchDetalle();
   }, [entrega_id]);
 
-  const finalizarEntrega = async () => {
-    setFinalizando(true);
-    setShowImage(true);
-
-    setTimeout(async () => {
-      try {
-        const token = await SecureStore.getItemAsync("token");
-        const url = config.API_URL + config.ENTREGAS.CAMBIAR_ESTADO;
-        const body = {
-          entregaId: detalle.id,
-          estadoId: 3,
-          repartidorId: detalle.repartidorId,
-        };
-        await axios.patch(url, body, {});
-        Alert.alert("Éxito", "La entrega fue finalizada.");
-        navigation.goBack();
-      } catch (error) {
-        Alert.alert("Error", "No se pudo finalizar la entrega.");
-      } finally {
-        setFinalizando(false);
-        setShowImage(false);
-      }
-    }, 4000);
-  };
-
+  
   if (loading) {
     return (
       <LinearGradient
@@ -235,7 +212,7 @@ const DetalleEntregaPendiente = () => {
                   borderColor: currentTheme.accent,
                 },
               ]}
-              onPress={finalizarEntrega}
+              onPress={() => navigation.navigate("QRScanner", { entrega_id: detalle.id,  repartidor_id: detalle.repartidorId })}
               disabled={finalizando}
               activeOpacity={0.8}
             >
