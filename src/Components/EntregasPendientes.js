@@ -85,6 +85,10 @@ const EntregasPendientes = ({ refresh, limitItems }) => {
     navigation.navigate("Detalle Entrega Pendiente", { entrega_id: entregaId });
   };
 
+  const handleFinalizarEntrega = (entregaId) => {
+    navigation.navigate("FinalizarEntrega", { entrega_id: entregaId });
+  };
+
   const renderEntrega = ({ item }) => (
     <Animated.View style={{ transform: [{ scale: scaleAnim }] }}>
       <Pressable
@@ -148,6 +152,17 @@ const EntregasPendientes = ({ refresh, limitItems }) => {
             </Text>
           </View>
         </View>
+        {item.estadoId === 2 && (
+          <Pressable
+            style={({ pressed }) => [
+              styles.finalizarButton,
+              { backgroundColor: pressed ? currentTheme.accent + "CC" : currentTheme.accent },
+            ]}
+            onPress={() => handleFinalizarEntrega(item.id)}
+          >
+            <Text style={styles.finalizarButtonText}>Finalizar Entrega</Text>
+          </Pressable>
+        )}
       </Pressable>
     </Animated.View>
   );
@@ -243,6 +258,18 @@ const styles = StyleSheet.create({
   statusText: {
     fontSize: 14,
     fontWeight: "500",
+  },
+  finalizarButton: {
+    marginTop: 12,
+    marginHorizontal: 16,
+    paddingVertical: 12,
+    borderRadius: 8,
+    alignItems: "center",
+  },
+  finalizarButtonText: {
+    color: "#fff",
+    fontWeight: "bold",
+    fontSize: 16,
   },
 });
 

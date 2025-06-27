@@ -38,6 +38,7 @@ import { theme } from "./src/styles/theme";
 import { Provider as PaperProvider } from "react-native-paper";
 import { navigationRef } from './src/Components/NavigationService';
 import QRScanner from "./src/Components/QRScanner";
+import FinalizarEntregaScreen from "./src/screens/FinalizarEntregaScreen";
 
 
 
@@ -346,6 +347,14 @@ const AppContent = () => {
           component={QRScanner}
           options={{
             title: "Escanear QR",
+            headerBackTitle: "Volver",
+          }}
+        />
+        <Stack.Screen
+          name="FinalizarEntrega"
+          component={FinalizarEntregaScreen}
+          options={{
+            title: "Finalizar Entrega",
             headerBackTitle: "Volver",
           }}
         />

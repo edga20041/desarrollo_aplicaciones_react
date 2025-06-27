@@ -12,6 +12,8 @@ import { SafeAreaView } from "react-native-safe-area-context";
 import { LinearGradient } from "expo-linear-gradient";
 import { useTheme } from "../context/ThemeContext";
 import { theme } from "../styles/theme";
+import axios from "../axiosInstance";
+import config from "../config/config";
 
 const FinalizarEntregaScreen = ({ route, navigation }) => {
   const { entrega_id } = route.params;
@@ -21,7 +23,7 @@ const FinalizarEntregaScreen = ({ route, navigation }) => {
   const [mensaje, setMensaje] = useState("");
   const [enviado, setEnviado] = useState(false);
 
-  const handleFinalizar = () => {
+  const handleFinalizar = async () => {
     Keyboard.dismiss();
     if (!codigo.trim()) {
       setMensaje("Por favor, ingresa el código recibido por mail.");
@@ -29,10 +31,29 @@ const FinalizarEntregaScreen = ({ route, navigation }) => {
     }
     setMensaje("");
     setEnviado(true);
-    setTimeout(() => {
+    try {
+      const response = await axios.post(config.ENTREGAS.VERIFICAR_CODIGO, {
+        entregaId: entrega_id,
+        repartidorId: null, // Si tienes el id del repartidor, pásalo aquí. Si no, el backend lo toma del token.
+        codigo: codigo.trim(),
+      });
+      if (response.data.status === "Ok") {
+        setMensaje("");
+        setTimeout(() => {
+          setEnviado(false);
+          navigation.goBack();
+        }, 1200);
+        alert("Entrega finalizada correctamente");
+      } else {
+        setMensaje(response.data.message || "Error al finalizar la entrega");
+        setEnviado(false);
+      }
+    } catch (error) {
+      setMensaje(
+        error.response?.data?.message || "Error al verificar el código"
+      );
       setEnviado(false);
-      navigation.goBack();
-    }, 1500);
+    }
   };
 
   return (

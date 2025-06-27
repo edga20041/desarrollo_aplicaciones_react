@@ -12,7 +12,7 @@ import {
 } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
 import { useNavigation, useRoute } from "@react-navigation/native";
-import axios from "../axiosInstance";
+import axiosInstance from '../axiosInstance';
 import config from "../config/config";
 import { LinearGradient } from "expo-linear-gradient";
 import * as SecureStore from "expo-secure-store";
@@ -40,7 +40,7 @@ const DetalleEntregaPendiente = () => {
         const url =
           config.API_URL +
           config.ENTREGAS.GET_BY_ID.replace("{entrega_id}", entrega_id);
-        const response = await axios.get(url);
+        const response = await axiosInstance.get(url);
         setDetalle(response.data);
       } catch (error) {
         Alert.alert("Error", "No se pudo cargar el detalle de la entrega.");
@@ -217,7 +217,7 @@ const DetalleEntregaPendiente = () => {
     const url = `${config.API_URL}${config.QR.GENERAR_VISTA}?text=${detalle.id}`;
     console.log("URL que se va a llamar:", url);
 
-    const response = await axios.get(url);
+    const response = await axiosInstance.get(url);
     console.log("Status:", response.status);
     console.log("Respuesta:", response.data);
 
