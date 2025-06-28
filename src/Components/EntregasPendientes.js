@@ -15,7 +15,7 @@ import { useTheme } from "../context/ThemeContext";
 import { theme } from "../styles/theme";
 import { Icon } from "react-native-paper";
 
-const EntregasPendientes = ({ refresh, limitItems }) => {
+const EntregasPendientes = ({ refresh, limitItems, userArea }) => {
   const [entregas, setEntregas] = useState([]);
   const [loading, setLoading] = useState(true);
   const navigation = useNavigation();
@@ -42,7 +42,19 @@ const EntregasPendientes = ({ refresh, limitItems }) => {
     const fetchEntregas = async () => {
       try {
         const response = await axios.get(config.ENTREGAS.PENDIENTES);
-        setEntregas(response.data);
+        let filteredEntregas = response.data;
+
+        // If userArea is provided and there are deliveries in that area, filter them
+        if (
+          userArea &&
+          response.data.some((entrega) => entrega.area === userArea)
+        ) {
+          filteredEntregas = response.data.filter(
+            (entrega) => entrega.area === userArea
+          );
+        }
+
+        setEntregas(filteredEntregas);
       } catch (error) {
         setEntregas([]);
       } finally {
@@ -50,7 +62,7 @@ const EntregasPendientes = ({ refresh, limitItems }) => {
       }
     };
     fetchEntregas();
-  }, [refresh]);
+  }, [refresh, userArea]);
 
   if (loading) {
     return (
@@ -70,7 +82,9 @@ const EntregasPendientes = ({ refresh, limitItems }) => {
           style={{ opacity: 0.5 }}
         />
         <Text style={[styles.emptyText, { color: currentTheme.text }]}>
-          No hay entregas pendientes
+          {userArea
+            ? "No hay entregas pendientes en tu zona"
+            : "No hay entregas pendientes"}
         </Text>
       </View>
     );
@@ -127,6 +141,17 @@ const EntregasPendientes = ({ refresh, limitItems }) => {
             />
             <Text style={[styles.infoText, { color: currentTheme.cardText }]}>
               {item.producto}
+            </Text>
+          </View>
+
+          <View style={styles.infoRow}>
+            <Icon
+              source="map-marker-radius"
+              size={20}
+              color={currentTheme.accent}
+            />
+            <Text style={[styles.infoText, { color: currentTheme.cardText }]}>
+              {item.area || "CABA"}
             </Text>
           </View>
         </View>

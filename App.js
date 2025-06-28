@@ -246,6 +246,8 @@ const AppContent = () => {
   }, []);
 
   // Agregado se puede borrar
+  {
+    /* 
   useEffect(() => {
     (async () => {
       // Configura el handler de expo-notifications
@@ -259,7 +261,7 @@ const AppContent = () => {
       }
 
       // Arranca el polling cada 1 minuto
-      startPeriodicNotifications(1);
+      //startPeriodicNotifications(1);
 
       // Cleanup si AppContent se desmontara
       return () => {
@@ -269,7 +271,8 @@ const AppContent = () => {
       };
     })();
   }, []);
-
+  */
+  }
   const screenOptions = {
     headerStyle: {
       backgroundColor: currentTheme.primary,
