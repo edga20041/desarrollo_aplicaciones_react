@@ -15,7 +15,6 @@ import { useNavigation, useRoute } from "@react-navigation/native";
 import axiosInstance from '../axiosInstance';
 import config from "../config/config";
 import { LinearGradient } from "expo-linear-gradient";
-import * as SecureStore from "expo-secure-store";
 import { useTheme } from "../context/ThemeContext";
 import { theme } from "../styles/theme";
 import { Icon } from "react-native-paper";
@@ -31,7 +30,6 @@ const DetalleEntregaPendiente = () => {
 
   const [detalle, setDetalle] = useState(null);
   const [loading, setLoading] = useState(true);
-  const [finalizando, setFinalizando] = useState(false);
   const [showImage, setShowImage] = useState(false);
 
   useEffect(() => {
@@ -213,25 +211,19 @@ const DetalleEntregaPendiente = () => {
                 },
               ]}
              onPress={async () => {
-  try {
-    const url = `${config.API_URL}${config.QR.GENERAR_VISTA}?text=${detalle.id}`;
-    console.log("URL que se va a llamar:", url);
+              try {
+                const url = `${config.API_URL}${config.QR.GENERAR_VISTA}?text=${detalle.id}`;
+                await axiosInstance.get(url);
+                console.log("✅ QR generado y abierto en la PC");
 
-    const response = await axiosInstance.get(url);
-    console.log("Status:", response.status);
-    console.log("Respuesta:", response.data);
-
-    console.log("QR generado y abierto en la PC");
-
-    navigation.navigate("QRScanner", {
-      entrega_id: detalle.id,
-      repartidor_id: detalle.repartidorId,
-    });
-  } catch (error) {
-    console.error("Error al generar el QR:", error);
-    Alert.alert("Error", "No se pudo generar el QR");
-  }
-}}
+                navigation.navigate("QRScanner", {
+                  entrega_id: detalle.id
+                });
+              } catch (error) {
+                console.error("Error al generar el QR:", error);
+                Alert.alert("Error", "No se pudo generar el QR");
+              }
+            }}
               disabled={finalizando}
               activeOpacity={0.8}
             >

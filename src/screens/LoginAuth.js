@@ -117,12 +117,15 @@ const LoginAuth = () => {
 
       const token = response.data.token;
       const name = response.data.name;
+      const userId = response.data.userId;
       if (token) {
         await SecureStore.setItemAsync("token", token);
         if (name) {
           await AsyncStorage.setItem("userName", name);
         }
-        //showMessage('¡Bienvenido!', false);
+        if (userId) {
+          await AsyncStorage.setItem("userId", userId.toString());
+        }
         navigation.reset({
           index: 0,
           routes: [{ name: "Main" }],

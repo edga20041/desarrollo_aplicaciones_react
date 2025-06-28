@@ -5,44 +5,55 @@ import { Button, ActivityIndicator, Surface } from 'react-native-paper';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import axios from '../axiosInstance';
 import config from '../config/config';
+import AsyncStorage from '@react-native-async-storage/async-storage';
+import { useRef } from 'react';
 
-const QRScanner = ({ navigation,route }) => {
+
+
+
+const QRScanner = ({ navigation}) => {
   const [scanned, setScanned] = useState(false);
   const [loading, setLoading] = useState(false);
   const insets = useSafeAreaInsets();
-  const { entrega_id, repartidor_id } = route.params;
+  const scanning = useRef(false);
+  
+  
 
   const [permission, requestPermission] = useCameraPermissions();
 
   useEffect(() => {
     requestPermission()
-}, [])
+  }, [])
 
 
   const handleBarCodeScanned = async ({ type, data }) => {
-    if (scanned) return;
+    if (scanning.current) return;
 
+    scanning.current = true;
     setScanned(true);
     setLoading(true);
 
     try {
       const entregaId = data;
+      const repartidorIdStr = await AsyncStorage.getItem("userId");
+      const repartidorId = repartidorIdStr ? parseInt(repartidorIdStr) : null;
       const url = config.API_URL + config.ENTREGAS.CAMBIAR_ESTADO;
       const body = {
         entregaId,
         estadoId: 2,
-        repartidorId: repartidor_id,
+        repartidorId
       };
       const response = await axios.patch(url, body);
       Alert.alert(
         'Código QR escaneado',
-        `ID: ${entregaId}\nEstado actualizado: ${response.data.estado}`,
+        `ID: ${entregaId}\n
+        Estado actualizado: EnProceso`,
         [
           {
             text: 'Aceptar',
             onPress: () => {
-              setScanned(false);
-              navigation.goBack();
+               scanning.current = false;
+              navigation.navigate('Main'); 
             },
           },
         ]
