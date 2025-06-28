@@ -12,7 +12,7 @@ import {
   Platform,
   Animated,
 } from "react-native";
-import { SafeAreaProvider, SafeAreaView} from "react-native-safe-area-context";
+import { SafeAreaProvider, SafeAreaView } from "react-native-safe-area-context";
 import { LinearGradient } from "expo-linear-gradient";
 import {
   useFonts,
@@ -39,13 +39,12 @@ import {
   requestNotificationPermissions,
   startPeriodicNotifications,
   stopPeriodicNotifications,
-  isNotificationServiceRunning
-} from "./src/services/NotificationService";
+  isNotificationServiceRunning,
+} from "./src/service/NotificationService";
 import { ThemeProvider, useTheme } from "./src/context/ThemeContext";
 import { theme } from "./src/styles/theme";
 import { Provider as PaperProvider } from "react-native-paper";
-import { navigationRef } from './src/Components/NavigationService';
-
+import { navigationRef } from "./src/Components/NavigationService";
 
 const Stack = createNativeStackNavigator();
 const { width, height } = Dimensions.get("window");
@@ -106,7 +105,10 @@ const HomeScreen = ({ navigation }) => {
     );
   }
   return (
-    <SafeAreaView style={[styles.container]} edges={['top', 'right', 'left', 'bottom']}>
+    <SafeAreaView
+      style={[styles.container]}
+      edges={["top", "right", "left", "bottom"]}
+    >
       <StatusBar
         barStyle={isDarkMode ? "light-content" : "dark-content"}
         backgroundColor={currentTheme.primary}
@@ -379,15 +381,18 @@ const AppContent = () => {
 
 export default function App() {
   return (
-  <SafeAreaProvider>
-    <SafeAreaView style={{ flex: 1 }} edges={['top', 'right', 'left', 'bottom']}>
-      <ThemeProvider>
-        <PaperProvider>
-          <AppContent />
-        </PaperProvider>
-      </ThemeProvider>
-    </SafeAreaView>
-  </SafeAreaProvider>
+    <SafeAreaProvider>
+      <SafeAreaView
+        style={{ flex: 1 }}
+        edges={["top", "right", "left", "bottom"]}
+      >
+        <ThemeProvider>
+          <PaperProvider>
+            <AppContent />
+          </PaperProvider>
+        </ThemeProvider>
+      </SafeAreaView>
+    </SafeAreaProvider>
   );
 }
 
