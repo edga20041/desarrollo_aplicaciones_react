@@ -129,6 +129,17 @@ const EntregasPendientes = ({ refresh, limitItems }) => {
               {item.producto}
             </Text>
           </View>
+
+          <View style={styles.infoRow}>
+            <Icon
+              source="map-marker-radius"
+              size={20}
+              color={currentTheme.accent}
+            />
+            <Text style={[styles.infoText, { color: currentTheme.cardText }]}>
+              {item.area || "CABA"}
+            </Text>
+          </View>
         </View>
 
         <View style={styles.cardFooter}>
