@@ -37,6 +37,27 @@ const QRScanner = ({ navigation}) => {
       const entregaId = data;
       const repartidorIdStr = await AsyncStorage.getItem("userId");
       const repartidorId = repartidorIdStr ? parseInt(repartidorIdStr) : null;
+      
+      const entregasEnProgresoUrl = config.API_URL + config.ENTREGAS.EN_PROGRESO;
+      const entregasResponse = await axios.get(entregasEnProgresoUrl);
+      
+      if (entregasResponse.data) {
+        Alert.alert(
+          'Entrega en curso',
+          'No puedes escanear otra entrega. Debes finalizar la entrega en curso primero.',
+          [
+            {
+              text: 'Entendido',
+              onPress: () => {
+                scanning.current = false;
+                setScanned(false);
+              },
+            },
+          ]
+        );
+        return;
+      }
+
       const url = config.API_URL + config.ENTREGAS.CAMBIAR_ESTADO;
       const body = {
         entregaId,
@@ -47,7 +68,7 @@ const QRScanner = ({ navigation}) => {
       Alert.alert(
         'Código QR escaneado',
         `ID: ${entregaId}\n
-        Estado actualizado: EnProceso`,
+        Estado actualizado: En Progreso`,
         [
           {
             text: 'Aceptar',
@@ -59,6 +80,7 @@ const QRScanner = ({ navigation}) => {
         ]
       );
     } catch (error) {
+      console.error('Error al procesar QR:', error);
       Alert.alert('Error', `Error al procesar el código QR: ${error.message}`, [
         { text: 'Aceptar', onPress: () => setScanned(false) },
       ]);

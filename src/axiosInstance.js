@@ -15,8 +15,12 @@ const instance = axios.create({
 instance.interceptors.request.use(
     async (configReq) => {
         const token = await SecureStore.getItemAsync('token'); 
+        console.log('🔑 Token en request:', token ? 'Presente' : 'Ausente');
         if (token) {
             configReq.headers.Authorization = `Bearer ${token}`;
+            console.log('📤 Enviando request con token a:', configReq.url);
+        } else {
+            console.log('⚠️ No hay token disponible para:', configReq.url);
         }
         return configReq;
     },
@@ -29,9 +33,13 @@ instance.interceptors.response.use(
     (response) => response,
     async (error) => {
         const originalRequest = error.config;
+        console.log('❌ Error en respuesta:', error.response?.status, error.response?.statusText);
+        console.log('🔗 URL que falló:', originalRequest.url);
+        
         if (error.response && [401, 403].includes(error.response.status) && !originalRequest._retry) {
             originalRequest._retry = true; 
             
+            console.log('🚫 Token expirado o no autorizado. Limpiando datos...');
             await SecureStore.deleteItemAsync('token'); 
             await AsyncStorage.removeItem('userName'); 
             

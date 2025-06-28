@@ -39,6 +39,7 @@ import { Provider as PaperProvider } from "react-native-paper";
 import { navigationRef } from './src/Components/NavigationService';
 import QRScanner from "./src/Components/QRScanner";
 import FinalizarEntregaScreen from "./src/screens/FinalizarEntregaScreen";
+import VerificarCodigoFinalizacion from "./src/screens/VerificarCodigoFinalizacion";
 
 
 
@@ -355,6 +356,14 @@ const AppContent = () => {
           component={FinalizarEntregaScreen}
           options={{
             title: "Finalizar Entrega",
+            headerBackTitle: "Volver",
+          }}
+        />
+        <Stack.Screen
+          name="VerificarCodigoFinalizacion"
+          component={VerificarCodigoFinalizacion}
+          options={{
+            title: "Verificar Código de Finalización",
             headerBackTitle: "Volver",
           }}
         />
