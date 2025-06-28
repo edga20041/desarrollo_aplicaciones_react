@@ -1,4 +1,6 @@
 // src/services/NotificationService.js
+{
+  /* 
 import * as Notifications from "expo-notifications";
 import axios from "../axiosInstance";
 import * as SecureStore from "expo-secure-store";
@@ -133,4 +135,6 @@ export function stopPeriodicNotifications() {
 
 export function isNotificationServiceRunning() {
   return notificationInterval !== null;
+}
+ */
 }
