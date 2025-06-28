@@ -8,6 +8,8 @@ import {
   Pressable,
   StyleSheet,
   TouchableOpacity,
+  Modal,
+  ScrollView,
 } from "react-native";
 import axios from "axios";
 import config from "../config/config";
@@ -100,10 +102,14 @@ const RegisterForm = ({ onRegisterSuccess, onInputFocus }) => {
   const [phoneNumber, setPhoneNumber] = useState("");
   const [password, setPassword] = useState("");
   const [confirmPassword, setConfirmPassword] = useState("");
+  const [area, setArea] = useState("Zona Norte");
+  const [showAreaPicker, setShowAreaPicker] = useState(false);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState(null);
   const [showPassword, setShowPassword] = useState(false);
   const [showConfirmPassword, setShowConfirmPassword] = useState(false);
+
+  const areas = ["Zona Norte", "Zona Sur", "Zona Oeste", "Zona Centro"];
 
   const handleRegister = async () => {
     setError(null);
@@ -129,6 +135,7 @@ const RegisterForm = ({ onRegisterSuccess, onInputFocus }) => {
       surname,
       dni: Number(dni),
       phoneNumber: Number(phoneNumber),
+      area,
     };
 
     setLoading(true);
@@ -258,6 +265,92 @@ const RegisterForm = ({ onRegisterSuccess, onInputFocus }) => {
           isDarkMode ? "rgba(255,255,255,0.6)" : "rgba(0,0,0,0.4)"
         }
       />
+
+      <View style={styles.pickerContainer}>
+        <Text style={[styles.label, { color: isDarkMode ? "#fff" : "#333" }]}>
+          Área
+        </Text>
+        <TouchableOpacity
+          onPress={() => setShowAreaPicker(true)}
+          style={[
+            styles.pickerButton,
+            {
+              borderColor: isDarkMode ? "#fff" : "#333",
+              borderWidth: 1,
+              backgroundColor: isDarkMode
+                ? "transparent"
+                : "rgba(255, 255, 255, 0.7)",
+            },
+          ]}
+        >
+          <Text style={{ color: isDarkMode ? "#fff" : "#000" }}>{area}</Text>
+          <MaterialCommunityIcons
+            name="chevron-down"
+            size={24}
+            color={isDarkMode ? "#fff" : "#333"}
+          />
+        </TouchableOpacity>
+      </View>
+
+      <Modal
+        visible={showAreaPicker}
+        transparent={true}
+        animationType="slide"
+        onRequestClose={() => setShowAreaPicker(false)}
+      >
+        <View style={styles.modalOverlay}>
+          <View
+            style={[
+              styles.modalContent,
+              {
+                backgroundColor: isDarkMode ? "#1A1A2E" : "#fff",
+              },
+            ]}
+          >
+            <Text
+              style={[
+                styles.modalTitle,
+                { color: isDarkMode ? "#fff" : "#333" },
+              ]}
+            >
+              Selecciona tu área
+            </Text>
+            {areas.map((item) => (
+              <TouchableOpacity
+                key={item}
+                style={[
+                  styles.areaOption,
+                  area === item && {
+                    backgroundColor: isDarkMode
+                      ? "rgba(255,255,255,0.1)"
+                      : "rgba(0,0,0,0.1)",
+                  },
+                ]}
+                onPress={() => {
+                  setArea(item);
+                  setShowAreaPicker(false);
+                }}
+              >
+                <Text
+                  style={[
+                    styles.areaOptionText,
+                    { color: isDarkMode ? "#fff" : "#333" },
+                  ]}
+                >
+                  {item}
+                </Text>
+              </TouchableOpacity>
+            ))}
+            <TouchableOpacity
+              style={styles.closeButton}
+              onPress={() => setShowAreaPicker(false)}
+            >
+              <Text style={styles.closeButtonText}>Cerrar</Text>
+            </TouchableOpacity>
+          </View>
+        </View>
+      </Modal>
+
       <Input
         label="Contraseña"
         value={password}
@@ -390,6 +483,63 @@ const styles = StyleSheet.create({
   registerButtonText: {
     color: "white",
     fontSize: 18,
+    fontFamily: "Montserrat_600SemiBold",
+  },
+  pickerContainer: {
+    width: "95%",
+    alignSelf: "center",
+    marginBottom: 15,
+  },
+  pickerButton: {
+    flexDirection: "row",
+    justifyContent: "space-between",
+    alignItems: "center",
+    height: 45,
+    paddingHorizontal: 15,
+    borderRadius: 8,
+  },
+  modalOverlay: {
+    flex: 1,
+    justifyContent: "center",
+    alignItems: "center",
+    backgroundColor: "rgba(0, 0, 0, 0.5)",
+  },
+  modalContent: {
+    width: "80%",
+    padding: 20,
+    borderRadius: 15,
+    elevation: 5,
+    shadowColor: "#000",
+    shadowOffset: { width: 0, height: 2 },
+    shadowOpacity: 0.25,
+    shadowRadius: 3.84,
+  },
+  modalTitle: {
+    fontSize: 18,
+    fontFamily: "Montserrat_600SemiBold",
+    marginBottom: 15,
+    textAlign: "center",
+  },
+  areaOption: {
+    paddingVertical: 12,
+    paddingHorizontal: 15,
+    borderRadius: 8,
+    marginBottom: 8,
+  },
+  areaOptionText: {
+    fontSize: 16,
+    fontFamily: "Montserrat_400Regular",
+  },
+  closeButton: {
+    marginTop: 10,
+    padding: 12,
+    backgroundColor: "#E94057",
+    borderRadius: 8,
+    alignItems: "center",
+  },
+  closeButtonText: {
+    color: "#fff",
+    fontSize: 16,
     fontFamily: "Montserrat_600SemiBold",
   },
 });
