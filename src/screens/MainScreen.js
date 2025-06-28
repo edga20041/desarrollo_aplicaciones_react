@@ -14,6 +14,7 @@ import { useNavigation, useFocusEffect } from "@react-navigation/native";
 import { LinearGradient } from "expo-linear-gradient";
 import EntregasPendientes from "../Components/EntregasPendientes";
 import HistorialEntregas from "../Components/HistorialEntregas";
+import EntregaEnProgreso from "../Components/EntregaEnProgreso";
 import * as SecureStore from "expo-secure-store";
 import { useTheme } from "../context/ThemeContext";
 import { theme } from "../styles/theme";
@@ -270,61 +271,91 @@ const MainScreen = () => {
             <View style={styles.mainContent}>
               {showDefaultView && (
                 <FlatList
-                  data={[{ type: "nextDelivery" }, { type: "recentActivity" }]}
+                  data={[{ type: "entregaSection" }, { type: "recentActivity" }]}
                   renderItem={({ item }) => {
-                    if (item.type === "nextDelivery") {
+                    if (item.type === "entregaSection") {
                       return (
                         <View style={styles.section}>
-                          <Text
-                            style={[
-                              styles.sectionTitle,
-                              { color: currentTheme.text },
-                            ]}
-                          >
-                            Siguiente{" "}
-                            <Text
-                              style={{
-                                color: currentTheme.accent,
-                                fontWeight: "bold",
-                              }}
-                            >
-                              Entrega
-                            </Text>
-                          </Text>
-                          <EntregasPendientes
-                            refresh={refreshEntregas}
-                            limitItems={1}
-                          />
-                          <Pressable
-                            onPress={() => {
-                              animatePress();
-                              setShowDefaultView(false);
-                              setShowEntregas(true);
-                              setShowHistorial(false);
+                          <EntregaEnProgreso 
+                            refresh={refreshEntregas} 
+                            renderHeader={(hasEntregaEnProgreso) => {
+                              if (hasEntregaEnProgreso) {
+                                return (
+                                  <Text
+                                    style={[
+                                      styles.sectionTitle,
+                                      { color: currentTheme.text },
+                                    ]}
+                                  >
+                                    Entrega{" "}
+                                    <Text
+                                      style={{
+                                        color: currentTheme.accent,
+                                        fontWeight: "bold",
+                                      }}
+                                    >
+                                      En Progreso
+                                    </Text>
+                                  </Text>
+                                );
+                              } else {
+                                return (
+                                  <>
+                                    <Text
+                                      style={[
+                                        styles.sectionTitle,
+                                        { color: currentTheme.text },
+                                      ]}
+                                    >
+                                      Siguiente{" "}
+                                      <Text
+                                        style={{
+                                          color: currentTheme.accent,
+                                          fontWeight: "bold",
+                                        }}
+                                      >
+                                        Entrega
+                                      </Text>
+                                    </Text>
+                                    <EntregasPendientes
+                                      refresh={refreshEntregas}
+                                      limitItems={1}
+                                    />
+                                    <Pressable
+                                      onPress={() => {
+                                        animatePress();
+                                        setShowDefaultView(false);
+                                        setShowEntregas(true);
+                                        setShowHistorial(false);
+                                      }}
+                                      style={({ pressed }) => [
+                                        styles.viewMoreButton,
+                                        {
+                                          backgroundColor: pressed
+                                            ? currentTheme.accent + "10"
+                                            : "transparent",
+                                        },
+                                      ]}
+                                    >
+                                      <Text
+                                        style={[
+                                          styles.viewMoreText,
+                                          { color: currentTheme.accent },
+                                        ]}
+                                      >
+                                        Ver todas las entregas pendientes
+                                      </Text>
+                                      <Icon
+                                        source="arrow-right-circle"
+                                        size={20}
+                                        color={currentTheme.accent}
+                                      />
+                                    </Pressable>
+                                  </>
+                                );
+                              }
                             }}
-                            style={({ pressed }) => [
-                              styles.viewMoreButton,
-                              {
-                                backgroundColor: pressed
-                                  ? currentTheme.accent + "10"
-                                  : "transparent",
-                              },
-                            ]}
-                          >
-                            <Text
-                              style={[
-                                styles.viewMoreText,
-                                { color: currentTheme.accent },
-                              ]}
-                            >
-                              Ver todas las entregas pendientes
-                            </Text>
-                            <Icon
-                              source="arrow-right-circle"
-                              size={20}
-                              color={currentTheme.accent}
-                            />
-                          </Pressable>
+                          />
                         </View>
                       );
                     } else {

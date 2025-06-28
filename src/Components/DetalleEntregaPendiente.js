@@ -32,6 +32,7 @@ const DetalleEntregaPendiente = () => {
   const [loading, setLoading] = useState(true);
   const [finalizando, setFinalizando] = useState(false);
   const [showImage, setShowImage] = useState(false);
+  const [finalizando, setFinalizando] = useState(false);
 
   useEffect(() => {
     const fetchDetalle = async () => {

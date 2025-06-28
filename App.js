@@ -37,6 +37,9 @@ import { ThemeProvider, useTheme } from "./src/context/ThemeContext";
 import { theme } from "./src/styles/theme";
 import { Provider as PaperProvider } from "react-native-paper";
 import { navigationRef } from './src/Components/NavigationService';
+import QRScanner from "./src/Components/QRScanner";
+import FinalizarEntregaScreen from "./src/screens/FinalizarEntregaScreen";
+import VerificarCodigoFinalizacion from "./src/screens/VerificarCodigoFinalizacion";
 
 
 const Stack = createNativeStackNavigator();
@@ -336,6 +339,30 @@ const AppContent = () => {
           component={DetalleEntregaPendiente}
           options={{
             title: "Detalle de Entrega",
+            headerBackTitle: "Volver",
+          }}
+        />
+        <Stack.Screen
+          name="QRScanner"
+          component={QRScanner}
+          options={{
+            title: "Escanear QR",
+            headerBackTitle: "Volver",
+          }}
+        />
+        <Stack.Screen
+          name="FinalizarEntrega"
+          component={FinalizarEntregaScreen}
+          options={{
+            title: "Finalizar Entrega",
+            headerBackTitle: "Volver",
+          }}
+        />
+        <Stack.Screen
+          name="VerificarCodigoFinalizacion"
+          component={VerificarCodigoFinalizacion}
+          options={{
+            title: "Verificar Código de Finalización",
             headerBackTitle: "Volver",
           }}
         />

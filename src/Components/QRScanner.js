@@ -4,12 +4,17 @@ import { CameraView, useCameraPermissions } from 'expo-camera';
 import { Button, ActivityIndicator, Surface } from 'react-native-paper';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { useQRCodeService } from '../services/qrCodeService';
+import AsyncStorage from '@react-native-async-storage/async-storage';
+import axios from 'axios';
+import { useRef } from 'react';
+import { config } from '../config';
 
 const QRScanner = ({ navigation }) => {
   const [scanned, setScanned] = useState(false);
   const [loading, setLoading] = useState(false);
   const insets = useSafeAreaInsets();
   const { processQRCode } = useQRCodeService();
+  const scanning = useRef(false);
 
   const [permission, requestPermission] = useCameraPermissions();
 
@@ -26,13 +31,52 @@ const QRScanner = ({ navigation }) => {
     setLoading(true);
 
     try {
-      const result = await processQRCode(data); //Aca llama al backend para procesar el código QR
+      const entregaId = data;
+      const repartidorIdStr = await AsyncStorage.getItem("userId");
+      const repartidorId = repartidorIdStr ? parseInt(repartidorIdStr) : null;
+      
+      const entregasEnProgresoUrl = config.API_URL + config.ENTREGAS.EN_PROGRESO;
+      const entregasResponse = await axios.get(entregasEnProgresoUrl);
+      
+      if (entregasResponse.data) {
+        Alert.alert(
+          'Entrega en curso',
+          'No puedes escanear otra entrega. Debes finalizar la entrega en curso primero.',
+          [
+            {
+              text: 'Entendido',
+              onPress: () => {
+                scanning.current = false;
+                setScanned(false);
+              },
+            },
+          ]
+        );
+        return;
+      }
+
+      const url = config.API_URL + config.ENTREGAS.CAMBIAR_ESTADO;
+      const body = {
+        entregaId,
+        estadoId: 2,
+        repartidorId
+      };
+      const response = await axios.patch(url, body);
       Alert.alert(
-        'Código QR Detectado',
-        `Datos: ${data}\n\nRespuesta del servidor: ${JSON.stringify(result)}`,
-        [{ text: 'Aceptar', onPress: () => setScanned(false) }]
+        'Código QR escaneado',
+        `ID: ${entregaId}\n\nEstado actualizado: En Progreso`,
+        [
+          {
+            text: 'Aceptar',
+            onPress: () => {
+              scanning.current = false;
+              navigation.navigate('Main'); 
+            },
+          },
+        ]
       );
     } catch (error) {
+      console.error('Error al procesar QR:', error);
       Alert.alert('Error', `Error al procesar el código QR: ${error.message}`, [
         { text: 'Aceptar', onPress: () => setScanned(false) },
       ]);

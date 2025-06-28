@@ -1,7 +1,7 @@
 import { Platform } from "react-native";
 
 // Cambia esta IP por la IP local del backend (de quien lo esté corriendo)
-const LOCAL_IP = "192.168.1.36";
+const LOCAL_IP = "192.168.0.186";
 const API_PORT = "8081";
 
 const getBaseUrl = () => {
@@ -27,6 +27,7 @@ const config = {
   ENTREGAS: {
     PENDIENTES: "/entregas/pendientes",
     HISTORIAL: "/entregas/historial",
+    EN_PROGRESO: "/entregas/en-progreso",
     GET_BY_ID: "/entregas/{entrega_id}",
     CAMBIAR_ESTADO: "/entregas/cambiar_estado",
   },
