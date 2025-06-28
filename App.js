@@ -33,6 +33,14 @@ import Geocoder from "react-native-geocoding";
 import config from "./src/config/config";
 import DetalleEntregaPendiente from "./src/Components/DetalleEntregaPendiente";
 import ProfileScreen from "./src/screens/Profilescreen";
+//Agregado se puede borrar
+import {
+  configureNotifications,
+  requestNotificationPermissions,
+  startPeriodicNotifications,
+  stopPeriodicNotifications,
+  isNotificationServiceRunning
+} from "./src/services/NotificationService";
 import { ThemeProvider, useTheme } from "./src/context/ThemeContext";
 import { theme } from "./src/styles/theme";
 import { Provider as PaperProvider } from "react-native-paper";
@@ -233,6 +241,31 @@ const AppContent = () => {
         "La clave de API de Google Maps no está configurada en config.js"
       );
     }
+  }, []);
+
+  // Agregado se puede borrar
+  useEffect(() => {
+    (async () => {
+      // Configura el handler de expo-notifications
+      await configureNotifications();
+
+      // Pide permisos al usuario
+      const granted = await requestNotificationPermissions();
+      if (!granted) {
+        console.warn("Permiso de notificaciones DENEGADO");
+        return;
+      }
+
+      // Arranca el polling cada 1 minuto
+      startPeriodicNotifications(1);
+
+      // Cleanup si AppContent se desmontara
+      return () => {
+        if (isNotificationServiceRunning()) {
+          stopPeriodicNotifications();
+        }
+      };
+    })();
   }, []);
 
   const screenOptions = {
