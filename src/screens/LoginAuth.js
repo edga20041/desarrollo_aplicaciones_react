@@ -222,7 +222,7 @@ const LoginAuth = () => {
               color={currentTheme.accent}
             />
           </View>
-          <Text style={[styles.title, { color: currentTheme.accent, text }]}>
+          <Text style={[styles.title, { color: currentTheme.accent, textAlign: "center" }]}>
             Iniciar Sesión
           </Text>
           <View style={[styles.formContainer]}>
