@@ -11,6 +11,7 @@ import {
   Image,
   Animated,
   TouchableOpacity,
+  ScrollView,
 } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
 import AsyncStorage from "@react-native-async-storage/async-storage";
@@ -30,6 +31,9 @@ const ProfileScreen = () => {
   const [loading, setLoading] = useState(true);
   const [message, setMessage] = useState(null);
   const [isModalVisible, setIsModalVisible] = useState(false);
+  const [isAreaModalVisible, setIsAreaModalVisible] = useState(false);
+  const [selectedArea, setSelectedArea] = useState("");
+  const [changingArea, setChangingArea] = useState(false);
   const { isDarkMode, toggleTheme } = useTheme();
   const currentTheme = theme[isDarkMode ? "dark" : "light"];
   const [profileImage, setProfileImage] = useState(null);
@@ -37,6 +41,9 @@ const ProfileScreen = () => {
 
   const navigation = useNavigation();
 
+  const areas = ["Zona Norte", "Zona Sur", "Zona Oeste", "Zona Centro"];
+
+  // Animated header values
   const headerHeight = scrollY.interpolate({
     inputRange: [0, 120],
     outputRange: [200, 80],
@@ -65,6 +72,32 @@ const ProfileScreen = () => {
   const showMessage = (msg, isError = false) => {
     setMessage({ text: msg, isError });
     setIsModalVisible(true);
+  };
+
+  const handleChangeArea = async () => {
+    if (!selectedArea) return;
+
+    setChangingArea(true);
+    try {
+      const response = await axiosInstance.post(config.AUTH.CHANGE_AREA, {
+        area: selectedArea,
+      });
+
+      if (response.status === 200) {
+        setPerfil((prev) => ({ ...prev, area: selectedArea }));
+        showMessage("Zona actualizada exitosamente", false);
+      }
+    } catch (error) {
+      console.error("Error al cambiar la zona:", error);
+      let errorMessage = "Error al cambiar la zona.";
+      if (error.response?.data?.message) {
+        errorMessage = error.response.data.message;
+      }
+      showMessage(errorMessage, true);
+    } finally {
+      setChangingArea(false);
+      setIsAreaModalVisible(false);
+    }
   };
 
   useEffect(() => {
@@ -267,6 +300,28 @@ const ProfileScreen = () => {
                   {perfil?.dni}
                 </Text>
               </View>
+              <View style={styles.infoRow}>
+                <Icon
+                  source="map-marker-radius"
+                  size={24}
+                  color={currentTheme.accent}
+                />
+                <Text style={[styles.infoText, { color: currentTheme.text }]}>
+                  {perfil?.area || "No especificada"}
+                </Text>
+                <TouchableOpacity
+                  style={[
+                    styles.changeAreaButton,
+                    { backgroundColor: currentTheme.accent },
+                  ]}
+                  onPress={() => {
+                    setSelectedArea(perfil?.area || areas[0]);
+                    setIsAreaModalVisible(true);
+                  }}
+                >
+                  <Text style={styles.changeAreaButtonText}>Cambiar zona</Text>
+                </TouchableOpacity>
+              </View>
             </View>
 
             <TouchableOpacity
@@ -333,6 +388,88 @@ const ProfileScreen = () => {
             >
               <Text style={styles.modalButtonText}>Cerrar</Text>
             </Pressable>
+          </View>
+        </Pressable>
+      </Modal>
+
+      {/* Area Selection Modal */}
+      <Modal
+        animationType="fade"
+        transparent={true}
+        visible={isAreaModalVisible}
+        onRequestClose={() => setIsAreaModalVisible(false)}
+      >
+        <Pressable
+          style={styles.modalOverlay}
+          activeOpacity={1}
+          onPressOut={() => setIsAreaModalVisible(false)}
+        >
+          <View
+            style={[
+              styles.modalContent,
+              { backgroundColor: currentTheme.cardBg },
+            ]}
+          >
+            <Text style={[styles.modalTitle, { color: currentTheme.text }]}>
+              Seleccionar Zona
+            </Text>
+            <ScrollView style={styles.areaList}>
+              {areas.map((area) => (
+                <TouchableOpacity
+                  key={area}
+                  style={[
+                    styles.areaOption,
+                    {
+                      backgroundColor:
+                        selectedArea === area
+                          ? currentTheme.accent
+                          : currentTheme.cardBg,
+                    },
+                  ]}
+                  onPress={() => setSelectedArea(area)}
+                >
+                  <Text
+                    style={[
+                      styles.areaOptionText,
+                      {
+                        color:
+                          selectedArea === area ? "#fff" : currentTheme.text,
+                      },
+                    ]}
+                  >
+                    {area}
+                  </Text>
+                </TouchableOpacity>
+              ))}
+            </ScrollView>
+            <View style={styles.modalButtons}>
+              <TouchableOpacity
+                style={[
+                  styles.modalButton,
+                  { backgroundColor: currentTheme.error },
+                ]}
+                onPress={() => setIsAreaModalVisible(false)}
+              >
+                <Text style={styles.modalButtonText}>Cancelar</Text>
+              </TouchableOpacity>
+              <TouchableOpacity
+                style={[
+                  styles.modalButton,
+                  {
+                    backgroundColor: currentTheme.accent,
+                    opacity: changingArea ? 0.7 : 1,
+                  },
+                ]}
+                onPress={handleChangeArea}
+                disabled={changingArea}
+              >
+                {changingArea ? (
+                  <ActivityIndicator color="#fff" size="small" />
+                ) : (
+                  <Text style={styles.modalButtonText}>Guardar</Text>
+                )}
+              </TouchableOpacity>
+            </View>
           </View>
         </Pressable>
       </Modal>
@@ -484,6 +621,43 @@ const styles = StyleSheet.create({
   modalButtonText: {
     color: "white",
     fontSize: 16,
+  },
+  changeAreaButton: {
+    paddingHorizontal: 12,
+    paddingVertical: 6,
+    borderRadius: 8,
+    marginLeft: "auto",
+  },
+  changeAreaButtonText: {
+    color: "#fff",
+    fontSize: 14,
+    fontWeight: "500",
+  },
+  modalTitle: {
+    fontSize: 20,
+    fontWeight: "bold",
+    marginBottom: 20,
+    textAlign: "center",
+  },
+  areaList: {
+    maxHeight: 200,
+    width: "100%",
+  },
+  areaOption: {
+    padding: 15,
+    borderRadius: 8,
+    marginBottom: 8,
+  },
+  areaOptionText: {
+    fontSize: 16,
+    textAlign: "center",
+  },
+  modalButtons: {
+    flexDirection: "row",
+    justifyContent: "space-between",
+    width: "100%",
+    marginTop: 20,
+    gap: 12,
   },
 });
 

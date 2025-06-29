@@ -18,11 +18,14 @@ import * as SecureStore from "expo-secure-store";
 import { useTheme } from "../context/ThemeContext";
 import { theme } from "../styles/theme";
 import { Icon } from "react-native-paper";
+import axios from "../axiosInstance";
+import config from "../config/config";
 
 const MainScreen = () => {
   const navigation = useNavigation();
   const [greeting, setGreeting] = useState("");
   const [userName, setUserName] = useState("");
+  const [userArea, setUserArea] = useState("");
   const [showDefaultView, setShowDefaultView] = useState(true);
   const [showEntregas, setShowEntregas] = useState(false);
   const [showHistorial, setShowHistorial] = useState(false);
@@ -61,11 +64,24 @@ const MainScreen = () => {
     };
     checkAuthentication();
 
-    const fetchUserName = async () => {
-      const name = await AsyncStorage.getItem("userName");
-      setUserName(name || "Usuario");
+    const fetchUserProfile = async () => {
+      try {
+        const response = await axios.get(config.AUTH.PROFILE);
+        if (response.data) {
+          setUserName(response.data.name || "Usuario");
+          setUserArea(response.data.area || "");
+          await AsyncStorage.setItem(
+            "userName",
+            response.data.name || "Usuario"
+          );
+        }
+      } catch (error) {
+        console.error("Error fetching user profile:", error);
+        const name = await AsyncStorage.getItem("userName");
+        setUserName(name || "Usuario");
+      }
     };
-    fetchUserName();
+    fetchUserProfile();
 
     const getGreeting = () => {
       const now = new Date();
@@ -281,19 +297,20 @@ const MainScreen = () => {
                               { color: currentTheme.text },
                             ]}
                           >
-                            Siguiente{" "}
+                            Entrega{" "}
                             <Text
                               style={{
                                 color: currentTheme.accent,
                                 fontWeight: "bold",
                               }}
                             >
-                              Entrega
+                              Recomendada
                             </Text>
                           </Text>
                           <EntregasPendientes
                             refresh={refreshEntregas}
                             limitItems={1}
+                            userArea={userArea}
                           />
                           <Pressable
                             onPress={() => {

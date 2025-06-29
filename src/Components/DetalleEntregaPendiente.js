@@ -226,6 +226,12 @@ const DetalleEntregaPendiente = () => {
                   {formatDate(detalle.fechaCreacion)}
                 </Text>
               </Text>
+              <Text style={[styles.label, { color: currentTheme.cardText }]}>
+                Zona:{" "}
+                <Text style={[styles.value, { color: currentTheme.cardText }]}>
+                  {detalle.area || "CABA"}
+                </Text>
+              </Text>
             </View>
             <Pressable
               style={[
