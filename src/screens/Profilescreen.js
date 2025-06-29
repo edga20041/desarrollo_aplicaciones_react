@@ -28,6 +28,7 @@ import { Icon } from "react-native-paper";
 import * as ImagePicker from "expo-image-picker";
 import { SharedElement } from "react-navigation-shared-element";
 import { stopPeriodicNotifications } from "../service/NotificationService";
+import { useUserArea } from "../context/UserAreaContext";
 
 const ProfileScreen = () => {
   const [perfil, setPerfil] = useState(null);
@@ -38,6 +39,7 @@ const ProfileScreen = () => {
   const [selectedArea, setSelectedArea] = useState("");
   const [changingArea, setChangingArea] = useState(false);
   const { isDarkMode, toggleTheme } = useTheme();
+  const { updateUserArea } = useUserArea();
   const currentTheme = theme[isDarkMode ? "dark" : "light"];
   const [profileImage, setProfileImage] = useState(null);
   const [scrollY] = useState(new Animated.Value(0));
@@ -86,6 +88,7 @@ const ProfileScreen = () => {
 
       if (response.status === 200) {
         setPerfil((prev) => ({ ...prev, area: selectedArea }));
+        updateUserArea(selectedArea);
         showMessage("Zona actualizada exitosamente", false);
       }
     } catch (error) {
@@ -111,7 +114,10 @@ const ProfileScreen = () => {
         if (response.data) {
           setPerfil(response.data);
         } else {
-          showMessage("Respuesta vacía del servidor al cargar el perfil.", true);
+          showMessage(
+            "Respuesta vacía del servidor al cargar el perfil.",
+            true
+          );
         }
       } catch (error) {
         let errorMessage = "Error desconocido al obtener el perfil.";
@@ -216,7 +222,10 @@ const ProfileScreen = () => {
         style={styles.gradient}
       >
         <SafeAreaView
-          style={[styles.container, { justifyContent: "center", alignItems: "center" }]}
+          style={[
+            styles.container,
+            { justifyContent: "center", alignItems: "center" },
+          ]}
           edges={["top", "right", "left", "bottom"]}
         >
           <ActivityIndicator size="large" color={currentTheme.accent} />
@@ -234,7 +243,10 @@ const ProfileScreen = () => {
       }
       style={styles.gradient}
     >
-      <SafeAreaView style={styles.container} edges={["top", "right", "left", "bottom"]}>
+      <SafeAreaView
+        style={styles.container}
+        edges={["top", "right", "left", "bottom"]}
+      >
         <StatusBar
           barStyle={isDarkMode ? "light-content" : "dark-content"}
           backgroundColor="transparent"
@@ -252,7 +264,9 @@ const ProfileScreen = () => {
           {renderProfileHeader()}
 
           <View style={styles.content}>
-            <View style={[styles.card, { backgroundColor: currentTheme.cardBg }]}>
+            <View
+              style={[styles.card, { backgroundColor: currentTheme.cardBg }]}
+            >
               <View style={styles.infoRow}>
                 <Icon source="email" size={24} color={currentTheme.accent} />
                 <Text style={[styles.infoText, { color: currentTheme.text }]}>
@@ -266,18 +280,29 @@ const ProfileScreen = () => {
                 </Text>
               </View>
               <View style={styles.infoRow}>
-                <Icon source="card-account-details" size={24} color={currentTheme.accent} />
+                <Icon
+                  source="card-account-details"
+                  size={24}
+                  color={currentTheme.accent}
+                />
                 <Text style={[styles.infoText, { color: currentTheme.text }]}>
                   {perfil?.dni}
                 </Text>
               </View>
               <View style={styles.infoRow}>
-                <Icon source="map-marker-radius" size={24} color={currentTheme.accent} />
+                <Icon
+                  source="map-marker-radius"
+                  size={24}
+                  color={currentTheme.accent}
+                />
                 <Text style={[styles.infoText, { color: currentTheme.text }]}>
                   {perfil?.area || "No especificada"}
                 </Text>
                 <TouchableOpacity
-                  style={[styles.changeAreaButton, { backgroundColor: currentTheme.accent }]}
+                  style={[
+                    styles.changeAreaButton,
+                    { backgroundColor: currentTheme.accent },
+                  ]}
                   onPress={() => {
                     setSelectedArea(perfil?.area || areas[0]);
                     setIsAreaModalVisible(true);
@@ -289,7 +314,10 @@ const ProfileScreen = () => {
             </View>
 
             <TouchableOpacity
-              style={[styles.logoutButton, { backgroundColor: currentTheme.error }]}
+              style={[
+                styles.logoutButton,
+                { backgroundColor: currentTheme.error },
+              ]}
               onPress={handleLogout}
             >
               <Icon source="logout" size={24} color="#fff" />
@@ -299,7 +327,11 @@ const ProfileScreen = () => {
         </Animated.ScrollView>
 
         <View style={styles.themeToggleContainer}>
-          <Icon source={isDarkMode ? "weather-night" : "weather-sunny"} size={24} color={currentTheme.text} />
+          <Icon
+            source={isDarkMode ? "weather-night" : "weather-sunny"}
+            size={24}
+            color={currentTheme.text}
+          />
           <Switch
             value={isDarkMode}
             onValueChange={toggleTheme}
@@ -315,48 +347,115 @@ const ProfileScreen = () => {
         visible={isModalVisible}
         onRequestClose={() => setIsModalVisible(false)}
       >
-        <Pressable style={styles.modalOverlay} activeOpacity={1} onPressOut={() => setIsModalVisible(false)}>
-          <View style={[styles.modalContent, { backgroundColor: currentTheme.cardBg }]}>
-            <Text style={[styles.modalText, message?.isError ? styles.modalErrorText : styles.modalSuccessText]}>
+        <Pressable
+          style={styles.modalOverlay}
+          activeOpacity={1}
+          onPressOut={() => setIsModalVisible(false)}
+        >
+          <View
+            style={[
+              styles.modalContent,
+              { backgroundColor: currentTheme.cardBg },
+            ]}
+          >
+            <Text
+              style={[
+                styles.modalText,
+                message?.isError
+                  ? styles.modalErrorText
+                  : styles.modalSuccessText,
+              ]}
+            >
               {message?.text}
             </Text>
-            <Pressable onPress={() => setIsModalVisible(false)} style={[styles.modalButton, { backgroundColor: currentTheme.buttonBg }]}>
+            <Pressable
+              onPress={() => setIsModalVisible(false)}
+              style={[
+                styles.modalButton,
+                { backgroundColor: currentTheme.buttonBg },
+              ]}
+            >
               <Text style={styles.modalButtonText}>Cerrar</Text>
             </Pressable>
           </View>
         </Pressable>
       </Modal>
 
-      <Modal animationType="fade" transparent={true} visible={isAreaModalVisible} onRequestClose={() => setIsAreaModalVisible(false)}>
-        <Pressable style={styles.modalOverlay} activeOpacity={1} onPressOut={() => setIsAreaModalVisible(false)}>
-          <View style={[styles.modalContent, { backgroundColor: currentTheme.cardBg }]}>
-            <Text style={[styles.modalTitle, { color: currentTheme.text }]}>Seleccionar Zona</Text>
+      <Modal
+        animationType="fade"
+        transparent={true}
+        visible={isAreaModalVisible}
+        onRequestClose={() => setIsAreaModalVisible(false)}
+      >
+        <Pressable
+          style={styles.modalOverlay}
+          activeOpacity={1}
+          onPressOut={() => setIsAreaModalVisible(false)}
+        >
+          <View
+            style={[
+              styles.modalContent,
+              { backgroundColor: currentTheme.cardBg },
+            ]}
+          >
+            <Text style={[styles.modalTitle, { color: currentTheme.text }]}>
+              Seleccionar Zona
+            </Text>
             <ScrollView style={styles.areaList}>
-              {areas.map(area => (
+              {areas.map((area) => (
                 <TouchableOpacity
                   key={area}
                   style={[
                     styles.areaOption,
-                    { backgroundColor: selectedArea === area ? currentTheme.accent : currentTheme.cardBg },
+                    {
+                      backgroundColor:
+                        selectedArea === area
+                          ? currentTheme.accent
+                          : currentTheme.cardBg,
+                    },
                   ]}
                   onPress={() => setSelectedArea(area)}
                 >
-                  <Text style={[styles.areaOptionText, { color: selectedArea === area ? "#fff" : currentTheme.text }]}>
+                  <Text
+                    style={[
+                      styles.areaOptionText,
+                      {
+                        color:
+                          selectedArea === area ? "#fff" : currentTheme.text,
+                      },
+                    ]}
+                  >
                     {area}
                   </Text>
                 </TouchableOpacity>
               ))}
             </ScrollView>
             <View style={styles.modalButtons}>
-              <TouchableOpacity style={[styles.modalButton, { backgroundColor: currentTheme.error }]} onPress={() => setIsAreaModalVisible(false)}>
+              <TouchableOpacity
+                style={[
+                  styles.modalButton,
+                  { backgroundColor: currentTheme.error },
+                ]}
+                onPress={() => setIsAreaModalVisible(false)}
+              >
                 <Text style={styles.modalButtonText}>Cancelar</Text>
               </TouchableOpacity>
               <TouchableOpacity
-                style={[styles.modalButton, { backgroundColor: currentTheme.accent, opacity: changingArea ? 0.7 : 1 }]}
+                style={[
+                  styles.modalButton,
+                  {
+                    backgroundColor: currentTheme.accent,
+                    opacity: changingArea ? 0.7 : 1,
+                  },
+                ]}
                 onPress={handleChangeArea}
                 disabled={changingArea}
               >
-                {changingArea ? <ActivityIndicator color="#fff" size="small" /> : <Text style={styles.modalButtonText}>Guardar</Text>}
+                {changingArea ? (
+                  <ActivityIndicator color="#fff" size="small" />
+                ) : (
+                  <Text style={styles.modalButtonText}>Guardar</Text>
+                )}
               </TouchableOpacity>
             </View>
           </View>

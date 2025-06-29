@@ -44,6 +44,7 @@ import { ThemeProvider, useTheme } from "./src/context/ThemeContext";
 import { theme } from "./src/styles/theme";
 import { Provider as PaperProvider } from "react-native-paper";
 import { navigationRef } from "./src/Components/NavigationService";
+import { UserAreaProvider } from "./src/context/UserAreaContext";
 
 const Stack = createNativeStackNavigator();
 const { width, height } = Dimensions.get("window");
@@ -361,9 +362,11 @@ export default function App() {
         edges={["top", "right", "left", "bottom"]}
       >
         <ThemeProvider>
-          <PaperProvider>
-            <AppContent />
-          </PaperProvider>
+          <UserAreaProvider>
+            <PaperProvider>
+              <AppContent />
+            </PaperProvider>
+          </UserAreaProvider>
         </ThemeProvider>
       </SafeAreaView>
     </SafeAreaProvider>
