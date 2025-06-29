@@ -33,7 +33,6 @@ import Geocoder from "react-native-geocoding";
 import config from "./src/config/config";
 import DetalleEntregaPendiente from "./src/Components/DetalleEntregaPendiente";
 import ProfileScreen from "./src/screens/Profilescreen";
-//Agregado se puede borrar
 import {
   configureNotifications,
   requestNotificationPermissions,
@@ -244,35 +243,30 @@ const AppContent = () => {
       );
     }
   }, []);
-
-  // Agregado se puede borrar
-  {
-    /* 
+  
   useEffect(() => {
     (async () => {
-      // Configura el handler de expo-notifications
+      // 1) Configuro el handler de Expo
       await configureNotifications();
 
-      // Pide permisos al usuario
+      // 2) Pido permiso
       const granted = await requestNotificationPermissions();
       if (!granted) {
         console.warn("Permiso de notificaciones DENEGADO");
         return;
       }
-
-      // Arranca el polling cada 1 minuto
-      //startPeriodicNotifications(1);
-
-      // Cleanup si AppContent se desmontara
-      return () => {
-        if (isNotificationServiceRunning()) {
-          stopPeriodicNotifications();
-        }
-      };
+      // 3) Arranco el polling (cada 1 minuto)
+      startPeriodicNotifications(1);
     })();
-  }, []);
-  */
-  }
+
+    // 4) Cleanup: detener el polling al desmontar AppContent
+    return () => {
+      if (isNotificationServiceRunning()) {
+        stopPeriodicNotifications();
+      }
+    };
+  }, []); 
+
   const screenOptions = {
     headerStyle: {
       backgroundColor: currentTheme.primary,
