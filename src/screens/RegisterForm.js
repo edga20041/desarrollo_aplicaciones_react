@@ -106,10 +106,16 @@ const RegisterForm = ({ onRegisterSuccess, onInputFocus }) => {
   const [showAreaPicker, setShowAreaPicker] = useState(false);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState(null);
+  const [isModalVisible, setIsModalVisible] = useState(false);
   const [showPassword, setShowPassword] = useState(false);
   const [showConfirmPassword, setShowConfirmPassword] = useState(false);
 
   const areas = ["Zona Norte", "Zona Sur", "Zona Oeste", "Zona Centro"];
+
+  const showErrorModal = (msg) => {
+    setError(msg);
+    setIsModalVisible(true);
+  };
 
   const handleRegister = async () => {
     setError(null);
@@ -124,7 +130,7 @@ const RegisterForm = ({ onRegisterSuccess, onInputFocus }) => {
     );
 
     if (!validationResult.valid) {
-      setError(validationResult.message || "Error de validación.");
+      showErrorModal(validationResult.message || "Error de validación.");
       return;
     }
 
@@ -146,20 +152,22 @@ const RegisterForm = ({ onRegisterSuccess, onInputFocus }) => {
       );
       onRegisterSuccess(email);
     } catch (err) {
+      let errorMessage = "Ocurrió un error. Intenta nuevamente.";
       if (err.response) {
-        if (err.response.status === 400) {
-          setError(
-            err.response.data.message ||
-              "El usuario ya está registrado o datos inválidos."
-          );
-        } else {
-          setError("Error en el registro. Por favor, intenta nuevamente.");
+        const status = err.response.status;
+        if (err.response.data && err.response.data.message) {
+          errorMessage = err.response.data.message;
+        } else if (status === 400) {
+          errorMessage = "El usuario ya está registrado o datos inválidos.";
+        } else if (status >= 500) {
+          errorMessage = "Error del servidor. Intenta más tarde.";
         }
       } else if (err.request) {
-        setError("No se recibió respuesta del servidor.");
-      } else {
-        setError(`Error al configurar la petición: ${err.message}`);
+        errorMessage = "No se recibió respuesta del servidor. Revisa tu conexión a internet.";
+      } else if (err.message) {
+        errorMessage = err.message;
       }
+      showErrorModal(errorMessage);
     } finally {
       setLoading(false);
     }
@@ -412,11 +420,42 @@ const RegisterForm = ({ onRegisterSuccess, onInputFocus }) => {
         }
       />
       {error && (
-        <View style={[styles.errorContainer, { backgroundColor: "#f8d7da" }]}>
-          <Text style={[styles.errorText, { color: "#721c24" }]}>
-            Error: {error}
-          </Text>
-        </View>
+        <Modal
+          animationType="fade"
+          transparent={true}
+          visible={isModalVisible}
+          onRequestClose={() => setIsModalVisible(false)}
+        >
+          <Pressable
+            style={styles.modalOverlay}
+            onPress={() => setIsModalVisible(false)}
+          >
+            <View
+              style={[
+                styles.modalContent,
+                { backgroundColor: isDarkMode ? "#1A1A2E" : currentTheme.cardBg },
+              ]}
+              onStartShouldSetResponder={() => true}
+              onTouchEnd={(e) => e.stopPropagation()}
+            >
+              <Text style={[styles.modalText, { color: isDarkMode ? '#ff6b6b' : '#721c24' }]}>Error: {error}</Text>
+              <Pressable
+                onPress={() => setIsModalVisible(false)}
+                style={({ pressed }) => [
+                  styles.modalButton,
+                  pressed && { opacity: 0.8 },
+                ]}
+              >
+                <LinearGradient
+                  colors={["#F27121", "#E94057"]}
+                  style={styles.modalButtonGradient}
+                >
+                  <Text style={styles.modalButtonText}>Cerrar</Text>
+                </LinearGradient>
+              </Pressable>
+            </View>
+          </Pressable>
+        </Modal>
       )}
 
       {loading ? (
@@ -438,7 +477,7 @@ const RegisterForm = ({ onRegisterSuccess, onInputFocus }) => {
         </Pressable>
       )}
     </View>
-  );
+    );
 };
 
 const styles = StyleSheet.create({
@@ -538,6 +577,26 @@ const styles = StyleSheet.create({
     alignItems: "center",
   },
   closeButtonText: {
+    color: "#fff",
+    fontSize: 16,
+    fontFamily: "Montserrat_600SemiBold",
+  },
+  modalText: {
+    fontSize: 16,
+    fontFamily: "Montserrat_400Regular",
+    marginBottom: 10,
+    textAlign: "center",
+  },
+  modalButton: {
+    borderRadius: 8,
+    overflow: "hidden",
+    marginTop: 10,
+  },
+  modalButtonGradient: {
+    paddingVertical: 12,
+    alignItems: "center",
+  },
+  modalButtonText: {
     color: "#fff",
     fontSize: 16,
     fontFamily: "Montserrat_600SemiBold",
