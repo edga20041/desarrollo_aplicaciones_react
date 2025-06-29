@@ -129,13 +129,32 @@ const LoginAuth = () => {
         });
       } else {
         showMessage("Token no recibido del servidor.", true);
+        return;
       }
     } catch (error) {
-      console.error("Error de login:", error.response?.data || error.message);
-      const errorMessage =
-        error.response?.data?.message ||
-        "Credenciales incorrectas o problema de conexión.";
+      let errorMessage = "Ocurrió un error. Intenta nuevamente.";
+      if (error.response) {
+        const status = error.response.status;
+        if (error.response.data && error.response.data.message) {
+          errorMessage = error.response.data.message;
+        } else if (status === 400) {
+          errorMessage = "Solicitud inválida. Verifica los datos ingresados.";
+        } else if (status === 401) {
+          errorMessage = "Credenciales incorrectas. Por favor, verifica tu correo y contraseña.";
+        } else if (status === 403) {
+          errorMessage = "No tienes permisos para acceder.";
+        } else if (status === 404) {
+          errorMessage = "Usuario no encontrado.";
+        } else if (status >= 500) {
+          errorMessage = "Error del servidor. Intenta más tarde.";
+        }
+      } else if (error.request) {
+        errorMessage = "No se recibió respuesta del servidor. Revisa tu conexión a internet.";
+      } else if (error.message) {
+        errorMessage = error.message;
+      }
       showMessage(errorMessage, true);
+      return;
     } finally {
       setLoading(false);
     }
@@ -335,7 +354,7 @@ const LoginAuth = () => {
                 style={[
                   styles.modalText,
                   message?.isError
-                    ? styles.modalErrorText
+                    ? { color: isDarkMode ? '#ff6b6b' : '#721c24' }
                     : styles.modalSuccessText,
                 ]}
               >
