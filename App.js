@@ -243,29 +243,6 @@ const AppContent = () => {
       );
     }
   }, []);
-  
-  useEffect(() => {
-    (async () => {
-      // 1) Configuro el handler de Expo
-      await configureNotifications();
-
-      // 2) Pido permiso
-      const granted = await requestNotificationPermissions();
-      if (!granted) {
-        console.warn("Permiso de notificaciones DENEGADO");
-        return;
-      }
-      // 3) Arranco el polling (cada 1 minuto)
-      startPeriodicNotifications(1);
-    })();
-
-    // 4) Cleanup: detener el polling al desmontar AppContent
-    return () => {
-      if (isNotificationServiceRunning()) {
-        stopPeriodicNotifications();
-      }
-    };
-  }, []); 
 
   const screenOptions = {
     headerStyle: {
