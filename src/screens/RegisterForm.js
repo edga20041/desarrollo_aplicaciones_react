@@ -76,11 +76,11 @@ const validateFields = (
         "La contraseña debe contener al menos una letra mayúscula, una letra minúscula y un número.",
     };
   }
-  if (!/^[a-zA-Z]+$/.test(nombre)) {
-    return { valid: false, message: "El nombre solo puede contener letras." };
+  if (!/^[a-zA-Z ]+$/.test(nombre)) {
+    return { valid: false, message: "El nombre solo puede contener letras y espacios." };
   }
-  if (!/^[a-zA-Z]+$/.test(apellido)) {
-    return { valid: false, message: "El apellido solo puede contener letras." };
+  if (!/^[a-zA-Z ]+$/.test(apellido)) {
+    return { valid: false, message: "El apellido solo puede contener letras y espacios." };
   }
   if (nombre.length < 2 || apellido.length < 2) {
     return {
@@ -119,9 +119,12 @@ const RegisterForm = ({ onRegisterSuccess, onInputFocus }) => {
 
   const handleRegister = async () => {
     setError(null);
+    // Eliminar espacios al inicio y final
+    const trimmedName = name.trim();
+    const trimmedSurname = surname.trim();
     const validationResult = validateFields(
-      name,
-      surname,
+      trimmedName,
+      trimmedSurname,
       dni,
       phoneNumber,
       email,
@@ -137,8 +140,8 @@ const RegisterForm = ({ onRegisterSuccess, onInputFocus }) => {
     const registerRequest = {
       email,
       password,
-      name,
-      surname,
+      name: trimmedName,
+      surname: trimmedSurname,
       dni: Number(dni),
       phoneNumber: Number(phoneNumber),
       area,
