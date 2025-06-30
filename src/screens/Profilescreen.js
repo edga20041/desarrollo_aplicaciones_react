@@ -1,3 +1,5 @@
+// src/screens/ProfileScreen.js
+
 import React, { useEffect, useState } from "react";
 import {
   View,
@@ -11,6 +13,7 @@ import {
   Image,
   Animated,
   TouchableOpacity,
+  ScrollView,
 } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
 import AsyncStorage from "@react-native-async-storage/async-storage";
@@ -24,18 +27,25 @@ import { theme } from "../styles/theme";
 import { Icon } from "react-native-paper";
 import * as ImagePicker from "expo-image-picker";
 import { SharedElement } from "react-navigation-shared-element";
+import { stopPeriodicNotifications } from "../service/NotificationService";
+import { useUserArea } from "../context/UserAreaContext";
 
 const ProfileScreen = () => {
   const [perfil, setPerfil] = useState(null);
   const [loading, setLoading] = useState(true);
   const [message, setMessage] = useState(null);
   const [isModalVisible, setIsModalVisible] = useState(false);
+  const [isAreaModalVisible, setIsAreaModalVisible] = useState(false);
+  const [selectedArea, setSelectedArea] = useState("");
+  const [changingArea, setChangingArea] = useState(false);
   const { isDarkMode, toggleTheme } = useTheme();
+  const { updateUserArea } = useUserArea();
   const currentTheme = theme[isDarkMode ? "dark" : "light"];
   const [profileImage, setProfileImage] = useState(null);
   const [scrollY] = useState(new Animated.Value(0));
-
   const navigation = useNavigation();
+
+  const areas = ["Zona Norte", "Zona Sur", "Zona Oeste", "Zona Centro"];
 
   const headerHeight = scrollY.interpolate({
     inputRange: [0, 120],
@@ -67,6 +77,32 @@ const ProfileScreen = () => {
     setIsModalVisible(true);
   };
 
+  const handleChangeArea = async () => {
+    if (!selectedArea) return;
+
+    setChangingArea(true);
+    try {
+      const response = await axiosInstance.post(config.AUTH.CHANGE_AREA, {
+        area: selectedArea,
+      });
+
+      if (response.status === 200) {
+        setPerfil((prev) => ({ ...prev, area: selectedArea }));
+        updateUserArea(selectedArea);
+        showMessage("Zona actualizada exitosamente", false);
+      }
+    } catch (error) {
+      let errorMessage = "Error al cambiar la zona.";
+      if (error.response?.data?.message) {
+        errorMessage = error.response.data.message;
+      }
+      showMessage(errorMessage, true);
+    } finally {
+      setChangingArea(false);
+      setIsAreaModalVisible(false);
+    }
+  };
+
   useEffect(() => {
     const fetchPerfil = async () => {
       setLoading(true);
@@ -77,7 +113,6 @@ const ProfileScreen = () => {
 
         if (response.data) {
           setPerfil(response.data);
-          //  showMessage("Perfil cargado exitosamente.", false);
         } else {
           showMessage(
             "Respuesta vacía del servidor al cargar el perfil.",
@@ -85,15 +120,9 @@ const ProfileScreen = () => {
           );
         }
       } catch (error) {
-        console.error("Error al obtener el perfil:", error);
         let errorMessage = "Error desconocido al obtener el perfil.";
 
         if (error.response) {
-          console.error(
-            `Status: ${error.response.status}, Data: ${JSON.stringify(
-              error.response.data
-            )}`
-          );
           if (error.response.status === 401) {
             errorMessage =
               "Sesión expirada o no autorizado. Por favor, inicia sesión de nuevo.";
@@ -119,9 +148,11 @@ const ProfileScreen = () => {
 
     fetchPerfil();
   }, [navigation]);
+
   const handleLogout = async () => {
     setLoading(true);
     try {
+      stopPeriodicNotifications();
       await SecureStore.deleteItemAsync("token");
       await AsyncStorage.removeItem("userName");
       showMessage("Sesión cerrada exitosamente.", false);
@@ -132,7 +163,6 @@ const ProfileScreen = () => {
         });
       }, 2000);
     } catch (error) {
-      console.error("Error al cerrar sesión:", error);
       showMessage("Error al cerrar sesión.", true);
     } finally {
       setLoading(false);
@@ -192,21 +222,13 @@ const ProfileScreen = () => {
         style={styles.gradient}
       >
         <SafeAreaView
-          style={[{ flex: 1 }, { backgroundColor: "transparent" }]}
+          style={[
+            styles.container,
+            { justifyContent: "center", alignItems: "center" },
+          ]}
           edges={["top", "right", "left", "bottom"]}
         >
-          <View
-            style={[
-              styles.container,
-              {
-                backgroundColor: "transparent",
-                justifyContent: "center",
-                alignItems: "center",
-              },
-            ]}
-          >
-            <ActivityIndicator size="large" color={currentTheme.accent} />
-          </View>
+          <ActivityIndicator size="large" color={currentTheme.accent} />
         </SafeAreaView>
       </LinearGradient>
     );
@@ -222,7 +244,7 @@ const ProfileScreen = () => {
       style={styles.gradient}
     >
       <SafeAreaView
-        style={[{ flex: 1 }, { backgroundColor: "transparent" }]}
+        style={styles.container}
         edges={["top", "right", "left", "bottom"]}
       >
         <StatusBar
@@ -232,7 +254,7 @@ const ProfileScreen = () => {
         />
 
         <Animated.ScrollView
-          style={[styles.container, { backgroundColor: "transparent" }]}
+          style={styles.container}
           onScroll={Animated.event(
             [{ nativeEvent: { contentOffset: { y: scrollY } } }],
             { useNativeDriver: false }
@@ -266,6 +288,28 @@ const ProfileScreen = () => {
                 <Text style={[styles.infoText, { color: currentTheme.text }]}>
                   {perfil?.dni}
                 </Text>
+              </View>
+              <View style={styles.infoRow}>
+                <Icon
+                  source="map-marker-radius"
+                  size={24}
+                  color={currentTheme.accent}
+                />
+                <Text style={[styles.infoText, { color: currentTheme.text }]}>
+                  {perfil?.area || "No especificada"}
+                </Text>
+                <TouchableOpacity
+                  style={[
+                    styles.changeAreaButton,
+                    { backgroundColor: currentTheme.accent },
+                  ]}
+                  onPress={() => {
+                    setSelectedArea(perfil?.area || areas[0]);
+                    setIsAreaModalVisible(true);
+                  }}
+                >
+                  <Text style={styles.changeAreaButtonText}>Cambiar zona</Text>
+                </TouchableOpacity>
               </View>
             </View>
 
@@ -333,6 +377,87 @@ const ProfileScreen = () => {
             >
               <Text style={styles.modalButtonText}>Cerrar</Text>
             </Pressable>
+          </View>
+        </Pressable>
+      </Modal>
+
+      <Modal
+        animationType="fade"
+        transparent={true}
+        visible={isAreaModalVisible}
+        onRequestClose={() => setIsAreaModalVisible(false)}
+      >
+        <Pressable
+          style={styles.modalOverlay}
+          activeOpacity={1}
+          onPressOut={() => setIsAreaModalVisible(false)}
+        >
+          <View
+            style={[
+              styles.modalContent,
+              { backgroundColor: currentTheme.cardBg },
+            ]}
+          >
+            <Text style={[styles.modalTitle, { color: currentTheme.text }]}>
+              Seleccionar Zona
+            </Text>
+            <ScrollView style={styles.areaList}>
+              {areas.map((area) => (
+                <TouchableOpacity
+                  key={area}
+                  style={[
+                    styles.areaOption,
+                    {
+                      backgroundColor:
+                        selectedArea === area
+                          ? currentTheme.accent
+                          : currentTheme.cardBg,
+                    },
+                  ]}
+                  onPress={() => setSelectedArea(area)}
+                >
+                  <Text
+                    style={[
+                      styles.areaOptionText,
+                      {
+                        color:
+                          selectedArea === area ? "#fff" : currentTheme.text,
+                      },
+                    ]}
+                  >
+                    {area}
+                  </Text>
+                </TouchableOpacity>
+              ))}
+            </ScrollView>
+            <View style={styles.modalButtons}>
+              <TouchableOpacity
+                style={[
+                  styles.modalButton,
+                  { backgroundColor: currentTheme.error },
+                ]}
+                onPress={() => setIsAreaModalVisible(false)}
+              >
+                <Text style={styles.modalButtonText}>Cancelar</Text>
+              </TouchableOpacity>
+              <TouchableOpacity
+                style={[
+                  styles.modalButton,
+                  {
+                    backgroundColor: currentTheme.accent,
+                    opacity: changingArea ? 0.7 : 1,
+                  },
+                ]}
+                onPress={handleChangeArea}
+                disabled={changingArea}
+              >
+                {changingArea ? (
+                  <ActivityIndicator color="#fff" size="small" />
+                ) : (
+                  <Text style={styles.modalButtonText}>Guardar</Text>
+                )}
+              </TouchableOpacity>
+            </View>
           </View>
         </Pressable>
       </Modal>
@@ -484,6 +609,43 @@ const styles = StyleSheet.create({
   modalButtonText: {
     color: "white",
     fontSize: 16,
+  },
+  changeAreaButton: {
+    paddingHorizontal: 12,
+    paddingVertical: 6,
+    borderRadius: 8,
+    marginLeft: "auto",
+  },
+  changeAreaButtonText: {
+    color: "#fff",
+    fontSize: 14,
+    fontWeight: "500",
+  },
+  modalTitle: {
+    fontSize: 20,
+    fontWeight: "bold",
+    marginBottom: 20,
+    textAlign: "center",
+  },
+  areaList: {
+    maxHeight: 200,
+    width: "100%",
+  },
+  areaOption: {
+    padding: 15,
+    borderRadius: 8,
+    marginBottom: 8,
+  },
+  areaOptionText: {
+    fontSize: 16,
+    textAlign: "center",
+  },
+  modalButtons: {
+    flexDirection: "row",
+    justifyContent: "space-between",
+    width: "100%",
+    marginTop: 20,
+    gap: 12,
   },
 });
 
