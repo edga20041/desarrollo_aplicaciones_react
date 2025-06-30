@@ -38,6 +38,9 @@ const config = {
   RUTAS: {
     GET_BY_ID: "/rutas/{ruta_id}",
   },
+  QR: {
+  GENERAR_VISTA: "/api/qr/view",
+},
 };
 
 export default config;

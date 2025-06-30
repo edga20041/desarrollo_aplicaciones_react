@@ -8,7 +8,7 @@ import axios from 'axios';
 import { useRef } from 'react';
 import config from '../config/config';
 
-const QRScanner = ({ navigation }) => {
+const QRScanner = ({ navigation}) => {
   const [scanned, setScanned] = useState(false);
   const [loading, setLoading] = useState(false);
   const insets = useSafeAreaInsets();
@@ -17,14 +17,14 @@ const QRScanner = ({ navigation }) => {
   const [permission, requestPermission] = useCameraPermissions();
 
   useEffect(() => {
-    (async () => {
-      requestPermission();
-    })();
-  }, []);
+    requestPermission()
+  }, [])
+
 
   const handleBarCodeScanned = async ({ type, data }) => {
-    if (scanned) return;
+    if (scanning.current) return;
 
+    scanning.current = true;
     setScanned(true);
     setLoading(true);
 
