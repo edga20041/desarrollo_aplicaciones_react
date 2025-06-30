@@ -3,17 +3,15 @@ import { StyleSheet, View, Text, Alert } from 'react-native';
 import { CameraView, useCameraPermissions } from 'expo-camera';
 import { Button, ActivityIndicator, Surface } from 'react-native-paper';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
-import { useQRCodeService } from '../services/qrCodeService';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import axios from 'axios';
 import { useRef } from 'react';
-import { config } from '../config';
+import config from '../config/config';
 
 const QRScanner = ({ navigation }) => {
   const [scanned, setScanned] = useState(false);
   const [loading, setLoading] = useState(false);
   const insets = useSafeAreaInsets();
-  const { processQRCode } = useQRCodeService();
   const scanning = useRef(false);
 
   const [permission, requestPermission] = useCameraPermissions();

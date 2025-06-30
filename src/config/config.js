@@ -30,6 +30,7 @@ const config = {
     EN_PROGRESO: "/entregas/en-progreso",
     GET_BY_ID: "/entregas/{entrega_id}",
     CAMBIAR_ESTADO: "/entregas/cambiar_estado",
+    VERIFICAR_CODIGO: "/entregas/verificar_codigo",
   },
   ESTADOS: {
     GET_BY_ID: "/estados/{estado_id}",

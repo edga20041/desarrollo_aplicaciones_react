@@ -30,7 +30,6 @@ const DetalleEntregaPendiente = () => {
 
   const [detalle, setDetalle] = useState(null);
   const [loading, setLoading] = useState(true);
-  const [finalizando, setFinalizando] = useState(false);
   const [showImage, setShowImage] = useState(false);
   const [finalizando, setFinalizando] = useState(false);
 
