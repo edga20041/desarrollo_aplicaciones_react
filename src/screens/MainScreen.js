@@ -388,12 +388,7 @@ const MainScreen = () => {
                   showsVerticalScrollIndicator={false}
                 />
               )}
-              {showEntregas && (
-                <EntregasPendientes
-                  refresh={refreshEntregas}
-                  userArea={userArea}
-                />
-              )}
+              {showEntregas && <EntregasPendientes refresh={refreshEntregas} />}
               {showHistorial && <HistorialEntregas refresh={refreshEntregas} />}
             </View>
           </View>
