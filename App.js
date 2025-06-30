@@ -105,25 +105,19 @@ const HomeScreen = ({ navigation }) => {
     );
   }
   return (
-    <SafeAreaView
-      style={[styles.container]}
-      edges={["top", "right", "left", "bottom"]}
+    <LinearGradient
+      colors={
+        isDarkMode
+          ? ["#1A1A2E", "#16213E", "#0F3460"]
+          : ["#FFFFFF", "#F5F5F5", "#E8E8E8"]
+      }
+      style={styles.gradient}
+      start={{ x: 0, y: 0 }}
+      end={{ x: 1, y: 1 }}
     >
-      <StatusBar
-        barStyle={isDarkMode ? "light-content" : "dark-content"}
-        backgroundColor={currentTheme.primary}
-        translucent
-      />
-
-      <LinearGradient
-        colors={
-          isDarkMode
-            ? ["#1A1A2E", "#16213E", "#0F3460"]
-            : ["#FFFFFF", "#F5F5F5", "#E8E8E8"]
-        }
-        style={styles.gradient}
-        start={{ x: 0, y: 0 }}
-        end={{ x: 1, y: 1 }}
+      <SafeAreaView
+        style={styles.container}
+        edges={["right", "left", "bottom"]}
       >
         <Animatable.View
           animation="fadeIn"
@@ -222,8 +216,8 @@ const HomeScreen = ({ navigation }) => {
             end={{ x: 1, y: 0 }}
           />
         </View>
-      </LinearGradient>
-    </SafeAreaView>
+      </SafeAreaView>
+    </LinearGradient>
   );
 };
 
@@ -266,6 +260,11 @@ const AppContent = () => {
 
   return (
     <NavigationContainer ref={navigationRef}>
+      <StatusBar
+        barStyle={isDarkMode ? "light-content" : "dark-content"}
+        backgroundColor="transparent"
+        translucent
+      />
       <Stack.Navigator initialRouteName="Home" screenOptions={screenOptions}>
         <Stack.Screen
           name="Home"
@@ -357,18 +356,13 @@ const AppContent = () => {
 export default function App() {
   return (
     <SafeAreaProvider>
-      <SafeAreaView
-        style={{ flex: 1 }}
-        edges={["top", "right", "left", "bottom"]}
-      >
-        <ThemeProvider>
-          <UserAreaProvider>
-            <PaperProvider>
-              <AppContent />
-            </PaperProvider>
-          </UserAreaProvider>
-        </ThemeProvider>
-      </SafeAreaView>
+      <ThemeProvider>
+        <UserAreaProvider>
+          <PaperProvider>
+            <AppContent />
+          </PaperProvider>
+        </UserAreaProvider>
+      </ThemeProvider>
     </SafeAreaProvider>
   );
 }
@@ -381,7 +375,6 @@ const styles = StyleSheet.create({
     flex: 1,
     justifyContent: "center",
     alignItems: "center",
-    backgroundColor: "#1A1A2E",
   },
   loadingText: {
     color: "#fff",
@@ -389,13 +382,11 @@ const styles = StyleSheet.create({
   },
   gradient: {
     flex: 1,
-    justifyContent: "space-between",
-    paddingTop: Platform.OS === "android" ? StatusBar.currentHeight + 20 : 60,
-    paddingBottom: 30,
   },
   logoContainer: {
     alignItems: "center",
     marginBottom: 2,
+    marginTop: Platform.OS === "android" ? StatusBar.currentHeight + 20 : 20,
   },
   logoCircle: {
     width: 10,
