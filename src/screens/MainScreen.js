@@ -318,30 +318,22 @@ const MainScreen = () => {
                             } else {
                               return (
                                 <>
+                                <Text
+                                  style={[
+                                    styles.sectionTitle,
+                                    { color: currentTheme.text },
+                                  ]}
+                                >
+                                  Entrega{" "}
                                   <Text
-                                    style={[
-                                      styles.sectionTitle,
-                                      { color: currentTheme.text },
-                                    ]}
+                                    style={{
+                                      color: currentTheme.accent,
+                                      fontWeight: "bold",
+                                    }}
                                   >
-                                    {userArea ? `Entrega` : `Entrega`}{" "}
-                                    <Text
-                                      style={{
-                                        color: currentTheme.accent,
-                                        fontWeight: "bold",
-                                      }}
-                                    >
-                                      {userArea ? "Recomendada" : "Siguiente"}
-                                    </Text>
-                                    <Text
-                                      style={{
-                                        color: currentTheme.accent,
-                                        fontWeight: "bold",
-                                      }}
-                                    >
-                                      {userArea ? "" : "Entrega"}
-                                    </Text>
+                                    {userArea ? "Recomendada" : "Siguiente"}
                                   </Text>
+                                </Text>
                                   <EntregasPendientes
                                     refresh={refreshEntregas}
                                     limitItems={1}
