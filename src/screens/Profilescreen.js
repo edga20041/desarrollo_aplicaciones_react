@@ -44,6 +44,7 @@ const ProfileScreen = () => {
   const currentTheme = theme[isDarkMode ? "dark" : "light"];
   const [profileImage, setProfileImage] = useState(null);
   const [uploadingImage, setUploadingImage] = useState(false);
+  const [loadingProfilePhoto, setLoadingProfilePhoto] = useState(false);
   const [scrollY] = useState(new Animated.Value(0));
   const navigation = useNavigation();
 
@@ -140,19 +141,52 @@ const ProfileScreen = () => {
 
   const fetchProfilePhoto = async (dni) => {
     try {
-      const fileName = `${dni}_profile.jpg`;
+      setLoadingProfilePhoto(true);
+      // Listar todos los archivos en la carpeta profiles que coincidan con el DNI
+      const { data: files, error: listError } = await supabase.storage
+        .from(BUCKET_NAME)
+        .list("profiles", {
+          search: `${dni}_`,
+        });
+
+      if (listError) {
+        console.error("Error listing files:", listError);
+        return;
+      }
+
+      if (!files || files.length === 0) {
+        console.log("No profile photo found for DNI:", dni);
+        return;
+      }
+
+      // Ordenar por fecha de creación (más reciente primero)
+      const sortedFiles = files.sort(
+        (a, b) => new Date(b.created_at) - new Date(a.created_at)
+      );
+
+      // Obtener la URL pública del archivo más reciente
+      const mostRecentFile = sortedFiles[0];
+      const fileName = `profiles/${mostRecentFile.name}`;
+
+      console.log("Fetching most recent profile photo:", fileName);
+
       const {
         data: { publicUrl },
       } = supabase.storage.from(BUCKET_NAME).getPublicUrl(fileName);
 
-      // Check if the image exists by trying to load it
+      // Verificar que la imagen existe y es accesible
       const response = await fetch(publicUrl);
       if (response.ok) {
+        console.log("Profile photo found:", publicUrl);
         setProfileImage(publicUrl);
+      } else {
+        console.error("Error accessing profile photo:", response.status);
       }
     } catch (error) {
       console.error("Error fetching profile photo:", error);
-      // If there's an error or no photo exists, we'll use the default avatar
+      // Si hay un error, usaremos el avatar por defecto
+    } finally {
+      setLoadingProfilePhoto(false);
     }
   };
 
@@ -283,7 +317,7 @@ const ProfileScreen = () => {
               { height: imageSize, width: imageSize },
             ]}
           >
-            {uploadingImage ? (
+            {uploadingImage || loadingProfilePhoto ? (
               <View style={styles.loadingContainer}>
                 <ActivityIndicator size="large" color="#fff" />
               </View>
@@ -297,10 +331,10 @@ const ProfileScreen = () => {
                 style={styles.profileImage}
               />
             )}
-            <View style={styles.editImageButton}>
-              <Icon source="camera" size={16} color="#fff" />
-            </View>
           </Animated.View>
+          <View style={styles.editImageButton}>
+            <Icon source="camera" size={16} color="#fff" />
+          </View>
         </Pressable>
         <Text style={styles.profileName}>
           {perfil?.name} {perfil?.surname}
@@ -611,6 +645,7 @@ const styles = StyleSheet.create({
     backgroundColor: "rgba(0,0,0,0.6)",
     borderRadius: 12,
     padding: 4,
+    zIndex: 1000,
   },
   profileName: {
     fontSize: 24,
