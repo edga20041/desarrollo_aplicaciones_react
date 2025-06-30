@@ -213,16 +213,24 @@ const DetalleEntregaPendiente = () => {
               ]}
              onPress={async () => {
               try {
+                const entregasEnProgresoUrl = `${config.API_URL}${config.ENTREGAS.EN_PROGRESO}`;
+                const response = await axiosInstance.get(entregasEnProgresoUrl);
+                if (response.data) {
+                  Alert.alert(
+                    'Entrega en curso',
+                    'No puedes escanear otra entrega. Debes finalizar la entrega en curso primero.'
+                  );
+                  return;
+                }
                 const url = `${config.API_URL}${config.QR.GENERAR_VISTA}?text=${detalle.id}`;
                 await axiosInstance.get(url);
                 console.log("✅ QR generado y abierto en la PC");
-
                 navigation.navigate("QRScanner", {
                   entrega_id: detalle.id
                 });
               } catch (error) {
-                console.error("Error al generar el QR:", error);
-                Alert.alert("Error", "No se pudo generar el QR");
+                console.error("Error al generar el QR o validar entregas en curso:", error);
+                Alert.alert("Error", "No se pudo generar el QR o validar entregas en curso");
               }
             }}
               disabled={finalizando}
