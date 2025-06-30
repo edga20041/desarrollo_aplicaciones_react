@@ -29,6 +29,7 @@ import * as ImagePicker from "expo-image-picker";
 import { SharedElement } from "react-navigation-shared-element";
 import { stopPeriodicNotifications } from "../service/NotificationService";
 import { useUserArea } from "../context/UserAreaContext";
+import supabase, { BUCKET_NAME } from "../config/supabase";
 
 const ProfileScreen = () => {
   const [perfil, setPerfil] = useState(null);
@@ -42,6 +43,8 @@ const ProfileScreen = () => {
   const { updateUserArea } = useUserArea();
   const currentTheme = theme[isDarkMode ? "dark" : "light"];
   const [profileImage, setProfileImage] = useState(null);
+  const [uploadingImage, setUploadingImage] = useState(false);
+  const [loadingProfilePhoto, setLoadingProfilePhoto] = useState(false);
   const [scrollY] = useState(new Animated.Value(0));
   const navigation = useNavigation();
 
@@ -59,6 +62,134 @@ const ProfileScreen = () => {
     extrapolate: "clamp",
   });
 
+  const uploadImageToSupabase = async (uri) => {
+    try {
+      setUploadingImage(true);
+
+      // Fetch the image and convert to blob
+      const response = await fetch(uri);
+      if (!response.ok) {
+        throw new Error(`Error fetching image: ${response.status}`);
+      }
+
+      const blob = await response.blob();
+      console.log("Blob size:", blob.size);
+      console.log("Blob type:", blob.type);
+
+      if (blob.size === 0) {
+        throw new Error("Blob is empty");
+      }
+
+      // Convert blob to base64
+      const reader = new FileReader();
+      const base64Promise = new Promise((resolve, reject) => {
+        reader.onload = () => resolve(reader.result);
+        reader.onerror = reject;
+        reader.readAsDataURL(blob);
+      });
+
+      const base64Data = await base64Promise;
+      console.log("Base64 data length:", base64Data.length);
+
+      // Remove data URL prefix (e.g., "data:image/jpeg;base64,")
+      const base64Clean = base64Data.split(",")[1];
+
+      // Convert base64 to Uint8Array
+      const binaryString = atob(base64Clean);
+      const bytes = new Uint8Array(binaryString.length);
+      for (let i = 0; i < binaryString.length; i++) {
+        bytes[i] = binaryString.charCodeAt(i);
+      }
+
+      // Generate file name
+      const timestamp = new Date().getTime();
+      const fileName = `profiles/${perfil.dni}_${timestamp}.jpg`;
+
+      console.log("Intentando subir archivo:", fileName);
+
+      // Upload to Supabase Storage
+      const { data, error } = await supabase.storage
+        .from(BUCKET_NAME)
+        .upload(fileName, bytes, {
+          contentType: "image/jpeg",
+          upsert: true,
+        });
+
+      if (error) {
+        console.error("Error de Supabase:", error);
+        throw error;
+      }
+
+      console.log("Archivo subido exitosamente:", data);
+
+      // Get the public URL
+      const {
+        data: { publicUrl },
+      } = supabase.storage.from(BUCKET_NAME).getPublicUrl(fileName);
+
+      console.log("URL pública generada:", publicUrl);
+
+      setProfileImage(publicUrl);
+      showMessage("Foto actualizada exitosamente", false);
+    } catch (error) {
+      console.error("Error completo:", error);
+      showMessage(`Error al subir la imagen: ${error.message}`, true);
+    } finally {
+      setUploadingImage(false);
+    }
+  };
+
+  const fetchProfilePhoto = async (dni) => {
+    try {
+      setLoadingProfilePhoto(true);
+      // Listar todos los archivos en la carpeta profiles que coincidan con el DNI
+      const { data: files, error: listError } = await supabase.storage
+        .from(BUCKET_NAME)
+        .list("profiles", {
+          search: `${dni}_`,
+        });
+
+      if (listError) {
+        console.error("Error listing files:", listError);
+        return;
+      }
+
+      if (!files || files.length === 0) {
+        console.log("No profile photo found for DNI:", dni);
+        return;
+      }
+
+      // Ordenar por fecha de creación (más reciente primero)
+      const sortedFiles = files.sort(
+        (a, b) => new Date(b.created_at) - new Date(a.created_at)
+      );
+
+      // Obtener la URL pública del archivo más reciente
+      const mostRecentFile = sortedFiles[0];
+      const fileName = `profiles/${mostRecentFile.name}`;
+
+      console.log("Fetching most recent profile photo:", fileName);
+
+      const {
+        data: { publicUrl },
+      } = supabase.storage.from(BUCKET_NAME).getPublicUrl(fileName);
+
+      // Verificar que la imagen existe y es accesible
+      const response = await fetch(publicUrl);
+      if (response.ok) {
+        console.log("Profile photo found:", publicUrl);
+        setProfileImage(publicUrl);
+      } else {
+        console.error("Error accessing profile photo:", response.status);
+      }
+    } catch (error) {
+      console.error("Error fetching profile photo:", error);
+      // Si hay un error, usaremos el avatar por defecto
+    } finally {
+      setLoadingProfilePhoto(false);
+    }
+  };
+
   const pickImage = async () => {
     const result = await ImagePicker.launchImageLibraryAsync({
       mediaTypes: ImagePicker.MediaTypeOptions.Images,
@@ -68,7 +199,7 @@ const ProfileScreen = () => {
     });
 
     if (!result.canceled) {
-      setProfileImage(result.assets[0].uri);
+      uploadImageToSupabase(result.assets[0].uri);
     }
   };
 
@@ -113,6 +244,10 @@ const ProfileScreen = () => {
 
         if (response.data) {
           setPerfil(response.data);
+          // Fetch profile photo once we have the DNI
+          if (response.data.dni) {
+            fetchProfilePhoto(response.data.dni);
+          }
         } else {
           showMessage(
             "Respuesta vacía del servidor al cargar el perfil.",
@@ -175,21 +310,31 @@ const ProfileScreen = () => {
         colors={isDarkMode ? ["#1A1A2E", "#16213E"] : ["#F27121", "#E94057"]}
         style={styles.headerGradient}
       >
-        <Pressable onPress={pickImage}>
+        <Pressable onPress={pickImage} disabled={uploadingImage}>
           <Animated.View
             style={[
               styles.profileImageContainer,
               { height: imageSize, width: imageSize },
             ]}
           >
-            <Image
-              source={require("../../assets/avatar.png")}
-              style={styles.profileImage}
-            />
-            <View style={styles.editImageButton}>
-              <Icon source="camera" size={16} color="#fff" />
-            </View>
+            {uploadingImage || loadingProfilePhoto ? (
+              <View style={styles.loadingContainer}>
+                <ActivityIndicator size="large" color="#fff" />
+              </View>
+            ) : (
+              <Image
+                source={
+                  profileImage
+                    ? { uri: profileImage }
+                    : require("../../assets/avatar.png")
+                }
+                style={styles.profileImage}
+              />
+            )}
           </Animated.View>
+          <View style={styles.editImageButton}>
+            <Icon source="camera" size={16} color="#fff" />
+          </View>
         </Pressable>
         <Text style={styles.profileName}>
           {perfil?.name} {perfil?.surname}
@@ -500,6 +645,7 @@ const styles = StyleSheet.create({
     backgroundColor: "rgba(0,0,0,0.6)",
     borderRadius: 12,
     padding: 4,
+    zIndex: 1000,
   },
   profileName: {
     fontSize: 24,
@@ -646,6 +792,12 @@ const styles = StyleSheet.create({
     width: "100%",
     marginTop: 20,
     gap: 12,
+  },
+  loadingContainer: {
+    flex: 1,
+    justifyContent: "center",
+    alignItems: "center",
+    backgroundColor: "rgba(0,0,0,0.3)",
   },
 });
 
