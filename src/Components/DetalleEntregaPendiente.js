@@ -12,10 +12,9 @@ import {
 } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
 import { useNavigation, useRoute } from "@react-navigation/native";
-import axios from "../axiosInstance";
+import axiosInstance from "../axiosInstance";
 import config from "../config/config";
 import { LinearGradient } from "expo-linear-gradient";
-import * as SecureStore from "expo-secure-store";
 import { useTheme } from "../context/ThemeContext";
 import { theme } from "../styles/theme";
 import { Icon } from "react-native-paper";
@@ -30,8 +29,8 @@ const DetalleEntregaPendiente = () => {
 
   const [detalle, setDetalle] = useState(null);
   const [loading, setLoading] = useState(true);
-  const [finalizando, setFinalizando] = useState(false);
   const [showImage, setShowImage] = useState(false);
+  const [finalizando, setFinalizando] = useState(false);
 
   useEffect(() => {
     const fetchDetalle = async () => {
@@ -39,7 +38,7 @@ const DetalleEntregaPendiente = () => {
         const url =
           config.API_URL +
           config.ENTREGAS.GET_BY_ID.replace("{entrega_id}", entrega_id);
-        const response = await axios.get(url);
+        const response = await axiosInstance.get(url);
         setDetalle(response.data);
       } catch (error) {
         Alert.alert("Error", "No se pudo cargar el detalle de la entrega.");
@@ -49,31 +48,6 @@ const DetalleEntregaPendiente = () => {
     };
     fetchDetalle();
   }, [entrega_id]);
-
-  const finalizarEntrega = async () => {
-    setFinalizando(true);
-    setShowImage(true);
-
-    setTimeout(async () => {
-      try {
-        const token = await SecureStore.getItemAsync("token");
-        const url = config.API_URL + config.ENTREGAS.CAMBIAR_ESTADO;
-        const body = {
-          entregaId: detalle.id,
-          estadoId: 3,
-          repartidorId: detalle.repartidorId,
-        };
-        await axios.patch(url, body, {});
-        Alert.alert("Éxito", "La entrega fue finalizada.");
-        navigation.goBack();
-      } catch (error) {
-        Alert.alert("Error", "No se pudo finalizar la entrega.");
-      } finally {
-        setFinalizando(false);
-        setShowImage(false);
-      }
-    }, 4000);
-  };
 
   if (loading) {
     return (
@@ -241,7 +215,23 @@ const DetalleEntregaPendiente = () => {
                   borderColor: currentTheme.accent,
                 },
               ]}
-              onPress={finalizarEntrega}
+              onPress={async () => {
+                try {
+                  setFinalizando(true);
+                  const url = `${config.API_URL}${config.QR.GENERAR_VISTA}?text=${detalle.id}`;
+                  await axiosInstance.get(url);
+                  console.log("✅ QR generado y abierto en la PC");
+
+                  navigation.navigate("QRScanner", {
+                    entrega_id: detalle.id,
+                  });
+                } catch (error) {
+                  console.error("Error al generar el QR:", error);
+                  Alert.alert("Error", "No se pudo generar el QR");
+                } finally {
+                  setFinalizando(false);
+                }
+              }}
               disabled={finalizando}
               activeOpacity={0.8}
             >
