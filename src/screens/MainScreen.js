@@ -519,7 +519,7 @@ const styles = StyleSheet.create({
     fontWeight: "500",
   },
   section: {
-    marginBottom: 24,
+    marginTop: 16,
   },
   activityContainer: {
     borderRadius: 16,
