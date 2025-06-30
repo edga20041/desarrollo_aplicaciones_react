@@ -97,6 +97,8 @@ const MainScreen = () => {
     setGreeting(getGreeting());
   }, [navigation]);
 
+  const data = [{ type: "entregaSection" }, { type: "historialSection" }];
+
   return (
     <LinearGradient
       colors={
@@ -287,92 +289,69 @@ const MainScreen = () => {
             <View style={styles.mainContent}>
               {showDefaultView && (
                 <FlatList
-                  data={[{ type: "entregaSection" }, { type: "recentActivity" }]}
+                  data={data}
                   renderItem={({ item }) => {
                     if (item.type === "entregaSection") {
                       return (
-                        <View style={styles.section}>
-                          <EntregaEnProgreso 
-                            refresh={refreshEntregas} 
-                            renderHeader={(hasEntregaEnProgreso) => {
-                              if (hasEntregaEnProgreso) {
-                                return (
+                        <EntregaEnProgreso
+                          refresh={refreshEntregas}
+                          renderHeader={(hasEntregaEnProgreso) => {
+                            if (hasEntregaEnProgreso) {
+                              return (
+                                <Text
+                                  style={[
+                                    styles.sectionTitle,
+                                    { color: currentTheme.text },
+                                  ]}
+                                >
+                                  Entrega{" "}
+                                  <Text
+                                    style={{
+                                      color: currentTheme.accent,
+                                      fontWeight: "bold",
+                                    }}
+                                  >
+                                    En Progreso
+                                  </Text>
+                                </Text>
+                              );
+                            } else {
+                              return (
+                                <>
                                   <Text
                                     style={[
                                       styles.sectionTitle,
                                       { color: currentTheme.text },
                                     ]}
                                   >
-                                    Entrega{" "}
+                                    {userArea ? `Entrega` : `Entrega`}{" "}
                                     <Text
                                       style={{
                                         color: currentTheme.accent,
                                         fontWeight: "bold",
                                       }}
                                     >
-                                      En Progreso
+                                      {userArea ? "Recomendada" : "Siguiente"}
+                                    </Text>
+                                    <Text
+                                      style={{
+                                        color: currentTheme.accent,
+                                        fontWeight: "bold",
+                                      }}
+                                    >
+                                      {userArea ? "" : "Entrega"}
                                     </Text>
                                   </Text>
-                                );
-                              } else {
-                                return (
-                                  <>
-                                    <Text
-                                      style={[
-                                        styles.sectionTitle,
-                                        { color: currentTheme.text },
-                                      ]}
-                                    >
-                                      Siguiente{" "}
-                                      <Text
-                                        style={{
-                                          color: currentTheme.accent,
-                                          fontWeight: "bold",
-                                        }}
-                                      >
-                                        Entrega
-                                      </Text>
-                                    </Text>
-                                    <EntregasPendientes
-                                      refresh={refreshEntregas}
-                                      limitItems={1}
-                                    />
-                                    <Pressable
-                                      onPress={() => {
-                                        animatePress();
-                                        setShowDefaultView(false);
-                                        setShowEntregas(true);
-                                        setShowHistorial(false);
-                                      }}
-                                      style={({ pressed }) => [
-                                        styles.viewMoreButton,
-                                        {
-                                          backgroundColor: pressed
-                                            ? currentTheme.accent + "10"
-                                            : "transparent",
-                                        },
-                                      ]}
-                                    >
-                                      <Text
-                                        style={[
-                                          styles.viewMoreText,
-                                          { color: currentTheme.accent },
-                                        ]}
-                                      >
-                                        Ver todas las entregas pendientes
-                                      </Text>
-                                      <Icon
-                                        source="arrow-right-circle"
-                                        size={20}
-                                        color={currentTheme.accent}
-                                      />
-                                    </Pressable>
-                                  </>
-                                );
-                              }
-                            }}
-                          />
-                        </View>
+                                  <EntregasPendientes
+                                    refresh={refreshEntregas}
+                                    limitItems={1}
+                                    userArea={userArea}
+                                  />
+                                </>
+                              );
+                            }
+                          }}
+                        />
                       );
                     } else {
                       return (
@@ -409,7 +388,12 @@ const MainScreen = () => {
                   showsVerticalScrollIndicator={false}
                 />
               )}
-              {showEntregas && <EntregasPendientes refresh={refreshEntregas} />}
+              {showEntregas && (
+                <EntregasPendientes
+                  refresh={refreshEntregas}
+                  userArea={userArea}
+                />
+              )}
               {showHistorial && <HistorialEntregas refresh={refreshEntregas} />}
             </View>
           </View>
