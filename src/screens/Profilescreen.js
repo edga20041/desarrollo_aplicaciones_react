@@ -65,38 +65,74 @@ const ProfileScreen = () => {
     try {
       setUploadingImage(true);
 
-      // Convert URI to Blob
+      // Fetch the image and convert to blob
       const response = await fetch(uri);
-      const blob = await response.blob();
+      if (!response.ok) {
+        throw new Error(`Error fetching image: ${response.status}`);
+      }
 
-      // Generate a unique file name using DNI
-      const fileName = `${perfil.dni}_profile.jpg`;
+      const blob = await response.blob();
+      console.log("Blob size:", blob.size);
+      console.log("Blob type:", blob.type);
+
+      if (blob.size === 0) {
+        throw new Error("Blob is empty");
+      }
+
+      // Convert blob to base64
+      const reader = new FileReader();
+      const base64Promise = new Promise((resolve, reject) => {
+        reader.onload = () => resolve(reader.result);
+        reader.onerror = reject;
+        reader.readAsDataURL(blob);
+      });
+
+      const base64Data = await base64Promise;
+      console.log("Base64 data length:", base64Data.length);
+
+      // Remove data URL prefix (e.g., "data:image/jpeg;base64,")
+      const base64Clean = base64Data.split(",")[1];
+
+      // Convert base64 to Uint8Array
+      const binaryString = atob(base64Clean);
+      const bytes = new Uint8Array(binaryString.length);
+      for (let i = 0; i < binaryString.length; i++) {
+        bytes[i] = binaryString.charCodeAt(i);
+      }
+
+      // Generate file name
+      const timestamp = new Date().getTime();
+      const fileName = `profiles/${perfil.dni}_${timestamp}.jpg`;
+
+      console.log("Intentando subir archivo:", fileName);
 
       // Upload to Supabase Storage
       const { data, error } = await supabase.storage
         .from(BUCKET_NAME)
-        .upload(fileName, blob, {
-          upsert: true,
+        .upload(fileName, bytes, {
           contentType: "image/jpeg",
+          upsert: true,
         });
 
       if (error) {
+        console.error("Error de Supabase:", error);
         throw error;
       }
+
+      console.log("Archivo subido exitosamente:", data);
 
       // Get the public URL
       const {
         data: { publicUrl },
       } = supabase.storage.from(BUCKET_NAME).getPublicUrl(fileName);
 
+      console.log("URL pública generada:", publicUrl);
+
       setProfileImage(publicUrl);
       showMessage("Foto actualizada exitosamente", false);
     } catch (error) {
-      console.error("Error uploading image:", error);
-      showMessage(
-        "Error al subir la imagen. Por favor intente nuevamente.",
-        true
-      );
+      console.error("Error completo:", error);
+      showMessage(`Error al subir la imagen: ${error.message}`, true);
     } finally {
       setUploadingImage(false);
     }
