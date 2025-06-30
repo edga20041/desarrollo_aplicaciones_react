@@ -30,12 +30,16 @@ const config = {
     HISTORIAL: "/entregas/historial",
     GET_BY_ID: "/entregas/{entrega_id}",
     CAMBIAR_ESTADO: "/entregas/cambiar_estado",
+    VERIFICAR_CODIGO: "/entregas/verificar_codigo",
   },
   ESTADOS: {
     GET_BY_ID: "/estados/{estado_id}",
   },
   RUTAS: {
     GET_BY_ID: "/rutas/{ruta_id}",
+  },
+  QR: {
+    GENERAR_VISTA: "/api/qr/view",
   },
 };
 

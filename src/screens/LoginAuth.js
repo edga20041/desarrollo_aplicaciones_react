@@ -112,6 +112,7 @@ const LoginAuth = () => {
 
       const token = response.data.token;
       const name = response.data.name;
+      const userId = response.data.userId;
       if (token) {
         await SecureStore.setItemAsync("token", token);
 
@@ -123,6 +124,9 @@ const LoginAuth = () => {
 
         if (name) {
           await AsyncStorage.setItem("userName", name);
+        }
+        if (userId) {
+          await AsyncStorage.setItem("userId", userId.toString());
         }
         navigation.reset({
           index: 0,
