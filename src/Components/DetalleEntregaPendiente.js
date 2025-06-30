@@ -12,14 +12,13 @@ import {
 } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
 import { useNavigation, useRoute } from "@react-navigation/native";
-import axiosInstance from '../axiosInstance';
+import axiosInstance from "../axiosInstance";
 import config from "../config/config";
 import { LinearGradient } from "expo-linear-gradient";
 import { useTheme } from "../context/ThemeContext";
 import { theme } from "../styles/theme";
 import { Icon } from "react-native-paper";
 import { formatDate } from "../utils/dateFormatter";
-
 
 const DetalleEntregaPendiente = () => {
   const navigation = useNavigation();
@@ -50,7 +49,6 @@ const DetalleEntregaPendiente = () => {
     fetchDetalle();
   }, [entrega_id]);
 
-  
   if (loading) {
     return (
       <LinearGradient
@@ -202,6 +200,12 @@ const DetalleEntregaPendiente = () => {
                   {formatDate(detalle.fechaCreacion)}
                 </Text>
               </Text>
+              <Text style={[styles.label, { color: currentTheme.cardText }]}>
+                Zona:{" "}
+                <Text style={[styles.value, { color: currentTheme.cardText }]}>
+                  {detalle.area || "CABA"}
+                </Text>
+              </Text>
             </View>
             <Pressable
               style={[
@@ -211,20 +215,23 @@ const DetalleEntregaPendiente = () => {
                   borderColor: currentTheme.accent,
                 },
               ]}
-             onPress={async () => {
-              try {
-                const url = `${config.API_URL}${config.QR.GENERAR_VISTA}?text=${detalle.id}`;
-                await axiosInstance.get(url);
-                console.log("✅ QR generado y abierto en la PC");
+              onPress={async () => {
+                try {
+                  setFinalizando(true);
+                  const url = `${config.API_URL}${config.QR.GENERAR_VISTA}?text=${detalle.id}`;
+                  await axiosInstance.get(url);
+                  console.log("✅ QR generado y abierto en la PC");
 
-                navigation.navigate("QRScanner", {
-                  entrega_id: detalle.id
-                });
-              } catch (error) {
-                console.error("Error al generar el QR:", error);
-                Alert.alert("Error", "No se pudo generar el QR");
-              }
-            }}
+                  navigation.navigate("QRScanner", {
+                    entrega_id: detalle.id,
+                  });
+                } catch (error) {
+                  console.error("Error al generar el QR:", error);
+                  Alert.alert("Error", "No se pudo generar el QR");
+                } finally {
+                  setFinalizando(false);
+                }
+              }}
               disabled={finalizando}
               activeOpacity={0.8}
             >
