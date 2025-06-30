@@ -38,17 +38,22 @@ instance.interceptors.response.use(
         
         if (error.response && [401, 403].includes(error.response.status) && !originalRequest._retry) {
             originalRequest._retry = true; 
+
             
             console.log('🚫 Token expirado o no autorizado. Limpiando datos...');
+
             await SecureStore.deleteItemAsync('token'); 
             await AsyncStorage.removeItem('userName'); 
-            
-            console.error('Token expirado o no autorizado. Redirigir a la pantalla de login.');
+
+            const currentRoute = navigationRef.getCurrentRoute && navigationRef.getCurrentRoute();
+            if (currentRoute && currentRoute.name === 'Login') {
+                return Promise.reject(error);
+            }
 
             if (navigationRef.isReady()) {
                 navigationRef.reset({
-                index: 0,
-                routes: [{ name: 'Login' }],
+                    index: 0,
+                    routes: [{ name: 'Login' }],
                 });
             }
         }
@@ -56,4 +61,4 @@ instance.interceptors.response.use(
     }
 );
 
-export default instance; 
+export default instance;

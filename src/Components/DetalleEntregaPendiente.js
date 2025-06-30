@@ -12,14 +12,13 @@ import {
 } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
 import { useNavigation, useRoute } from "@react-navigation/native";
-import axiosInstance from '../axiosInstance';
+import axiosInstance from "../axiosInstance";
 import config from "../config/config";
 import { LinearGradient } from "expo-linear-gradient";
 import { useTheme } from "../context/ThemeContext";
 import { theme } from "../styles/theme";
 import { Icon } from "react-native-paper";
 import { formatDate } from "../utils/dateFormatter";
-
 
 const DetalleEntregaPendiente = () => {
   const navigation = useNavigation();
@@ -50,7 +49,6 @@ const DetalleEntregaPendiente = () => {
     fetchDetalle();
   }, [entrega_id]);
 
-  
   if (loading) {
     return (
       <LinearGradient
@@ -202,6 +200,12 @@ const DetalleEntregaPendiente = () => {
                   {formatDate(detalle.fechaCreacion)}
                 </Text>
               </Text>
+              <Text style={[styles.label, { color: currentTheme.cardText }]}>
+                Zona:{" "}
+                <Text style={[styles.value, { color: currentTheme.cardText }]}>
+                  {detalle.area || "CABA"}
+                </Text>
+              </Text>
             </View>
             <Pressable
               style={[
@@ -211,28 +215,32 @@ const DetalleEntregaPendiente = () => {
                   borderColor: currentTheme.accent,
                 },
               ]}
-             onPress={async () => {
-              try {
-                const entregasEnProgresoUrl = `${config.API_URL}${config.ENTREGAS.EN_PROGRESO}`;
-                const response = await axiosInstance.get(entregasEnProgresoUrl);
-                if (response.data) {
-                  Alert.alert(
-                    'Entrega en curso',
-                    'No puedes escanear otra entrega. Debes finalizar la entrega en curso primero.'
-                  );
-                  return;
+              onPress={async () => {
+                try {
+                  setFinalizando(true);
+                  const entregasEnProgresoUrl = `${config.API_URL}${config.ENTREGAS.EN_PROGRESO}`;
+                  const response = await axiosInstance.get(entregasEnProgresoUrl);
+                  if (response.data) {
+                    Alert.alert(
+                      'Entrega en curso',
+                      'No puedes escanear otra entrega. Debes finalizar la entrega en curso primero.'
+                    );
+                    setFinalizando(false);
+                    return;
+                  }
+                  const url = `${config.API_URL}${config.QR.GENERAR_VISTA}?text=${detalle.id}`;
+                  await axiosInstance.get(url);
+                  console.log("✅ QR generado y abierto en la PC");
+                  navigation.navigate("QRScanner", {
+                    entrega_id: detalle.id
+                  });
+                } catch (error) {
+                  console.error("Error al generar el QR o validar entregas en curso:", error);
+                  Alert.alert("Error", "No se pudo generar el QR o validar entregas en curso");
+                } finally {
+                  setFinalizando(false);
                 }
-                const url = `${config.API_URL}${config.QR.GENERAR_VISTA}?text=${detalle.id}`;
-                await axiosInstance.get(url);
-                console.log("✅ QR generado y abierto en la PC");
-                navigation.navigate("QRScanner", {
-                  entrega_id: detalle.id
-                });
-              } catch (error) {
-                console.error("Error al generar el QR o validar entregas en curso:", error);
-                Alert.alert("Error", "No se pudo generar el QR o validar entregas en curso");
-              }
-            }}
+              }}
               disabled={finalizando}
               activeOpacity={0.8}
             >

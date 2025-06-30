@@ -303,6 +303,12 @@ const DetalleEntregaHistorial = () => {
                   {formatDate(detalleEntrega.fechaFinalizacion)}
                 </Text>
               </Text>
+              <Text style={[styles.label, { color: currentTheme.cardText }]}>
+                Zona:{" "}
+                <Text style={[styles.value, { color: currentTheme.cardText }]}>
+                  {detalleEntrega.area || "CABA"}
+                </Text>
+              </Text>
             </View>
             <Text style={[styles.mapTitle, { color: currentTheme.accent }]}>
               Ubicación de la Ruta

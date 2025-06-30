@@ -1,6 +1,7 @@
 import { Platform } from "react-native";
 
 // Cambia esta IP por la IP local del backend (de quien lo esté corriendo)
+
 const LOCAL_IP = "192.168.0.186";
 const API_PORT = "8081";
 
@@ -23,6 +24,7 @@ const config = {
     VERIFY_CODE: "/auth/validate-recovery-code",
     RESEND_CODE_RECOVERY: "/auth/resend-recovery-code",
     PROFILE: "/auth/user/me",
+    CHANGE_AREA: "/auth/cambiar-area",
   },
   ENTREGAS: {
     PENDIENTES: "/entregas/pendientes",
@@ -39,8 +41,8 @@ const config = {
     GET_BY_ID: "/rutas/{ruta_id}",
   },
   QR: {
-  GENERAR_VISTA: "/api/qr/view",
-},
+    GENERAR_VISTA: "/api/qr/view",
+  },
 };
 
 export default config;

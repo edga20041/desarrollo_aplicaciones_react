@@ -2,7 +2,6 @@ import React, { useState, useEffect, useRef } from "react";
 import {
   View,
   Text,
-  TextInput,
   Pressable,
   StyleSheet,
   ActivityIndicator,
@@ -11,7 +10,6 @@ import {
   ScrollView,
   Keyboard,
   Platform,
-  Dimensions,
   TouchableOpacity,
 } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
@@ -32,6 +30,12 @@ import { useTheme } from "../context/ThemeContext";
 import { theme } from "../styles/theme";
 import MaterialCommunityIcons from "react-native-vector-icons/MaterialCommunityIcons";
 
+import {
+  configureNotifications,
+  requestNotificationPermissions,
+  startPeriodicNotifications,
+} from "../service/NotificationService";
+
 const LoginAuth = () => {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
@@ -43,8 +47,8 @@ const LoginAuth = () => {
   const scrollViewRef = useRef(null);
   const { isDarkMode } = useTheme();
   const currentTheme = theme[isDarkMode ? "dark" : "light"];
-
   const navigation = useNavigation();
+
   const [fontsLoaded] = useFonts({
     Montserrat_400Regular,
     Montserrat_600SemiBold,
@@ -56,8 +60,9 @@ const LoginAuth = () => {
     setIsModalVisible(true);
   };
 
+  // Si ya hay token, vamos directamente a Main
   useEffect(() => {
-    const checkToken = async () => {
+    (async () => {
       const savedToken = await SecureStore.getItemAsync("token");
       if (savedToken) {
         navigation.reset({
@@ -65,24 +70,20 @@ const LoginAuth = () => {
           routes: [{ name: "Main" }],
         });
       }
-    };
-    checkToken();
+    })();
   }, [navigation]);
 
+  // Ajuste de scroll cuando aparece el teclado
   useEffect(() => {
-    const keyboardWillShow = Keyboard.addListener(
-      Platform.OS === "ios" ? "keyboardWillShow" : "keyboardDidShow",
-      (e) => {
-        setKeyboardHeight(e.endCoordinates.height);
-      }
-    );
+    const show = Platform.OS === "ios" ? "keyboardWillShow" : "keyboardDidShow";
+    const hide = Platform.OS === "ios" ? "keyboardWillHide" : "keyboardDidHide";
 
-    const keyboardWillHide = Keyboard.addListener(
-      Platform.OS === "ios" ? "keyboardWillHide" : "keyboardDidHide",
-      () => {
-        setKeyboardHeight(0);
-      }
-    );
+    const keyboardWillShow = Keyboard.addListener(show, e => {
+      setKeyboardHeight(e.endCoordinates.height);
+    });
+    const keyboardWillHide = Keyboard.addListener(hide, () => {
+      setKeyboardHeight(0);
+    });
 
     return () => {
       keyboardWillShow.remove();
@@ -90,16 +91,13 @@ const LoginAuth = () => {
     };
   }, []);
 
-  const isValidEmail = (email) => {
-    return /\S+@\S+\.\S+/.test(email);
-  };
+  const isValidEmail = email => /\S+@\S+\.\S+/.test(email);
 
   const handleLogin = async () => {
     if (!email || !password) {
       showMessage("Por favor, completa todos los campos.", true);
       return;
     }
-
     if (!isValidEmail(email)) {
       showMessage("Por favor, introduce un email válido.", true);
       return;
@@ -109,10 +107,7 @@ const LoginAuth = () => {
     try {
       const response = await axios.post(
         `${config.API_URL}${config.AUTH.LOGIN}`,
-        {
-          email,
-          password,
-        }
+        { email, password }
       );
 
       const token = response.data.token;
@@ -120,6 +115,13 @@ const LoginAuth = () => {
       const userId = response.data.userId;
       if (token) {
         await SecureStore.setItemAsync("token", token);
+
+        await configureNotifications();
+        const granted = await requestNotificationPermissions();
+        if (granted) {
+          startPeriodicNotifications(3); // polling cada 3 minuto
+        }
+
         if (name) {
           await AsyncStorage.setItem("userName", name);
         }
@@ -134,10 +136,27 @@ const LoginAuth = () => {
         showMessage("Token no recibido del servidor.", true);
       }
     } catch (error) {
-      console.error("Error de login:", error.response?.data || error.message);
-      const errorMessage =
-        error.response?.data?.message ||
-        "Credenciales incorrectas o problema de conexión.";
+      let errorMessage = "Ocurrió un error. Intenta nuevamente.";
+      if (error.response) {
+        const status = error.response.status;
+        if (error.response.data?.message) {
+          errorMessage = error.response.data.message;
+        } else if (status === 400) {
+          errorMessage = "Solicitud inválida. Verifica los datos ingresados.";
+        } else if (status === 401) {
+          errorMessage = "Credenciales incorrectas. Verifica tus datos.";
+        } else if (status === 403) {
+          errorMessage = "No tienes permisos para acceder.";
+        } else if (status === 404) {
+          errorMessage = "Usuario no encontrado.";
+        } else if (status >= 500) {
+          errorMessage = "Error del servidor. Intenta más tarde.";
+        }
+      } else if (error.request) {
+        errorMessage = "Sin respuesta del servidor. Revisa tu conexión.";
+      } else {
+        errorMessage = error.message;
+      }
       showMessage(errorMessage, true);
     } finally {
       setLoading(false);
@@ -146,12 +165,11 @@ const LoginAuth = () => {
 
   const handleInputFocus = () => {
     if (scrollViewRef.current) {
-      setTimeout(() => {
-        scrollViewRef.current.scrollTo({
-          y: 200,
-          animated: true,
-        });
-      }, 100);
+      setTimeout(
+        () =>
+          scrollViewRef.current.scrollTo({ y: 200, animated: true }),
+        100
+      );
     }
   };
 
@@ -208,12 +226,10 @@ const LoginAuth = () => {
               color={currentTheme.accent}
             />
           </View>
-          <Text style={[styles.title, { color: currentTheme.accent }]}>
+          <Text style={[styles.title, { color: currentTheme.accent, textAlign: "center" }]}>
             Iniciar Sesión
           </Text>
-          <View
-            style={[styles.formContainer, { backgroundColor: "transparent" }]}
-          >
+          <View style={[styles.formContainer]}>
             <Input
               label="Correo electrónico"
               placeholder="Correo electrónico"
@@ -263,7 +279,7 @@ const LoginAuth = () => {
               }}
               rightIcon={
                 <TouchableOpacity
-                  onPress={() => setShowPassword((prev) => !prev)}
+                  onPress={() => setShowPassword(prev => !prev)}
                 >
                   <MaterialCommunityIcons
                     name={showPassword ? "eye-off-outline" : "eye-outline"}
@@ -296,18 +312,14 @@ const LoginAuth = () => {
               </Pressable>
             )}
           </View>
-
           <View style={styles.links}>
             <Pressable onPress={() => navigation.navigate("RecoverPassword")}>
               <Text style={[styles.link, { color: currentTheme.accent }]}>
                 ¿Olvidaste tu contraseña?
               </Text>
             </Pressable>
-
             <Pressable
-              onPress={() =>
-                navigation.navigate("Register", { screen: "Register" })
-              }
+              onPress={() => navigation.navigate("Register", { screen: "Register" })}
             >
               <Text style={[styles.link, { color: currentTheme.accent }]}>
                 ¿No tienes cuenta? Regístrate
@@ -315,10 +327,9 @@ const LoginAuth = () => {
             </Pressable>
           </View>
         </ScrollView>
-
         <Modal
           animationType="fade"
-          transparent={true}
+          transparent
           visible={isModalVisible}
           onRequestClose={() => setIsModalVisible(false)}
         >
@@ -331,14 +342,12 @@ const LoginAuth = () => {
                 styles.modalContent,
                 { backgroundColor: currentTheme.cardBg },
               ]}
-              onStartShouldSetResponder={() => true}
-              onTouchEnd={(e) => e.stopPropagation()}
             >
               <Text
                 style={[
                   styles.modalText,
                   message?.isError
-                    ? styles.modalErrorText
+                    ? { color: isDarkMode ? "#ff6b6b" : "#721c24" }
                     : styles.modalSuccessText,
                 ]}
               >
@@ -367,60 +376,23 @@ const LoginAuth = () => {
 };
 
 const styles = StyleSheet.create({
-  gradient: {
-    flex: 1,
-  },
-  container: {
-    flex: 1,
-    padding: 20,
-    justifyContent: "center",
-  },
-  logoContainer: {
-    alignItems: "center",
-    marginBottom: 5,
-  },
+  gradient: { flex: 1 },
+  container: { flex: 1, padding: 20, justifyContent: "center" },
+  logoContainer: { alignItems: "center", marginBottom: 5 },
   formContainer: {
     borderRadius: 15,
     padding: 20,
     marginBottom: 20,
     width: "95%",
     alignSelf: "center",
+    backgroundColor: "transparent",
   },
-  loadingContainer: {
-    flex: 1,
-    justifyContent: "center",
-    alignItems: "center",
-  },
-  loadingText: {
-    fontSize: 16,
-    marginTop: 10,
-    fontFamily: "Montserrat_400Regular",
-  },
-  loadingSpinner: {
-    marginTop: 20,
-  },
-  title: {
-    fontSize: 28,
-    marginBottom: 20,
-    textAlign: "center",
-    fontFamily: "Montserrat_600SemiBold",
-  },
-  input: {
-    marginBottom: 15,
-  },
+  input: { marginBottom: 15 },
   label: {
     fontSize: 15,
     marginBottom: 6,
     fontFamily: "Montserrat_400Regular",
     marginLeft: "2.5%",
-  },
-  inputField: {
-    borderWidth: 1,
-    borderRadius: 8,
-    paddingVertical: 12,
-    paddingHorizontal: 15,
-    fontSize: 15,
-    fontFamily: "Montserrat_400Regular",
   },
   loginButton: {
     borderRadius: 10,
@@ -432,22 +404,18 @@ const styles = StyleSheet.create({
     elevation: 5,
     marginTop: 5,
   },
-  buttonGradient: {
-    paddingVertical: 14,
-    alignItems: "center",
-  },
+  buttonGradient: { paddingVertical: 14, alignItems: "center" },
   loginButtonText: {
     color: "white",
     fontSize: 18,
     fontFamily: "Montserrat_600SemiBold",
   },
-  links: {
-    marginTop: -10,
-    alignItems: "center",
-  },
-  link: {
-    marginTop: 8,
-    fontSize: 15,
+  links: { marginTop: -10, alignItems: "center" },
+  link: { marginTop: 8, fontSize: 15, fontFamily: "Montserrat_400Regular" },
+  loadingSpinner: { marginTop: 20 },
+  loadingText: {
+    fontSize: 16,
+    marginTop: 10,
     fontFamily: "Montserrat_400Regular",
   },
   modalOverlay: {
@@ -462,10 +430,7 @@ const styles = StyleSheet.create({
     borderRadius: 15,
     alignItems: "center",
     shadowColor: "#000",
-    shadowOffset: {
-      width: 0,
-      height: 2,
-    },
+    shadowOffset: { width: 0, height: 2 },
     shadowOpacity: 0.25,
     shadowRadius: 3.84,
     elevation: 5,
@@ -476,30 +441,15 @@ const styles = StyleSheet.create({
     marginBottom: 20,
     fontFamily: "Montserrat_400Regular",
   },
-  modalErrorText: {
-    color: "#721c24",
-  },
-  modalSuccessText: {
-    color: "#155724",
-  },
-  modalButton: {
-    borderRadius: 8,
-    overflow: "hidden",
-    width: "100%",
-  },
-  modalButtonGradient: {
-    paddingVertical: 12,
-    alignItems: "center",
-  },
+  modalSuccessText: { color: "#155724" },
+  modalButton: { borderRadius: 8, overflow: "hidden", width: "100%" },
+  modalButtonGradient: { paddingVertical: 12, alignItems: "center" },
   modalButtonText: {
     color: "white",
     fontSize: 16,
     fontFamily: "Montserrat_600SemiBold",
   },
-  scrollContainer: {
-    flexGrow: 1,
-    justifyContent: "center",
-  },
+  scrollContainer: { flexGrow: 1, justifyContent: "center" },
 });
 
 export default LoginAuth;

@@ -11,6 +11,7 @@ import {
   Keyboard,
   Platform,
   Dimensions,
+  Modal,
 } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
 import axios from "axios";
@@ -32,6 +33,8 @@ const RecoverPasswordScreen = ({ navigation }) => {
   const [email, setEmail] = useState("");
   const [loading, setLoading] = useState(false);
   const [keyboardHeight, setKeyboardHeight] = useState(0);
+  const [isModalVisible, setIsModalVisible] = useState(false);
+  const [modalMessage, setModalMessage] = useState("");
   const scrollViewRef = useRef(null);
   const windowHeight = Dimensions.get("window").height;
 
@@ -87,10 +90,8 @@ const RecoverPasswordScreen = ({ navigation }) => {
 
   const handleRecoverPassword = async () => {
     if (!email) {
-      ToastAndroid.show(
-        "Por favor, ingresa tu correo electrónico.",
-        ToastAndroid.SHORT
-      );
+      setModalMessage("Por favor, ingresa tu correo electrónico.");
+      setIsModalVisible(true);
       return;
     }
 
@@ -105,11 +106,18 @@ const RecoverPasswordScreen = ({ navigation }) => {
       );
       navigation.navigate("VerifyCodePassword", { email });
     } catch (error) {
-      console.error(error);
-      ToastAndroid.show(
-        "No se pudo enviar el correo. Verifica el email.",
-        ToastAndroid.SHORT
-      );
+      let errorMessage = "No se pudo enviar el correo. Verifica el email.";
+      if (error.response) {
+        if (error.response.status === 404) {
+          errorMessage = "No se pudo enviar el correo. Verifica el email.";
+        } else if (error.response.status === 500) {
+          errorMessage = "Error del servidor. Intenta más tarde.";
+        }
+      } else if (error.message) {
+        errorMessage = error.message;
+      }
+      setModalMessage(errorMessage);
+      setIsModalVisible(true);
     } finally {
       setLoading(false);
     }
@@ -208,6 +216,44 @@ const RecoverPasswordScreen = ({ navigation }) => {
                 </Pressable>
               )}
             </View>
+
+            {/* Modal solo para errores */}
+            <Modal
+              animationType="fade"
+              transparent={true}
+              visible={isModalVisible}
+              onRequestClose={() => setIsModalVisible(false)}
+            >
+              <Pressable
+                style={styles.modalOverlay}
+                onPress={() => setIsModalVisible(false)}
+              >
+                <View
+                  style={[
+                    styles.modalContent,
+                    { backgroundColor: currentTheme.cardBg },
+                  ]}
+                  onStartShouldSetResponder={() => true}
+                  onTouchEnd={(e) => e.stopPropagation()}
+                >
+                  <Text style={[styles.modalText, { color: isDarkMode ? '#ff6b6b' : '#721c24' }]}>{modalMessage}</Text>
+                  <Pressable
+                    onPress={() => setIsModalVisible(false)}
+                    style={({ pressed }) => [
+                      styles.modalButton,
+                      pressed && { opacity: 0.8 },
+                    ]}
+                  >
+                    <LinearGradient
+                      colors={["#F27121", "#E94057"]}
+                      style={styles.modalButtonGradient}
+                    >
+                      <Text style={styles.modalButtonText}>Cerrar</Text>
+                    </LinearGradient>
+                  </Pressable>
+                </View>
+              </Pressable>
+            </Modal>
 
             <View style={styles.buttonContainer}>
               <Pressable
@@ -313,5 +359,42 @@ const styles = StyleSheet.create({
     fontSize: 16,
     fontFamily: "Montserrat_400Regular",
     textAlign: "center",
+  },
+  modalOverlay: {
+    flex: 1,
+    justifyContent: "center",
+    alignItems: "center",
+    backgroundColor: "rgba(0, 0, 0, 0.7)",
+  },
+  modalContent: {
+    width: "80%",
+    borderRadius: 10,
+    padding: 20,
+    alignItems: "center",
+    shadowColor: "#000",
+    shadowOffset: { width: 0, height: 2 },
+    shadowOpacity: 0.25,
+    shadowRadius: 3.84,
+    elevation: 5,
+  },
+  modalText: {
+    fontSize: 16,
+    fontFamily: "Montserrat_400Regular",
+    marginBottom: 20,
+    textAlign: "center",
+  },
+  modalButton: {
+    width: "100%",
+    borderRadius: 10,
+    overflow: "hidden",
+  },
+  modalButtonGradient: {
+    paddingVertical: 12,
+    alignItems: "center",
+  },
+  modalButtonText: {
+    color: "white",
+    fontSize: 16,
+    fontFamily: "Montserrat_600SemiBold",
   },
 });
