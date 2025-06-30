@@ -29,6 +29,7 @@ import * as ImagePicker from "expo-image-picker";
 import { SharedElement } from "react-navigation-shared-element";
 import { stopPeriodicNotifications } from "../service/NotificationService";
 import { useUserArea } from "../context/UserAreaContext";
+import supabase, { BUCKET_NAME } from "../config/supabase";
 
 const ProfileScreen = () => {
   const [perfil, setPerfil] = useState(null);
@@ -42,6 +43,7 @@ const ProfileScreen = () => {
   const { updateUserArea } = useUserArea();
   const currentTheme = theme[isDarkMode ? "dark" : "light"];
   const [profileImage, setProfileImage] = useState(null);
+  const [uploadingImage, setUploadingImage] = useState(false);
   const [scrollY] = useState(new Animated.Value(0));
   const navigation = useNavigation();
 
@@ -59,6 +61,65 @@ const ProfileScreen = () => {
     extrapolate: "clamp",
   });
 
+  const uploadImageToSupabase = async (uri) => {
+    try {
+      setUploadingImage(true);
+
+      // Convert URI to Blob
+      const response = await fetch(uri);
+      const blob = await response.blob();
+
+      // Generate a unique file name using DNI
+      const fileName = `${perfil.dni}_profile.jpg`;
+
+      // Upload to Supabase Storage
+      const { data, error } = await supabase.storage
+        .from(BUCKET_NAME)
+        .upload(fileName, blob, {
+          upsert: true,
+          contentType: "image/jpeg",
+        });
+
+      if (error) {
+        throw error;
+      }
+
+      // Get the public URL
+      const {
+        data: { publicUrl },
+      } = supabase.storage.from(BUCKET_NAME).getPublicUrl(fileName);
+
+      setProfileImage(publicUrl);
+      showMessage("Foto actualizada exitosamente", false);
+    } catch (error) {
+      console.error("Error uploading image:", error);
+      showMessage(
+        "Error al subir la imagen. Por favor intente nuevamente.",
+        true
+      );
+    } finally {
+      setUploadingImage(false);
+    }
+  };
+
+  const fetchProfilePhoto = async (dni) => {
+    try {
+      const fileName = `${dni}_profile.jpg`;
+      const {
+        data: { publicUrl },
+      } = supabase.storage.from(BUCKET_NAME).getPublicUrl(fileName);
+
+      // Check if the image exists by trying to load it
+      const response = await fetch(publicUrl);
+      if (response.ok) {
+        setProfileImage(publicUrl);
+      }
+    } catch (error) {
+      console.error("Error fetching profile photo:", error);
+      // If there's an error or no photo exists, we'll use the default avatar
+    }
+  };
+
   const pickImage = async () => {
     const result = await ImagePicker.launchImageLibraryAsync({
       mediaTypes: ImagePicker.MediaTypeOptions.Images,
@@ -68,7 +129,7 @@ const ProfileScreen = () => {
     });
 
     if (!result.canceled) {
-      setProfileImage(result.assets[0].uri);
+      uploadImageToSupabase(result.assets[0].uri);
     }
   };
 
@@ -113,6 +174,10 @@ const ProfileScreen = () => {
 
         if (response.data) {
           setPerfil(response.data);
+          // Fetch profile photo once we have the DNI
+          if (response.data.dni) {
+            fetchProfilePhoto(response.data.dni);
+          }
         } else {
           showMessage(
             "Respuesta vacía del servidor al cargar el perfil.",
@@ -175,17 +240,27 @@ const ProfileScreen = () => {
         colors={isDarkMode ? ["#1A1A2E", "#16213E"] : ["#F27121", "#E94057"]}
         style={styles.headerGradient}
       >
-        <Pressable onPress={pickImage}>
+        <Pressable onPress={pickImage} disabled={uploadingImage}>
           <Animated.View
             style={[
               styles.profileImageContainer,
               { height: imageSize, width: imageSize },
             ]}
           >
-            <Image
-              source={require("../../assets/avatar.png")}
-              style={styles.profileImage}
-            />
+            {uploadingImage ? (
+              <View style={styles.loadingContainer}>
+                <ActivityIndicator size="large" color="#fff" />
+              </View>
+            ) : (
+              <Image
+                source={
+                  profileImage
+                    ? { uri: profileImage }
+                    : require("../../assets/avatar.png")
+                }
+                style={styles.profileImage}
+              />
+            )}
             <View style={styles.editImageButton}>
               <Icon source="camera" size={16} color="#fff" />
             </View>
@@ -646,6 +721,12 @@ const styles = StyleSheet.create({
     width: "100%",
     marginTop: 20,
     gap: 12,
+  },
+  loadingContainer: {
+    flex: 1,
+    justifyContent: "center",
+    alignItems: "center",
+    backgroundColor: "rgba(0,0,0,0.3)",
   },
 });
 
