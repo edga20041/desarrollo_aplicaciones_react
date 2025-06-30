@@ -4,7 +4,7 @@ import { CameraView, useCameraPermissions } from 'expo-camera';
 import { Button, ActivityIndicator, Surface } from 'react-native-paper';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import AsyncStorage from '@react-native-async-storage/async-storage';
-import axios from 'axios';
+import axiosInstance from '../axiosInstance';
 import { useRef } from 'react';
 import config from '../config/config';
 
@@ -34,7 +34,7 @@ const QRScanner = ({ navigation}) => {
       const repartidorId = repartidorIdStr ? parseInt(repartidorIdStr) : null;
       
       const entregasEnProgresoUrl = config.API_URL + config.ENTREGAS.EN_PROGRESO;
-      const entregasResponse = await axios.get(entregasEnProgresoUrl);
+      const entregasResponse = await axiosInstance.get(entregasEnProgresoUrl);
       
       if (entregasResponse.data) {
         Alert.alert(
@@ -59,7 +59,7 @@ const QRScanner = ({ navigation}) => {
         estadoId: 2,
         repartidorId
       };
-      const response = await axios.patch(url, body);
+      const response = await axiosInstance.patch(url, body);
       Alert.alert(
         'Código QR escaneado',
         `ID: ${entregaId}\n\nEstado actualizado: En Progreso`,
