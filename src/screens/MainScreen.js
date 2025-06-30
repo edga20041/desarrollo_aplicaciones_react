@@ -16,8 +16,11 @@ import EntregasPendientes from "../Components/EntregasPendientes";
 import HistorialEntregas from "../Components/HistorialEntregas";
 import * as SecureStore from "expo-secure-store";
 import { useTheme } from "../context/ThemeContext";
+import { useUserArea } from "../context/UserAreaContext";
 import { theme } from "../styles/theme";
 import { Icon } from "react-native-paper";
+import axios from "../axiosInstance";
+import config from "../config/config";
 
 const MainScreen = () => {
   const navigation = useNavigation();
@@ -26,9 +29,10 @@ const MainScreen = () => {
   const [showDefaultView, setShowDefaultView] = useState(true);
   const [showEntregas, setShowEntregas] = useState(false);
   const [showHistorial, setShowHistorial] = useState(false);
-  const [refreshEntregas, setRefreshEntregas] = useState(false);
+  const [refreshEntregas, setRefreshEntregas] = useState(0);
   const [scaleAnim] = useState(new Animated.Value(1));
   const { isDarkMode } = useTheme();
+  const { userArea } = useUserArea();
   const currentTheme = theme[isDarkMode ? "dark" : "light"];
 
   const animatePress = () => {
@@ -48,7 +52,7 @@ const MainScreen = () => {
 
   useFocusEffect(
     React.useCallback(() => {
-      setRefreshEntregas((prev) => !prev);
+      setRefreshEntregas((prev) => prev + 1);
     }, [])
   );
 
@@ -61,11 +65,23 @@ const MainScreen = () => {
     };
     checkAuthentication();
 
-    const fetchUserName = async () => {
-      const name = await AsyncStorage.getItem("userName");
-      setUserName(name || "Usuario");
+    const fetchUserProfile = async () => {
+      try {
+        const response = await axios.get(config.AUTH.PROFILE);
+        if (response.data) {
+          setUserName(response.data.name || "Usuario");
+          await AsyncStorage.setItem(
+            "userName",
+            response.data.name || "Usuario"
+          );
+        }
+      } catch (error) {
+        console.error("Error fetching user profile:", error);
+        const name = await AsyncStorage.getItem("userName");
+        setUserName(name || "Usuario");
+      }
     };
-    fetchUserName();
+    fetchUserProfile();
 
     const getGreeting = () => {
       const now = new Date();
@@ -281,19 +297,20 @@ const MainScreen = () => {
                               { color: currentTheme.text },
                             ]}
                           >
-                            Siguiente{" "}
+                            Entrega{" "}
                             <Text
                               style={{
                                 color: currentTheme.accent,
                                 fontWeight: "bold",
                               }}
                             >
-                              Entrega
+                              Recomendada
                             </Text>
                           </Text>
                           <EntregasPendientes
                             refresh={refreshEntregas}
                             limitItems={1}
+                            userArea={userArea}
                           />
                           <Pressable
                             onPress={() => {

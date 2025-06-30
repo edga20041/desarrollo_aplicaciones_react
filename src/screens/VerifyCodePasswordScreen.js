@@ -105,7 +105,6 @@ const VerifyCodePasswordScreen = ({ navigation, route }) => {
                 showMessage("Código inválido. Intenta de nuevo.", true);
             }
         } catch (error) {
-            console.error(error);
             const errorMessage = error.response?.data?.message || 'Error de conexión. Intenta de nuevo.';
             showMessage(errorMessage, true);
         } finally {
