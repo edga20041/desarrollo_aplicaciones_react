@@ -54,7 +54,7 @@ const EntregaEnProgreso = ({ refresh, renderHeader }) => {
       const response = await axiosInstance.get(config.ENTREGAS.EN_PROGRESO);
       setEntrega(response.data);
 
-      // Si hay entrega, busca la ruta
+      
       if (response.data && response.data.rutaId) {
         const rutaUrl = config.API_URL + config.RUTAS.GET_BY_ID.replace("{ruta_id}", response.data.rutaId);
         const rutaRes = await axiosInstance.get(rutaUrl);
