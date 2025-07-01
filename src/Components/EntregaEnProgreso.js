@@ -211,6 +211,7 @@ const EntregaEnProgreso = ({ refresh, renderHeader }) => {
             style={[
               styles.actionButton,
               { backgroundColor: "#4CAF50" },
+              enviandoEmail && { opacity: 0.6 }
             ]}
             onPress={handleFinalizarEntrega}
             disabled={enviandoEmail}
@@ -221,7 +222,12 @@ const EntregaEnProgreso = ({ refresh, renderHeader }) => {
               color="#fff"
               style={styles.actionIcon}
             />
-            <Text style={styles.actionText}> Finalizar</Text>
+            {enviandoEmail ? (
+              <ActivityIndicator size="small" color="#fff" style={{ marginLeft: 8 }} />
+            ) : null}
+            <Text style={styles.actionText}>
+              {enviandoEmail ? 'Enviando...' : 'Finalizar'}
+            </Text>
           </Pressable>
         </View>
       </View>
