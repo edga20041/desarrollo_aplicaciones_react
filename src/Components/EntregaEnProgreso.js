@@ -199,7 +199,7 @@ const EntregaEnProgreso = ({ refresh, renderHeader }) => {
               color="#fff"
               style={styles.actionIcon}
             />
-            <Text style={styles.actionText}> Completado</Text>
+            <Text style={styles.actionText}> Finalizar</Text>
           </Pressable>
         </View>
       </View>
