@@ -28,7 +28,7 @@ const VerificarCodigoFinalizacion = () => {
   const navigation = useNavigation();
   const route = useRoute();
   const { entrega_id, repartidor_id, cliente, producto } = route.params;
-  
+
   const { isDarkMode } = useTheme();
   const currentTheme = theme[isDarkMode ? "dark" : "light"];
   const [code, setCode] = useState(["", "", "", "", "", ""]);
@@ -124,9 +124,9 @@ const VerificarCodigoFinalizacion = () => {
         requestData,
         {
           headers: {
-            'Authorization': `Bearer ${await SecureStore.getItemAsync('token')}`,
-            'Content-Type': 'application/json',
-          }
+            Authorization: `Bearer ${await SecureStore.getItemAsync("token")}`,
+            "Content-Type": "application/json",
+          },
         }
       );
 
@@ -141,12 +141,17 @@ const VerificarCodigoFinalizacion = () => {
           "¡Entrega Finalizada! La entrega ha sido completada exitosamente.",
           false
         );
-        setTimeout(() => {
+        const timer = setTimeout(() => {
+          setIsModalVisible(false);
           navigation.navigate("Main");
-        }, 1500);
+        }, 2000);
+        return () => clearTimeout(timer);
       } else {
         console.log("Error en la finalización:", response.data.message);
-        showMessage(response.data.message || "Error al finalizar la entrega", true);
+        showMessage(
+          response.data.message || "Error al finalizar la entrega",
+          true
+        );
       }
     } catch (err) {
       console.error("Error detallado en la finalización:", {
@@ -154,9 +159,12 @@ const VerificarCodigoFinalizacion = () => {
         response: err.response?.data,
         status: err.response?.status,
       });
-      
-      if (err.code === 'ECONNABORTED') {
-        showMessage("Tiempo de espera agotado. Verifique su conexión e intente nuevamente.", true);
+
+      if (err.code === "ECONNABORTED") {
+        showMessage(
+          "Tiempo de espera agotado. Verifique su conexión e intente nuevamente.",
+          true
+        );
       } else {
         showMessage(
           err.response?.data?.message || "Error al verificar el código",
@@ -176,21 +184,21 @@ const VerificarCodigoFinalizacion = () => {
       const url = config.API_URL + config.ENTREGAS.CAMBIAR_ESTADO;
       const body = {
         entregaId: entrega_id,
-        estadoId: 3, 
-        repartidorId: repartidor_id
+        estadoId: 3,
+        repartidorId: repartidor_id,
       };
-      
+
       const axiosWithTimeout = axios.create({
-        timeout: 30000, 
+        timeout: 30000,
       });
-      
+
       const response = await axiosWithTimeout.patch(url, body, {
         headers: {
-          'Authorization': `Bearer ${await SecureStore.getItemAsync('token')}`,
-          'Content-Type': 'application/json',
-        }
+          Authorization: `Bearer ${await SecureStore.getItemAsync("token")}`,
+          "Content-Type": "application/json",
+        },
       });
-      
+
       if (response.data.status === "Ok") {
         setTimeLeft(60);
         setCanResend(false);
@@ -199,11 +207,17 @@ const VerificarCodigoFinalizacion = () => {
           false
         );
       } else {
-        showMessage(response.data.message || "Error al reenviar el código", true);
+        showMessage(
+          response.data.message || "Error al reenviar el código",
+          true
+        );
       }
     } catch (err) {
-      if (err.code === 'ECONNABORTED') {
-        showMessage("Tiempo de espera agotado. Verifique su conexión e intente nuevamente.", true);
+      if (err.code === "ECONNABORTED") {
+        showMessage(
+          "Tiempo de espera agotado. Verifique su conexión e intente nuevamente.",
+          true
+        );
       } else {
         showMessage(
           err.response?.data?.message || "Error al reenviar el código",
@@ -252,10 +266,14 @@ const VerificarCodigoFinalizacion = () => {
               Hemos enviado un código de finalización a tu correo
             </Text>
             <View style={styles.entregaInfo}>
-              <Text style={[styles.entregaText, { color: currentTheme.accent }]}>
+              <Text
+                style={[styles.entregaText, { color: currentTheme.accent }]}
+              >
                 Cliente: {cliente}
               </Text>
-              <Text style={[styles.entregaText, { color: currentTheme.accent }]}>
+              <Text
+                style={[styles.entregaText, { color: currentTheme.accent }]}
+              >
                 Producto: {producto}
               </Text>
             </View>
@@ -333,7 +351,12 @@ const VerificarCodigoFinalizacion = () => {
           animationType="fade"
           transparent={true}
           visible={isModalVisible}
-          onRequestClose={() => setIsModalVisible(false)}
+          onRequestClose={() => {
+            setIsModalVisible(false);
+            if (message && !message.isError) {
+              navigation.navigate("Main");
+            }
+          }}
         >
           <Pressable
             style={styles.modalOverlay}
@@ -497,4 +520,4 @@ const styles = StyleSheet.create({
   },
 });
 
-export default VerificarCodigoFinalizacion; 
+export default VerificarCodigoFinalizacion;

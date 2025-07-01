@@ -11,6 +11,7 @@ import {
   Image,
   Platform,
   Animated,
+  LogBox,
 } from "react-native";
 import { SafeAreaProvider, SafeAreaView } from "react-native-safe-area-context";
 import { LinearGradient } from "expo-linear-gradient";
@@ -36,13 +37,18 @@ import ProfileScreen from "./src/screens/Profilescreen";
 import { ThemeProvider, useTheme } from "./src/context/ThemeContext";
 import { theme } from "./src/styles/theme";
 import { Provider as PaperProvider } from "react-native-paper";
-import { navigationRef } from './src/Components/NavigationService';
+import { navigationRef } from "./src/Components/NavigationService";
 import QRScanner from "./src/Components/QRScanner";
 import FinalizarEntregaScreen from "./src/screens/FinalizarEntregaScreen";
 
 import VerificarCodigoFinalizacion from "./src/screens/VerificarCodigoFinalizacion";
 
 import { UserAreaProvider } from "./src/context/UserAreaContext";
+
+// Ignorar el mensaje específico de notificaciones
+LogBox.ignoreLogs([
+  "Android Push notifications (remote notifications) functionality provided by expo-notifications",
+]);
 
 const Stack = createNativeStackNavigator();
 const { width, height } = Dimensions.get("window");

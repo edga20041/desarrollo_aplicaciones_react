@@ -7,10 +7,10 @@ import {
   ActivityIndicator,
   Alert,
   Platform,
-  Linking
+  Linking,
 } from "react-native";
 import { useNavigation } from "@react-navigation/native";
-import axiosInstance from '../axiosInstance';
+import axiosInstance from "../axiosInstance";
 import config from "../config/config";
 import { useTheme } from "../context/ThemeContext";
 import { theme } from "../styles/theme";
@@ -20,19 +20,19 @@ import axios from "axios";
 import * as SecureStore from "expo-secure-store";
 
 const openRouteInMaps = (latO, lngO, latD, lngD) => {
-  const origin      = `${latO},${lngO}`;
+  const origin = `${latO},${lngO}`;
   const destination = `${latD},${lngD}`;
 
-  const iosURL     = `comgooglemaps://?saddr=${origin}&daddr=${destination}&directionsmode=driving`;
+  const iosURL = `comgooglemaps://?saddr=${origin}&daddr=${destination}&directionsmode=driving`;
   const androidURL = `google.navigation:q=${destination}&mode=d`;
-  const webURL     = `https://www.google.com/maps/dir/?api=1&origin=${origin}&destination=${destination}&travelmode=driving`;
-  const url        = Platform.OS === "ios" ? iosURL : androidURL;
+  const webURL = `https://www.google.com/maps/dir/?api=1&origin=${origin}&destination=${destination}&travelmode=driving`;
+  const url = Platform.OS === "ios" ? iosURL : androidURL;
 
   Linking.canOpenURL(url)
-    .then(supported =>
+    .then((supported) =>
       supported ? Linking.openURL(url) : Linking.openURL(webURL)
     )
-    .catch(err => console.error("Error al abrir rutas en Maps:", err));
+    .catch((err) => console.error("Error al abrir rutas en Maps:", err));
 };
 
 const EntregaEnProgreso = ({ refresh, renderHeader }) => {
@@ -54,9 +54,10 @@ const EntregaEnProgreso = ({ refresh, renderHeader }) => {
       const response = await axiosInstance.get(config.ENTREGAS.EN_PROGRESO);
       setEntrega(response.data);
 
-      
       if (response.data && response.data.rutaId) {
-        const rutaUrl = config.API_URL + config.RUTAS.GET_BY_ID.replace("{ruta_id}", response.data.rutaId);
+        const rutaUrl =
+          config.API_URL +
+          config.RUTAS.GET_BY_ID.replace("{ruta_id}", response.data.rutaId);
         const rutaRes = await axiosInstance.get(rutaUrl);
         setDetalleRuta(rutaRes.data);
       } else {
@@ -75,46 +76,60 @@ const EntregaEnProgreso = ({ refresh, renderHeader }) => {
     if (entrega) {
       try {
         setEnviandoEmail(true);
-        
+
         Alert.alert(
           "Enviando código",
           "Aguarde mientras se envía el código de finalización a su correo electrónico...",
-          [],
+          [
+            {
+              text: "OK",
+              onPress: () => {}, // No hacemos nada al presionar OK, solo para confirmar
+              style: "default",
+            },
+          ],
           { cancelable: false }
         );
-        
+
         const url = config.API_URL + config.ENTREGAS.CAMBIAR_ESTADO;
         const body = {
           entregaId: entrega.id,
-          estadoId: 3, 
-          repartidorId: entrega.repartidorId
+          estadoId: 3,
+          repartidorId: entrega.repartidorId,
         };
-        
+
         const axiosWithTimeout = axios.create({
-          timeout: 30000, 
+          timeout: 30000,
         });
-        
+
         const response = await axiosWithTimeout.patch(url, body, {
           headers: {
-            'Authorization': `Bearer ${await SecureStore.getItemAsync('token')}`,
-            'Content-Type': 'application/json',
-          }
+            Authorization: `Bearer ${await SecureStore.getItemAsync("token")}`,
+            "Content-Type": "application/json",
+          },
         });
-        
+
         if (response.data.status === "Ok") {
-          navigation.navigate("VerificarCodigoFinalizacion", {
-            entrega_id: entrega.id,
-            repartidor_id: entrega.repartidorId,
-            cliente: entrega.cliente,
-            producto: entrega.producto,
-          });
+          setTimeout(() => {
+            navigation.navigate("VerificarCodigoFinalizacion", {
+              entrega_id: entrega.id,
+              repartidor_id: entrega.repartidorId,
+              cliente: entrega.cliente,
+              producto: entrega.producto,
+            });
+          }, 500);
         } else {
-          Alert.alert("Error", response.data.message || "Error al enviar el código de finalización");
+          Alert.alert(
+            "Error",
+            response.data.message || "Error al enviar el código de finalización"
+          );
         }
       } catch (error) {
         console.error("Error al finalizar entrega:", error);
-        if (error.code === 'ECONNABORTED') {
-          Alert.alert("Error", "Tiempo de espera agotado. Verifique su conexión e intente nuevamente.");
+        if (error.code === "ECONNABORTED") {
+          Alert.alert(
+            "Error",
+            "Tiempo de espera agotado. Verifique su conexión e intente nuevamente."
+          );
         } else {
           Alert.alert("Error", "No se pudo enviar el código de finalización");
         }
@@ -139,10 +154,16 @@ const EntregaEnProgreso = ({ refresh, renderHeader }) => {
   return (
     <>
       {renderHeader && renderHeader(true)}
-      <View style={[styles.container, { backgroundColor: currentTheme.cardBg }]}>
+      <View
+        style={[styles.container, { backgroundColor: currentTheme.cardBg }]}
+      >
         <View style={styles.header}>
           <View style={styles.statusContainer}>
-            <Icon source="truck-delivery" size={24} color={currentTheme.accent} />
+            <Icon
+              source="truck-delivery"
+              size={24}
+              color={currentTheme.accent}
+            />
             <Text style={[styles.statusText, { color: currentTheme.accent }]}>
               En Progreso
             </Text>
@@ -163,7 +184,11 @@ const EntregaEnProgreso = ({ refresh, renderHeader }) => {
           </View>
 
           <View style={styles.infoRow}>
-            <Icon source="package-variant" size={20} color={currentTheme.accent} />
+            <Icon
+              source="package-variant"
+              size={20}
+              color={currentTheme.accent}
+            />
             <Text style={[styles.infoText, { color: currentTheme.cardText }]}>
               {entrega.producto}
             </Text>
@@ -185,8 +210,10 @@ const EntregaEnProgreso = ({ refresh, renderHeader }) => {
             onPress={() => {
               if (
                 detalleRuta &&
-                detalleRuta.latitudOrigen && detalleRuta.longitudOrigen &&
-                detalleRuta.latitudDestino && detalleRuta.longitudDestino
+                detalleRuta.latitudOrigen &&
+                detalleRuta.longitudOrigen &&
+                detalleRuta.latitudDestino &&
+                detalleRuta.longitudDestino
               ) {
                 openRouteInMaps(
                   detalleRuta.latitudOrigen,
@@ -195,7 +222,10 @@ const EntregaEnProgreso = ({ refresh, renderHeader }) => {
                   detalleRuta.longitudDestino
                 );
               } else {
-                Alert.alert("Error", "No se encontraron las coordenadas de la ruta.");
+                Alert.alert(
+                  "Error",
+                  "No se encontraron las coordenadas de la ruta."
+                );
               }
             }}
           >
@@ -211,7 +241,7 @@ const EntregaEnProgreso = ({ refresh, renderHeader }) => {
             style={[
               styles.actionButton,
               { backgroundColor: "#4CAF50" },
-              enviandoEmail && { opacity: 0.6 }
+              enviandoEmail && { opacity: 0.6 },
             ]}
             onPress={handleFinalizarEntrega}
             disabled={enviandoEmail}
@@ -223,10 +253,14 @@ const EntregaEnProgreso = ({ refresh, renderHeader }) => {
               style={styles.actionIcon}
             />
             {enviandoEmail ? (
-              <ActivityIndicator size="small" color="#fff" style={{ marginLeft: 8 }} />
+              <ActivityIndicator
+                size="small"
+                color="#fff"
+                style={{ marginLeft: 8 }}
+              />
             ) : null}
             <Text style={styles.actionText}>
-              {enviandoEmail ? 'Enviando...' : 'Finalizar'}
+              {enviandoEmail ? "Enviando..." : "Finalizar"}
             </Text>
           </Pressable>
         </View>
@@ -323,28 +357,28 @@ const styles = StyleSheet.create({
     fontSize: 16,
     fontWeight: "bold",
   },
-actionButtons: {
-  flexDirection: "row",
-  justifyContent: "space-between",
-  marginTop: 12,
-},
-actionButton: {
-  flex: 1,
-  flexDirection: "row",
-  alignItems: "center",
-  justifyContent: "center",
-  paddingVertical: 14,
-  borderRadius: 12,
-  marginHorizontal: 10,  
-},
-actionIcon: {
-  marginRight: 8,
-},
-actionText: {
-  color: "#fff",
-  fontSize: 16,
-  fontWeight: "600",
-},
+  actionButtons: {
+    flexDirection: "row",
+    justifyContent: "space-between",
+    marginTop: 12,
+  },
+  actionButton: {
+    flex: 1,
+    flexDirection: "row",
+    alignItems: "center",
+    justifyContent: "center",
+    paddingVertical: 14,
+    borderRadius: 12,
+    marginHorizontal: 10,
+  },
+  actionIcon: {
+    marginRight: 8,
+  },
+  actionText: {
+    color: "#fff",
+    fontSize: 16,
+    fontWeight: "600",
+  },
 });
 
-export default EntregaEnProgreso; 
+export default EntregaEnProgreso;
