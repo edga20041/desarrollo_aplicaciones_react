@@ -33,7 +33,7 @@ const MainScreen = () => {
   const [refreshEntregas, setRefreshEntregas] = useState(0);
   const [scaleAnim] = useState(new Animated.Value(1));
   const { isDarkMode } = useTheme();
-  const { userArea } = useUserArea();
+  const { userArea, updateUserArea } = useUserArea();
   const currentTheme = theme[isDarkMode ? "dark" : "light"];
 
   const animatePress = () => {
@@ -75,6 +75,9 @@ const MainScreen = () => {
             "userName",
             response.data.name || "Usuario"
           );
+          if (response.data.area) {
+            updateUserArea(response.data.area);
+          }
         }
       } catch (error) {
         console.error("Error fetching user profile:", error);
@@ -318,22 +321,22 @@ const MainScreen = () => {
                             } else {
                               return (
                                 <>
-                                <Text
-                                  style={[
-                                    styles.sectionTitle,
-                                    { color: currentTheme.text },
-                                  ]}
-                                >
-                                  Entrega{" "}
                                   <Text
-                                    style={{
-                                      color: currentTheme.accent,
-                                      fontWeight: "bold",
-                                    }}
+                                    style={[
+                                      styles.sectionTitle,
+                                      { color: currentTheme.text },
+                                    ]}
                                   >
-                                    {userArea ? "Recomendada" : "Siguiente"}
+                                    Entrega{" "}
+                                    <Text
+                                      style={{
+                                        color: currentTheme.accent,
+                                        fontWeight: "bold",
+                                      }}
+                                    >
+                                      {userArea ? "Recomendada" : "Siguiente"}
+                                    </Text>
                                   </Text>
-                                </Text>
                                   <EntregasPendientes
                                     refresh={refreshEntregas}
                                     limitItems={1}
