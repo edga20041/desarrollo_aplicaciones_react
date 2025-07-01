@@ -33,13 +33,6 @@ import Geocoder from "react-native-geocoding";
 import config from "./src/config/config";
 import DetalleEntregaPendiente from "./src/Components/DetalleEntregaPendiente";
 import ProfileScreen from "./src/screens/Profilescreen";
-import {
-  configureNotifications,
-  requestNotificationPermissions,
-  startPeriodicNotifications,
-  stopPeriodicNotifications,
-  isNotificationServiceRunning,
-} from "./src/service/NotificationService";
 import { ThemeProvider, useTheme } from "./src/context/ThemeContext";
 import { theme } from "./src/styles/theme";
 import { Provider as PaperProvider } from "react-native-paper";

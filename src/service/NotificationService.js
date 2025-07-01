@@ -41,10 +41,16 @@ export async function startPeriodicNotifications(intervalMinutes = 1) {
     try {
       const { data: count } = await axios.get(API_COUNT, config);
       console.log("[Notification] Count recibido:", count);
-      if (count > 0) {
+      if (count === 1) {
+        await sendNotification(
+          "¡NUEVO PEDIDO DISPONIBLE!",
+          `Apareció ${count} pedido nuevo, revisa 'Ver Entregas' para completarlo.`
+        );
+        console.log("[Notification] Disparada por 1 pedido");
+      } else if (count > 1) {
         await sendNotification(
           "¡NUEVOS PEDIDOS DISPONIBLES!",
-          `Aparecieron ${count} pedidos nuevos, revisa 'Ver Entregas' para completar uno de ellos.`
+          `Aparecieron ${count} pedidos nuevos, revisa 'Ver Entregas' para completarlos.`
         );
         console.log(`[Notification] Disparada por ${count} pedido(s)`);
       }

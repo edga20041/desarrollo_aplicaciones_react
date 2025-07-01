@@ -119,7 +119,7 @@ const LoginAuth = () => {
         await configureNotifications();
         const granted = await requestNotificationPermissions();
         if (granted) {
-          startPeriodicNotifications(3); // polling cada 3 minuto
+          startPeriodicNotifications(2); // polling cada 2 minuto
         }
 
         if (name) {
