@@ -42,6 +42,7 @@ const EntregaEnProgreso = ({ refresh, renderHeader }) => {
   const [enviandoEmail, setEnviandoEmail] = useState(false);
   const { isDarkMode } = useTheme();
   const currentTheme = theme[isDarkMode ? "dark" : "light"];
+  const [detalleRuta, setDetalleRuta] = useState(null);
 
   useEffect(() => {
     fetchEntregaEnProgreso();
@@ -52,9 +53,19 @@ const EntregaEnProgreso = ({ refresh, renderHeader }) => {
       setLoading(true);
       const response = await axiosInstance.get(config.ENTREGAS.EN_PROGRESO);
       setEntrega(response.data);
+
+      // Si hay entrega, busca la ruta
+      if (response.data && response.data.rutaId) {
+        const rutaUrl = config.API_URL + config.RUTAS.GET_BY_ID.replace("{ruta_id}", response.data.rutaId);
+        const rutaRes = await axiosInstance.get(rutaUrl);
+        setDetalleRuta(rutaRes.data);
+      } else {
+        setDetalleRuta(null);
+      }
     } catch (error) {
       console.log("No hay entrega en progreso o error:", error.message);
       setEntrega(null);
+      setDetalleRuta(null);
     } finally {
       setLoading(false);
     }
@@ -171,11 +182,22 @@ const EntregaEnProgreso = ({ refresh, renderHeader }) => {
               styles.actionButton,
               { backgroundColor: currentTheme.accent },
             ]}
-            onPress={() =>
-              navigation.navigate("DetalleEntregaHistorial", {
-                entrega_id: entrega.id,
-              })
-            }
+            onPress={() => {
+              if (
+                detalleRuta &&
+                detalleRuta.latitudOrigen && detalleRuta.longitudOrigen &&
+                detalleRuta.latitudDestino && detalleRuta.longitudDestino
+              ) {
+                openRouteInMaps(
+                  detalleRuta.latitudOrigen,
+                  detalleRuta.longitudOrigen,
+                  detalleRuta.latitudDestino,
+                  detalleRuta.longitudDestino
+                );
+              } else {
+                Alert.alert("Error", "No se encontraron las coordenadas de la ruta.");
+              }
+            }}
           >
             <Icon
               source="map-marker-outline"
