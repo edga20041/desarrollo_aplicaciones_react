@@ -6,6 +6,8 @@ import {
   Pressable,
   ActivityIndicator,
   Alert,
+  Platform,
+  Linking
 } from "react-native";
 import { useNavigation } from "@react-navigation/native";
 import axiosInstance from '../axiosInstance';
@@ -16,6 +18,22 @@ import { Icon } from "react-native-paper";
 import { formatDate } from "../utils/dateFormatter";
 import axios from "axios";
 import * as SecureStore from "expo-secure-store";
+
+const openRouteInMaps = (latO, lngO, latD, lngD) => {
+  const origin      = `${latO},${lngO}`;
+  const destination = `${latD},${lngD}`;
+
+  const iosURL     = `comgooglemaps://?saddr=${origin}&daddr=${destination}&directionsmode=driving`;
+  const androidURL = `google.navigation:q=${destination}&mode=d`;
+  const webURL     = `https://www.google.com/maps/dir/?api=1&origin=${origin}&destination=${destination}&travelmode=driving`;
+  const url        = Platform.OS === "ios" ? iosURL : androidURL;
+
+  Linking.canOpenURL(url)
+    .then(supported =>
+      supported ? Linking.openURL(url) : Linking.openURL(webURL)
+    )
+    .catch(err => console.error("Error al abrir rutas en Maps:", err));
+};
 
 const EntregaEnProgreso = ({ refresh, renderHeader }) => {
   const navigation = useNavigation();
@@ -147,30 +165,43 @@ const EntregaEnProgreso = ({ refresh, renderHeader }) => {
             </Text>
           </View>
         </View>
-
-        <Pressable
-          style={[
-            styles.finalizarButton, 
-            { 
-              backgroundColor: enviandoEmail ? currentTheme.accent + "50" : currentTheme.accent,
-              opacity: enviandoEmail ? 0.7 : 1
+        <View style={styles.actionButtons}>
+          <Pressable
+            style={[
+              styles.actionButton,
+              { backgroundColor: currentTheme.accent },
+            ]}
+            onPress={() =>
+              navigation.navigate("DetalleEntregaHistorial", {
+                entrega_id: entrega.id,
+              })
             }
-          ]}
-          onPress={handleFinalizarEntrega}
-          disabled={enviandoEmail}
-        >
-          {enviandoEmail ? (
-            <>
-              <ActivityIndicator size="small" color="#FFFFFF" />
-              <Text style={styles.finalizarButtonText}>Enviando código...</Text>
-            </>
-          ) : (
-            <>
-              <Icon source="check-circle" size={20} color="#FFFFFF" />
-              <Text style={styles.finalizarButtonText}>Finalizar Entrega</Text>
-            </>
-          )}
-        </Pressable>
+          >
+            <Icon
+              source="map-marker-outline"
+              size={20}
+              color="#fff"
+              style={styles.actionIcon}
+            />
+            <Text style={styles.actionText}>Ver mapa</Text>
+          </Pressable>
+          <Pressable
+            style={[
+              styles.actionButton,
+              { backgroundColor: "#4CAF50" },
+            ]}
+            onPress={handleFinalizarEntrega}
+            disabled={enviandoEmail}
+          >
+            <Icon
+              source="check-circle"
+              size={20}
+              color="#fff"
+              style={styles.actionIcon}
+            />
+            <Text style={styles.actionText}> Completado</Text>
+          </Pressable>
+        </View>
       </View>
     </>
   );
@@ -264,6 +295,28 @@ const styles = StyleSheet.create({
     fontSize: 16,
     fontWeight: "bold",
   },
+actionButtons: {
+  flexDirection: "row",
+  justifyContent: "space-between",
+  marginTop: 12,
+},
+actionButton: {
+  flex: 1,
+  flexDirection: "row",
+  alignItems: "center",
+  justifyContent: "center",
+  paddingVertical: 14,
+  borderRadius: 12,
+  marginHorizontal: 10,  
+},
+actionIcon: {
+  marginRight: 8,
+},
+actionText: {
+  color: "#fff",
+  fontSize: 16,
+  fontWeight: "600",
+},
 });
 
 export default EntregaEnProgreso; 
